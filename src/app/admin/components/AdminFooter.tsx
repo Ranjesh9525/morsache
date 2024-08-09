@@ -24,8 +24,8 @@ const AdminFooter = (props: Props) => {
       >
         <section className="flex  items-center gap-4">
           {" "}
-          {links.map((link) => (
-            <Link className="text-[12.5px]" href={link.href}>
+          {links.map((link,index) => (
+            <Link key={index} className="text-[12.5px]" href={link.href}>
               {link.title}
             </Link>
           ))}
