@@ -3,10 +3,11 @@ import AdsPromotions from "@/components/home/AdsPromotions";
 import DisplayNewAndTrending from "@/components/home/displayProducts/DisplayNewAndTrending";
 import DisplayProductsByCategory from "@/components/home/displayProducts/DisplayProductsByCategory";
 import HeaderAds from "@/components/home/HeaderAds";
-import RecentlyViewed from "@/components/home/RecentlyViewed";
+import RecentlyViewed from "@/components/general/RecentlyViewed";
 import Slider from "@/components/home/slider/Slider";
 import HomeLayout from "@/components/layouts/HomeLayout";
 import Image from "next/image";
+import Protected from "@/_hooks/useProtected";
 
 export default function Home() {
   const category=[
@@ -194,9 +195,9 @@ const defaultTabs= [
   ];
 
   return (
-    <>
-    <title>Morsache Clothing</title>
-    <HomeLayout>
+    <Protected>
+
+    <HomeLayout title="Morsache Clothing">
       <Slider />
       <DisplayNewAndTrending defaultTabs={defaultTabs} />
       <DisplayProductsByCategory category={category[0]} />
@@ -206,6 +207,6 @@ const defaultTabs= [
       <DisplayNewAndTrending defaultTabs={defaultTabs} />
       <RecentlyViewed/>
     </HomeLayout>
-    </>
+    </Protected>
   );
 }

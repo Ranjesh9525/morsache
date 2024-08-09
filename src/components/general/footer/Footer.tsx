@@ -1,6 +1,15 @@
+import { Input } from "@/components/ui/input";
+import { Send, SendHorizontal } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { FaInstagram,FaFacebook,FaYoutube,FaLinkedinIn,FaTwitter } from "react-icons/fa6";
+import { CiMail } from "react-icons/ci";
+import {
+  FaInstagram,
+  FaFacebook,
+  FaYoutube,
+  FaLinkedinIn,
+  FaTwitter,
+} from "react-icons/fa6";
 
 type Props = {};
 
@@ -10,7 +19,9 @@ const Footer = (props: Props) => {
       <div className="p-9">
         <section className="grid grid-cols-4 gap-6 py-4">
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">Offline Store</h1>
+            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+              Offline Store
+            </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
                 <Link href="#">Find Stores Near Me</Link>
@@ -18,7 +29,9 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">Get to know us</h1>
+            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+              Get to know us
+            </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
                 <Link href="#">Contact Us</Link>
@@ -35,7 +48,9 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">TRACK OR RETURN/EXCHANGE ORDER</h1>
+            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+              TRACK OR RETURN/EXCHANGE ORDER
+            </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
                 <Link href="#"> TRACK ORDER</Link>
@@ -49,7 +64,9 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">CUSTOMER CARE</h1>
+            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+              CUSTOMER CARE
+            </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">Timings: 10 AM - 7 PM (Mon - Sat)</li>
               <li className="mb-2">
@@ -62,18 +79,26 @@ const Footer = (props: Props) => {
 
         <section className="my-6">
           <span>
-            <h1 className="text-[15px] uppercase tracking-wider mb-4"> Sign up and save</h1>
+            <h1 className="text-[15px] uppercase tracking-wider mb-4">
+              {" "}
+              Sign up and save
+            </h1>
             <p className="text-[11.5px]">
               Sign up now and be the first to know about exclusive offers,
               latest fashion trends {"&"} style tips!
             </p>
           </span>
-          <div id="email">
-            
+          <div id="email" className="w-fit flex items-center my-3 relative">
+            <Input
+              type="text"
+              placeholder="Enter your email"
+              className="min-w-[280px] border-t-none border-x-none rounded-none border-t-0 pl-0 border-x-0 border-b-2 border-b-gray-900 focus-visible:outline-none focus-visible:ring-0 placeholder:text-[11.5px] "
+            />{" "}
+            <CiMail className="cursor-pointer absolute right-0" size={23} />
           </div>
 
           <div id="socials" className="flex gap-3 my-4">
-            <FaInstagram size={28}/>
+            <FaInstagram size={28} />
             <FaFacebook size={28} />
             <FaYoutube size={28} />
             <FaTwitter size={28} />
@@ -81,10 +106,14 @@ const Footer = (props: Props) => {
           </div>
         </section>
         <section className="w-full flex items-center justify-center flex-col my-6 text-[12px]">
-         
-            <h1 >© 2024 MORSACHE</h1>
-            <h1 className="font-medium">Made in India, for the World 🌍</h1>
-       
+          <h1>© {new Date().getFullYear()} MORSACHE</h1>
+          <Link
+           href="https://www.github.com/a-ww2-er"
+           target={"_blank"}
+            className="font-medium cursor-pointer"
+          >
+            Made By a-ww2-er
+          </Link>
         </section>
       </div>
     </div>

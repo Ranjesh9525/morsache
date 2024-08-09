@@ -1,0 +1,74 @@
+
+export type category = {
+    name:string,
+    image:string,
+    tags:{
+        tag:string,
+        values:string[]
+    }[]
+}
+
+export const tShirtCategory:category={
+    name:"T-Shirts",
+    image:"/items/cut-leaf-navy-shirt2.jpg",
+    tags:[
+        {
+            tag:"size",
+            values:[
+                "S",
+                "M",
+                "L",
+                "XL",
+                "XXL"
+            ]
+        },
+        {
+            tag:"color",
+            values:[
+                "red",
+                "blue",
+                "green"
+            ]
+        },
+        {
+            tag:"material",
+            values:[
+                "cotton",
+                "polyester"
+            ]
+        },
+        {
+            tag:"gender",
+            values:[
+                "men",
+                "women",
+                "unisex"
+            ]
+        },
+        {
+            tag:"season",
+            values:[
+                "spring",
+                "summer",
+                "autumn",
+                "winter"
+            ]
+        },
+        {
+            tag:"style",
+            values:[
+                "casual",
+                "sport",
+                "formal"
+            ]
+        },
+        {
+            tag:"fit",
+            values:[
+                "slim",
+                "regular",
+                "oversize",
+            ]
+        }
+    ]
+}

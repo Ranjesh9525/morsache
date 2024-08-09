@@ -1,9 +1,10 @@
-import CombinedProvider from "@/context/contextProvider";
+import { Toaster } from "@/components/ui/toaster";
+import CombinedProvider from "@/context/Providers";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Raleway } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const raleway = Raleway({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Morsache Clothing",
@@ -16,10 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <CombinedProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-    </CombinedProvider>
+    <html lang="en">
+      <body className={raleway.className}>
+        <CombinedProvider>
+          <Toaster />
+          {children}
+        </CombinedProvider>
+      </body>
+    </html>
   );
 }

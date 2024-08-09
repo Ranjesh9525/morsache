@@ -4,7 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChevronDown } from "react-icons/fa6";
-import { User2 } from "lucide-react";
+import { ArrowRightIcon, User2 } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
+import { FaInstagram,FaFacebook,FaLinkedinIn,FaTwitter } from "react-icons/fa6";
+import { MdLogout} from "react-icons/md";
+
+
+
 
 type Props = {
   sideNav: { open: boolean };
@@ -16,6 +22,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
   const user = {
     role: "user",
   };
+  const { data: session }: any = useSession();
 
   const pathname = usePathname();
   const [navItems, setNavItems] = useState<any[]>([]);
@@ -26,71 +33,61 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
       section: [
         {
           name: "Morsache plus",
-          path: "/dashboard",
+          path: "/",
           showIfNotLoggedIn: false,
-          exact: true,
-        },
-      ],
-    },
-    {
-      sectionName: "store",
-      section: [
-        {
-          name: "shirt",
-          path: "/marketplace",
-          showIfNotLoggedIn: true,
           exact: true,
         },
         {
           name: "T-shirts",
-          path: "/marketplace/categories",
-          showIfNotLoggedIn: true,
-          exact: true,
-        },
-        {
-          name: "Trousers",
-          path: "/marketplace/cart",
-          showIfNotLoggedIn: true,
-          exact: true,
-        },
-        {
-          name: "Cargo pants",
-          path: "/marketplace/orders",
+          path: "/products/category/t-shirts",
           showIfNotLoggedIn: true,
           exact: true,
         },
       ],
-    },
+    },   
+    // {
+    //   sectionName: "Categories",
+    //   section: [
+    //     {
+    //       name: "T-shirts",
+    //       path: "/products/category/t-shirts",
+    //       showIfNotLoggedIn: true,
+    //       exact: true,
+    //     },
+    //     {
+    //       name: "Casual Shirts",
+    //       path: "/products/category/casual",
+    //       showIfNotLoggedIn: true,
+    //       exact: true,
+    //     },
+
+    //   ],
+    // },
     {
       sectionName: "",
       section: [
         {
           name: "Track order",
-          path: "/watchhub",
+          path: "/orders",
           showIfNotLoggedIn: true,
           exact: true,
         },
+       
         {
           name: "place a return / Exchange request",
-          path: "/courses",
+          path: "/return",
           showIfNotLoggedIn: true,
           exact: true,
         },
         {
           name: "customer support",
-          path: "/courses/me",
+          path: "/support",
           showIfNotLoggedIn: false,
           exact: true,
         },
         {
           name: "Visit store",
-          path: "/watchhub/history",
-          showIfNotLoggedIn: true,
-          exact: true,
-        },
-        {
-          name: "relove",
-          path: "/watchhub/history",
+          path: "/products",
           showIfNotLoggedIn: true,
           exact: true,
         },
@@ -132,8 +129,8 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
       setNavItems(userNavItems);
     } else {
       setNavItems(userNavItems);
-    }
-  }, []);
+    } 
+ }, []);
 
   return (
     <motion.div
@@ -151,19 +148,39 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
         variants={sideNavVariants}
         animate={sideNav.open ? "open" : "closed"}
       >
-        <div className="p-4 pl-6 pt-6 inline-flex items-center gap-2 font-light uppercase">
-          <User2
-            size={28}
-            className="bg-gray-300 font-light p-1 rounded-full"
-          />{" "}
-          Login
-        </div>
+        <span className="p-4 px-6 pt-6 inline-flex justify-between items-center w-full font-light uppercase">
+          {!session?.user ? (
+            <Link href="/auth/login" className="inline-flex font-semibold items-center gap-2">
+              {" "}
+              <User2
+                size={28}
+                className="bg-gray-300  p-[0.35rem] font-light rounded-full"
+              />{" "}
+              Login
+            </Link>
+          ) : (
+            <Link href="/account" className="inline-flex font-medium items-center gap-2">
+              {" "}
+              <User2
+                size={30}
+                className="bg-gray-300 font-light  p-[0.35rem] rounded-full"
+              />{" "}
+              My Account
+            </Link>
+          )}
+          <h1
+            className="text-lg font-medium cursor-pointer"
+            onClick={() => setSideNav({ open: false })}
+          >
+            X
+          </h1>
+        </span>
         <div
           className={
             "  h-screen text-text-theme-color overflow-y-hidden hover:overflow-y-auto  z-40 top-0 left-0  "
           }
         >
-          <section className=" flex flex-col gap-4 ">
+          <section className=" flex flex-col gap-4 justify-between h-full ">
             <ul className="flex flex-col py-2 px-3 text-lg font-medium uppercase">
               {navItems.map((items, itemsIndex) => {
                 const accordionOpen = openAccordions.find(
@@ -278,25 +295,26 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
                   </ul>
                 );
               })}
+              {session?.user && <button
+                    onClick={() => signOut()}
+                    className="flex items-center gap-3 uppercase text-text-theme-color text-[1.05rem] mt-2 font-light px-3 tracking-wider"
+                  >
+                   <p>Logout</p> <ArrowRightIcon size={21}/>
+                  </button>}
             </ul>
-            <div className="flex flex-col gap-4 pb-5 px-2">
-              {/* <SupportBox /> */}
-              {/* {sideNav.open ? (
-                  <button
-                    onClick={() => onLogout()}
-                    className="flex items-center gap-16  text-text-theme-color text-[1rem] font-light px-3"
-                  >
-                    <MdLogout className="text-red-600 w-4 h-4" /> <p>Logout</p>
-                  </button>
-                ) : (
-                  <button
-                    className="flex items-center px-2 w-full"
-                    onClick={() => onLogout()}
-                  >
-                    <MdLogout className="text-red-600 w-5 h-5 " />
-                  </button>
-                )} */}
+    
+            <div className="flex flex-row w-full pb-5 px-2">
+           
+              
+                  
+                
+                <span className=" w-full border-l-0 p-4"> <FaInstagram size={25}/></span>
+                <span className=" w-full p-4"> <FaFacebook size={25} /></span>
+                <span className=" w-full p-4"><FaTwitter size={25} /></span>
+                <span className=" w-full p-4"> <FaLinkedinIn size={25} /></span>
             </div>
+            
+                      <div>    </div>
           </section>
         </div>
       </motion.div>

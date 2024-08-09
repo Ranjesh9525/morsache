@@ -10,6 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { motion } from "framer-motion";
+import {useSession} from "next-auth/react"
+import {AiOutlineUser} from "react-icons/ai"
 
 type Props = {
   scrolling: boolean;
@@ -33,12 +35,14 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
       position: "static" as CustomPosition,
       y: 0,
       transition: {},
+   
     },
-
   };
 
+  const { data: session }: any = useSession();
+  console.log(session)
   return (
-    <div className="min-h-[40px]">
+    <div className="min-h-[36px]">
     <motion.div
       variants={navbarScrollVariants}
       initial={"noScroll"}
@@ -50,7 +54,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
         <span className=" w-full text-left ">
           <MenuIcon className="cursor-pointer" onClick={() => setSideNav({ open: true })} />
         </span>
-        <Link  href="/" className="text-4xl font-bold inline-flex  gap-2 items-center cursor-pointer">
+        <Link  href="/" className="text-4xl font-bold inline-flex uppercase  items-end tracking-wider cursor-pointer">
           {/* <TreePineIcon size={34} /> */}
           <Image
             src="/morsache-clothing-logo-small.png"
@@ -59,16 +63,16 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
             className={"w-[50px] h-[50px]"}
             alt="logo"
           />
-          Morsache
+          orsache
         </Link>
         <span id="icons" className="flex items-center justify-end gap-4 w-full">
-          <Link href={"/#"}>
-            <User />
-          </Link>
-          <Link href={"/#"}>
+         
+          {session?.user ?  <Link href={"/account"}><AiOutlineUser className="bg-gray-200 p-[0.35rem] h-[30px] w-[30px] rounded-[50%]" /> </Link> : <Link href={"/auth/login"}><User /> </Link>}
+         
+          <Link href={"/search"}>
             <Search />
           </Link>
-          <Link href={"/#"}>
+          <Link href={"/account/wishlist"}>
             <Heart />
           </Link>
           <Link href={"/cart"}>

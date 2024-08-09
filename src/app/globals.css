@@ -68,6 +68,9 @@
   }
 }
 
+title{
+  text-transform: capitalize !important;
+}
 
 .embla {
   position: relative;

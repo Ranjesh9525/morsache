@@ -1,0 +1,30 @@
+Wednesday-
+fully working cart done
+fixed side nav pages done
+fix product view page completely done
+role based access for pages done
+wishlist page X
+
+Thursday-
+admin view users X
+admin layout done
+admin upload product page X
+products page done
+404 page done
+search page done
+create orders done
+
+when checkout a cart sucessdully, then create an order for it so create orders schema and add it to user orders object X
+admin has orders page and can update orders status.he see all orders X
+
+Friday-
+admin charts working
+admin add team and admin team page
+admin category page
+return policy page
+admin edit return policy page page
+
+Thing to note:
+if admin is authenticated his call back url should be /admin
+users who's order status has been chnaged to delivered can leave a review for the product
+in admin users page make function for admin to email user (optional)
