@@ -37,7 +37,7 @@ const Footer = (props: Props) => {
                 <Link href="#">Contact Us</Link>
               </li>
               <li className="mb-2">
-                <Link href="#">FAQ's</Link>
+                <Link href="#">FAQ&#39;s</Link>
               </li>
               <li className="mb-2">
                 <Link href="#"></Link>

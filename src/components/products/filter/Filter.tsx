@@ -102,7 +102,7 @@ const Filter = ({ category }: Props) => {
         <div id="filters">
           <Accordion
             type="multiple"
-            defaultValue={...tShirtCategory.tags.map((i) => i.tag)}
+            defaultValue={[...tShirtCategory.tags.map((i) => i.tag)]}
           >
             {tShirtCategory.tags.map((tag, index) => {
               return (

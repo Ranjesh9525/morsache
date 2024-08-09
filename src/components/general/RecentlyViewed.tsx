@@ -1,21 +1,23 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 
 type Props = {};
 
 const RecentlyViewed = (props: Props) => {
+  const [recentProductsWithinThreeDays, setRecentProductsWithinThreeDays] =
+    useState<any[]>([]);
+  useEffect(() => {
+    const allViewedProducts = JSON.parse(
+      localStorage.getItem("recentlyViewed") || "[]"
+    );
+    const i = allViewedProducts.filter(
+      (product: any) => product.viewedOn > Date.now() - 259200000
+    );
+    setRecentProductsWithinThreeDays(i);
 
-  const allViewedProducts = JSON.parse(
-    localStorage.getItem("recentlyViewed") || "[]"
-  );
-  const recentProductsWithinThreeDays = allViewedProducts.filter(
-    (product: any) => product.viewedOn > Date.now() - 259200000
-  );
-  localStorage.setItem(
-    "recentlyViewed",
-    JSON.stringify(recentProductsWithinThreeDays)
-  );
+    localStorage.setItem("recentlyViewed", JSON.stringify(i));
+  }, []);
   // allViewedProducts.map((item: any) => {
   //   //if product was viewed over three days ago dont include it
   //   if (item.viewedOn > Date.now() - 259200000) {
@@ -30,9 +32,11 @@ const RecentlyViewed = (props: Props) => {
       </h1>
       <div id="tab-content" className="w-full grid gap-4 grid-cols-5 mb-8">
         {recentProductsWithinThreeDays.length > 0 &&
-          recentProductsWithinThreeDays.slice(0,5).map((item: any, index: number) => (
-            <ProductCard item={item} index={index} />
-          ))}
+          recentProductsWithinThreeDays
+            .slice(0, 5)
+            .map((item: any, index: number) => (
+              <ProductCard key={index} item={item} index={index} />
+            ))}
       </div>
     </div>
   );

@@ -113,9 +113,10 @@ const ProductInfo = ({ product }: Props) => {
       </h1>
       <div id="variants" className="flex items-center gap-4">
         {product.variants &&
-          product?.variants.map((item) => {
+          product?.variants.map((item,index) => {
             return (
               <Image
+              key={index}
                 onClick={() => setSelectedVariant(item.variant)}
                 src={item.image}
                 alt={`${item.variant} variant`}
@@ -141,9 +142,10 @@ const ProductInfo = ({ product }: Props) => {
         )}
         <section className="flex items-center gap-4">
           {product.sizes &&
-            product?.sizes.map((item) => {
+            product?.sizes.map((item,index) => {
               return (
                 <span
+                key={index}
                   onClick={() => setSelectedSize(item)}
                   className={cn(
                     "py-3 px-4 border text-[12px] font-light cursor-pointer border-gray-900 rounded-xl hover:text-white hover:bg-gray-900 hover:shadow-lg",
@@ -187,9 +189,9 @@ const ProductInfo = ({ product }: Props) => {
             <AccordionItem value="item-1">
               <AccordionTrigger>Offers</AccordionTrigger>
               <AccordionContent>
-                {product?.offers.map((item) => {
+                {product?.offers.map((item,index) => {
                   return (
-                    <span className="flex flex-col gap-2">
+                    <span   key={index} className="flex flex-col gap-2">
                       {" "}
                       <h1>{item.title}</h1>
                       <p>{item.description}</p>

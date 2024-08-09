@@ -17,7 +17,7 @@ const item = {
     "/items/brush-stroke-red-shirt1.jpg",
   ],
 };
-const page = (props: Props) => {
+const Page = (props: Props) => {
 
   const {cart,dispatch} = useContext(CartContext)!
 
@@ -75,4 +75,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;

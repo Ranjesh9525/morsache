@@ -31,6 +31,7 @@ const DisplayNewAndTrending = ({ defaultTabs }: Props) => {
         >
           {defaultTabs.map((item: (typeof defaultTabs)[0], index: number) => (
             <span
+            key={index}
               className={` border-gray-500 rounded-full p-2 text-[15px] border cursor-pointer px-6  ${
                 index === activeTab
                   ? "bg-slate-900 border-none text-white "
@@ -46,7 +47,7 @@ const DisplayNewAndTrending = ({ defaultTabs }: Props) => {
         <div id="tab-content" className="w-full grid gap-x-4 grid-cols-5 mb-8">
           {defaultTabs[activeTab].items.map(
             (item: (typeof defaultTabs)[0]["items"][0], index: number) => (
-              <ProductCard item={item} index={index} />
+              <ProductCard key={index} item={item} index={index} />
             )
           )}
         </div>

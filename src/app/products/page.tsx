@@ -15,8 +15,8 @@ const page = (props: Props) => {
        morsache Products
       </h1>
       <div className=" grid grid-cols-4 gap-4 p-9">
-        {allCategories.map((item) => (
-          <CategoryCard category={item} />
+        {allCategories.map((item,index) => (
+          <CategoryCard key={index} category={item} />
         ))}
       </div>
     </HomeLayout>

@@ -13,7 +13,7 @@ const page = (props: Props) => {
     <div className="h-full min-h-[70vh] p-9 space-y-4">
       <div id="header" className="space-y-2">
         <h1 className="text-4xl font-bold tracking-tight capitalize"> Hello Harivansh,</h1>
-        <p className="text-gray-500 text-[14px] "> Here's how morsache store has been doing</p>
+        <p className="text-gray-500 text-[14px] "> Here&#39;s how morsache store has been doing</p>
       </div>
       <Separator />
       <div id="page-content" className="grid grid-cols-7 gap-4 mt-4">

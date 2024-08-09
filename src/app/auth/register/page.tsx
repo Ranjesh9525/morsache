@@ -148,7 +148,7 @@ import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 // "SNITCH"
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const router = useRouter()
   const formSchema = z.object({
     firstName: z.string().min(2, {
@@ -286,4 +286,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
