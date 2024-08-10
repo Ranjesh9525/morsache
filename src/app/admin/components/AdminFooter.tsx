@@ -7,7 +7,7 @@ type Props = {};
 
 const AdminFooter = (props: Props) => {
   return (
-    <div id="footer" className="p-9 space-y-3">
+    <div id="footer" className="p-9 space-y-3  mt-auto">
       <Link href="/admin" className="inline-flex items-end uppercase">
         <Image
           src="/morsache-clothing-logo-small.png"

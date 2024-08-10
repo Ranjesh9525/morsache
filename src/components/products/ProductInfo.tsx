@@ -19,6 +19,13 @@ type Props = {
   product: Product;
 };
 
+ export function format(value: number): string {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+    }).format(value);
+  }
+
 const ProductInfo = ({ product }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
   const [selectedProduct, setSelectedProduct] = useState<CartItem | null>(null);
@@ -74,7 +81,7 @@ const ProductInfo = ({ product }: Props) => {
         )}
       </div>
       <div className="mt-5">
-        <h1 className="w-full text-[17px]">INR 1{product.price}0</h1>
+        <h1 className="w-full text-[17px]">{format(product.price)}</h1>
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
       <div id="discounts" className="w-[280px] mt-5 ">

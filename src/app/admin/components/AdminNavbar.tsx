@@ -166,12 +166,15 @@ const AdminNavbar = ({ scrolling }: Props) => {
               <NavigationMenuItem>
                 <Link href="/admin/users" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                   <Users size={20} className="mr-2"/> Users
+                   {/* <Users size={20} className="mr-2"/>  */}
+                   Users
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem> 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className=""><Box size={20} className="mr-2" />Orders</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="">
+                  {/* <Box size={20} className="mr-2" /> */}
+                  Orders</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {ordersComponents.map((component) => (
@@ -187,7 +190,9 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger><Cloud size={20} className="mr-2"/>Categories</NavigationMenuTrigger>
+                <NavigationMenuTrigger>
+                  {/* <Cloud size={20} className="mr-2"/> */}
+                  Categories</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {categoriesComponents.map((component) => (
@@ -203,7 +208,9 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger><LifeBuoy size={20} className="mr-2" />Products</NavigationMenuTrigger>
+                <NavigationMenuTrigger>
+                  {/* <LifeBuoy size={20} className="mr-2" /> */}
+                  Products</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {productsComponents.map((component) => (
@@ -219,7 +226,9 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="space-x-2"><Mail size={20}/><h1>Pages</h1></NavigationMenuTrigger>
+                <NavigationMenuTrigger className="space-x-2">
+                  {/* <Mail size={20}/> */}
+                  <h1>Pages</h1></NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {pagesComponents.map((component) => (

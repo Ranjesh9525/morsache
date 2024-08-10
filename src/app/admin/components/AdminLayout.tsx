@@ -100,9 +100,9 @@ const AdminLayout = ({title,description,keywords,children}: Props) => {
         keywords={keywords || "online courses,digital skills,marketing,social marketing"}
       />
       <div>
-        <div className="min-h-screen w-full relative">  
+        <div className="min-h-screen  w-full relative">  
           <Navbar scrolling={scrolling}  />
-          <main className="relative ">{children}</main>
+          <main className="relative">{children}</main>
           <Footer />
         </div>
       </div>

@@ -7,7 +7,7 @@ import HomeLayout from "@/components/layouts/HomeLayout";
 import { signIn, useSession } from "next-auth/react";
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { redirect } from "next/navigation";
 import OTPVerification from "../components/OTPVerification";
 import SignIn from "../components/SignIn";

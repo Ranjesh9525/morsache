@@ -2,6 +2,7 @@
 import { connectDB } from "@/utilities/DB";
 import mongoose from "mongoose";
 import ProductsModel from "../models/Products";
+import CategoryModel from "../models/Category";
 
 // Import the Product model
 
@@ -73,5 +74,20 @@ export const getProducts = async () => {
     return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error("Error fetching products:", error);
+  }
+};
+
+export const FetchAllCategories = async ({ id }: { id: string }) => {
+  try {
+    await connectDB();
+    const categories = await CategoryModel.find();
+    if (!categories) {
+      return null;
+    }
+    // console.log(categories);
+    return JSON.parse(JSON.stringify(categories));
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
   }
 };

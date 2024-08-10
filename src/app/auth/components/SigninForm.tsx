@@ -82,7 +82,7 @@ const SigninForm = ({ setEmail }: Props) => {
             render={({ field }) => (
               <FormItem className="items-center flex w-full flex-col justify-center">
                 <h1 className="uppercase font-semibold tracking-tight text-3xl">
-                  Login With Email
+                  Signin With Email
                 </h1>
                 <FormDescription className="text-[12px]">
                   Please fill in your email to continue

@@ -79,18 +79,6 @@ const OTPVerification = ({ email, setEmail }: Props) => {
             <InputOTPSlot index={5} />
           </InputOTPGroup>
         </InputOTP>
-        {/* <Input
-            id="code"
-            name="code"
-            type="number"
-            minLength={6}
-            maxLength={6}
-            required
-            className="block w-full px-4 py-2 text-sm text-gray-900 border border-gray-300 rounded-md shadow-sm "
-            placeholder="OTP"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          /> */}
 
         <span>
           <Button

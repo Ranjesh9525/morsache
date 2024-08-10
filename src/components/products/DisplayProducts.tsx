@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import {Product} from "@/@types/products.d";
+import { Product } from "@/@types/products.d";
 import ProductCard from "../general/ProductCard";
 import { ChevronDown, RectangleVertical } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -30,13 +30,14 @@ const DisplayProducts = (props: Props) => {
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
-const [viewAs,setViewAs] = React.useState<number>(4);
+  const [viewAs, setViewAs] = React.useState<number>(4);
 
   const items = [
     {
       id: "23",
       name: "elementary magenta plain pure linen shirt",
       price: "$20.00",
+      road:84,
       sizes: ["S", "M", "L", "XL"],
       images: [
         "/items/elementary-magenta-plain-pure-linen-shirt1.webp",
@@ -168,27 +169,68 @@ const [viewAs,setViewAs] = React.useState<number>(4);
         id="basic-filter-setting"
         className="flex items-center justify-between w-full mb-7"
       >
-        <section
-          className="text-[14px] flex items-center gap-2"
-         
-        >
-         <h1  onClick={() => server_insertSampleProducts()}> View as</h1>
-         <span className="flex border p-[0.15rem] cursor-pointer" onClick={() => setViewAs(2)}>
-         <RectangleVertical fill={viewAs ===2 ?"black" : "gray"} stroke={''} width={18}/>
-         <RectangleVertical fill={viewAs ===2 ?"black" : "gray"}  stroke={''} width={18}/>
-         </span>
-         <span className="flex border   p-[0.15rem] cursor-pointer" onClick={() => setViewAs(3)}>
-         <RectangleVertical fill={viewAs ===3 ?"black" : "gray"} stroke={''}  width={18}/>
-         <RectangleVertical fill={viewAs ===3 ?"black" : "gray"}  stroke={''}  width={18}/>
-         <RectangleVertical fill={viewAs ===3 ?"black" : "gray"}  stroke={''}  width={18}/>
-         </span>
-         <span className="flex border   p-[0.15rem] cursor-pointer" onClick={() => setViewAs(4)}>
-         <RectangleVertical fill={viewAs ===4 ?"black" : "gray"} stroke={''}  width={18}/>
-         <RectangleVertical fill={viewAs ===4 ?"black" : "gray"}  stroke={''}  width={18}/>
-         <RectangleVertical fill={viewAs ===4 ?"black" : "gray"} stroke={''}  width={18}/>
-         <RectangleVertical fill={viewAs ===4 ?"black" : "gray"}  stroke={''}  width={18}/>
-
-         </span>
+        <section className="text-[14px] flex items-center gap-2">
+          <h1 onClick={() => server_insertSampleProducts()}> View as</h1>
+          <span
+            className="flex border p-[0.15rem] cursor-pointer"
+            onClick={() => setViewAs(2)}
+          >
+            <RectangleVertical
+              fill={viewAs === 2 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+            <RectangleVertical
+              fill={viewAs === 2 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+          </span>
+          <span
+            className="flex border   p-[0.15rem] cursor-pointer"
+            onClick={() => setViewAs(3)}
+          >
+            <RectangleVertical
+              fill={viewAs === 3 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+            <RectangleVertical
+              fill={viewAs === 3 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+            <RectangleVertical
+              fill={viewAs === 3 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+          </span>
+          <span
+            className="flex border   p-[0.15rem] cursor-pointer"
+            onClick={() => setViewAs(4)}
+          >
+            <RectangleVertical
+              fill={viewAs === 4 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+            <RectangleVertical
+              fill={viewAs === 4 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+            <RectangleVertical
+              fill={viewAs === 4 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+            <RectangleVertical
+              fill={viewAs === 4 ? "black" : "gray"}
+              stroke={""}
+              width={18}
+            />
+          </span>
         </section>
         <section>
           <DropdownMenu>
@@ -223,9 +265,12 @@ const [viewAs,setViewAs] = React.useState<number>(4);
           </DropdownMenu>
         </section>
       </section>
-      <section id="products" className={`grid grid-cols-${viewAs} gap-x-4 gap-y-7`}>
+      <section
+        id="products"
+        className={`grid grid-cols-${viewAs} gap-x-4 gap-y-7`}
+      >
         {data
-          ? data.map((item:Product, index:number) => (
+          ? data.map((item: Product, index: number) => (
               <ProductCard
                 item={item}
                 index={index}
@@ -233,7 +278,7 @@ const [viewAs,setViewAs] = React.useState<number>(4);
                 isLoading={isPending}
               />
             ))
-          :  sampleProducts.map((item, index) => (
+          : sampleProducts.map((item, index) => (
               <ProductCard
                 item={item}
                 index={index}
