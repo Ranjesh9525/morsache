@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import PageHeadingText from "../../components/PageHeadingText";
 import { z } from "zod";
 import {
@@ -10,39 +10,63 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import { format } from "@/components/products/ProductInfo";
+import { cn } from "@/lib/utils";
+import { MdOutlineDiscount } from "react-icons/md";
+import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
+import ProductPreview from "../../components/ProductPreview";
+import { useToast } from "@/components/ui/use-toast";
 
 type Props = {};
 
 const page = (props: Props) => {
+  const [dragging, setDragging] = React.useState(false);
+  const [imageDimensions, setImageDimensions] = React.useState<any[]>([]);
+
   const productSchema = z.object({
     name: z.string(),
     description: z.string(),
     category: z.array(z.string()).nonempty(),
-    price: z.number(),
+    price: z.string(),
     slug: z.string(),
     exchangeAndReturnPolicy: z.string().optional(),
-    salePrice: z.number().optional(),
+    salePrice: z.string().optional(),
     sizes: z.array(z.string()).nonempty(),
     tags: z.array(z.string()).nonempty(),
     variants: z
       .array(z.object({ variant: z.string(), image: z.string() }))
       .nonempty(),
     offers: z
-      .array(z.object({ offer: z.string(), description: z.string() }))
-      .nonempty(),
+      .array(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+          description2: z.string().optional(),
+          discount: z.number(),
+        })
+      )
+      .optional(),
     images: z.array(z.string()).nonempty(),
-    rating: z.number().default(0),
-    purchasedQuantity: z.number().default(0),
-    stock: z.number(),
+    stock: z.string(),
     moreInformation: z.string().optional(),
-    isFeatured: z.boolean(),
   });
+  // rating: z.number().default(0).optional(),
+  // purchasedQuantity: z.number().default(0).optional(),
   // id: string;
   // name: string;
   // description: string;
@@ -63,6 +87,10 @@ const page = (props: Props) => {
   // moreInformation?:string;
   // createdAt?: Date;
   // updatedAt?: Date;
+  const variantInput = React.useRef<HTMLInputElement>(null);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [preview, setPreview] = React.useState(false);
+  const [dialogInput, setDialogInput] = React.useState("");
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -72,287 +100,717 @@ const page = (props: Props) => {
       offers: [],
       tags: [],
       images: [],
+      stock: "1",
     },
   });
-  const updateSelectedOptionArray = <T extends string | any,D extends string | any>(fieldValue:string[],itemToUpdate:string)=>{
-            if(fieldValue?.includes(itemToUpdate)){
-                return fieldValue.filter((item)=>item !== itemToUpdate)
-            }else{
-                return [...fieldValue,itemToUpdate]
-            }
+
+  function slugify(str: string) {
+    str = str.replace(/^\s+|\s+$/g, ""); // trim
+    str = str.toLowerCase();
+
+    // Replace spaces with -
+    str = str.replace(/\s+/g, "-");
+
+    // Remove special characters
+    str = str.replace(/[^\w\-]+/g, "");
+
+    return str;
   }
+  const updateSelectedOptionArray = (
+    fieldValue: string[],
+    itemToUpdate: string
+  ) => {
+    if (fieldValue.includes(itemToUpdate)) {
+      return fieldValue.filter((item) => item !== itemToUpdate);
+    } else {
+      return [...fieldValue, itemToUpdate];
+    }
+  };
   function onSubmit(values: z.infer<typeof productSchema>) {
-    console.log(values);
+    //save as draft to local storage
+    localStorage.setItem("product-draft", JSON.stringify(values));
+    setPreview(true);
+    console.log("submitted");
   }
+
+  const handleFileChange = (e: any, field: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        if (reader.readyState === 2) {
+          form.setValue("images", [
+            ...form.getValues("images"),
+            reader.result as string,
+          ]);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e: any) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = (e: any) => {
+    e.preventDefault();
+    setDragging(false);
+  };
+
+  const handleDrop = (e: any) => {
+    e.preventDefault();
+    setDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        form.setValue("images", [
+          ...form.getValues("images"),
+          reader.result as string,
+        ]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const { toast } = useToast();
+  useEffect(() => {
+    if (localStorage.getItem("product-draft")) {
+      toast({
+        variant: "default",
+        title: "Product draft found",
+        description: "You can upload or discard it",
+      });
+      setPreview(true);
+    }
+  }, []);
+  const handleImageLoad = (
+    index: number,
+    event: React.SyntheticEvent<HTMLImageElement>
+  ) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+    const newImageDimensions = [...imageDimensions];
+    newImageDimensions[index] = { width: naturalWidth, height: naturalHeight };
+    setImageDimensions(newImageDimensions);
+  };
   //FetchAllCategories
-  const categories = ["men", "unisex"];
-  const tags = ["washable", "grey","clean"];
-  const sizes = ["xl", "l","sm"];
+  const categories = ["men", "unisex", "women", "cite", "edef"];
+  const tags = ["washable", "grey", "clean"];
+  const sizes = ["xl", "l", "sm"];
   const variants = ["men", "unisex"];
+  const offers = [
+    {
+      title: "10% off",
+      description: "10% off new users discount",
+      description2: "only avaiable on new users",
+      discount: 10,
+      effect: "percentage",
+    },
+    {
+      title: "20% off",
+      description: "20% off all products for 6 months",
+      description2: "20% off all products for 6 months",
+      discount: 20,
+      effect: "percentage",
+    },
+    {
+      title: "50% off",
+      description: "Get 50% off when you buy 5 of the same product",
+      description2: "only avaiable for 5 of the same product",
+      discount: 10,
+      effect: "quantity",
+    },
+    {
+      title: "300INR off",
+      description: "Get 300INR off when you buy 2 of the same product",
+      description2: "only avaiable for 2 of the same product",
+      discount: 300,
+      effect: "flat",
+    },
+  ];
+  if (preview) {
+    return <ProductPreview />;
+  }
+
   return (
     <>
       <PageHeadingText
         pageHeading="Create Product"
         description="Create a new product to be uploaded on the morsache store"
       />
-      <div className="container mx-auto min-h-[70vh] py-10">
+      <div className="container mx-auto min-h-[70vh] py-10 ">
         {/* <DataTable columns={columns} data={randomData} /> */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full grid grid-cols-3  gap-6 items-start"
+            className="w-full space-y-12"
           >
-            <FormField
-              control={form.control}
-              name={"name" as never}
-              render={({ field }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    Product name
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    Please fill in your email to continue
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="what's should the product be called?" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name={"description" as never}
-              render={({ field }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    Product Description
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    Please fill in your email to continue
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="what's should the product be called?" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name={"price" as never}
-              render={({ field }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    Product Price
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    This price will not be used if you set a sale price
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="what's should the product be called?" type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"category" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    Category
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                  Please fill in a category, use a comma "," to insert more than one or
-                    select from below
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="categories this should be product under" {...field} />
-                  </FormControl>
-                  <div className="flex gap-2">
-                    {categories.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field.value.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          field.onChange(() => [...field.value, item]);
+            <div className="w-full grid grid-cols-3  gap-6 items-start">
+              <FormField
+                control={form.control}
+                name={"name" as never}
+                render={({ field }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      Product name
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      Please fill in your email to continue
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="what's should the product be called?"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          form.setValue("slug", slugify(e.target.value));
                         }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"sizes" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    sizes
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    Please fill in a size, use a comma "," to insert more than one or
-                    select from below
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="sizes avaliable for this product" {...field} />
-                  </FormControl>
-                  <div className="flex gap-2">
-                    {sizes.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field?.value?.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          field.onChange(() => {
-                            updateSelectedOptionArray<string[],string>(field.value,item)
-                        });
-                        }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-           
-            <FormField
-              control={form.control}
-              name={"salePrice" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    sale Price
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                  Set a the selling price for this product
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="How much should this sell for?" {...field} type="number" />
-                  </FormControl>
-                    {field.value && <p className="text-sm">{`It will be sold for ${format(field.value)} INR`}</p>}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"variants" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    variants
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    This is the same as colors, upload the types of the products ithe variant is a product ,paste the link here
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="sizes avaliable for this product" {...field} />
-                  </FormControl>
-                  <div className="flex gap-2">
-                    {sizes.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field.value.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          field.onChange(() => {
-                            updateSelectedOptionArray<string[],string>(field.value,item)
-                        });
-                        }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"slug" as never}
-              render={({ field }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    Product Slug
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    if no slug is set , it will be set automatically
-                  </FormDescription>
-                  <FormControl>
-                    <Input  {...field} value={form.getValues("name")?.replaceAll(" ","-")}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"category" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    Category
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                  Please fill in a category, use a comma "," to insert more than one or
-                    select from below
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="categories this should be product under" {...field} />
-                  </FormControl>
-                  <div className="flex gap-2">
-                    {categories.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field.value.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          field.onChange(() => [...field.value, item]);
-                        }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"tags" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    tags
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    Please fill in a Tag, use a comma "," to insert more than one or
-                    select from below
-                  </FormDescription>
-                  <FormControl>
-                    <Input placeholder="tags avaliable for this product" {...field} />
-                  </FormControl>
-                  <div className="flex gap-2">
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"description" as never}
+                render={({ field }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      Product Description
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      Describe this product in as much detail as possible
+                    </FormDescription>
+                    <FormControl>
+                      <Textarea placeholder="product description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"price" as never}
+                render={({ field }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      Product Price
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      This price will not be used if you set a sale price
+                    </FormDescription>
+                    <FormControl>
+                      <Input placeholder="0.00" type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"category" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      Category
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      Please fill in a category, use a comma "," to insert more
+                      than one or select from below
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="categories this should be product under"
+                        {...field}
+                      />
+                    </FormControl>
+                    <div className="flex gap-2">
+                      {categories.map((item, index) => (
+                        <Button
+                          type="button"
+                          variant={
+                            field.value.includes(item) ? "default" : "outline"
+                          }
+                          onClick={() => {
+                            const updatedValue = updateSelectedOptionArray(
+                              field.value,
+                              item
+                            );
+                            field.onChange(updatedValue);
+                          }}
+                          key={index}
+                        >
+                          {item}
+                        </Button>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"sizes" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      sizes
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      Please fill in a size, use a comma "," to insert more than
+                      one or select from below
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="sizes avaliable for this product"
+                        {...field}
+                      />
+                    </FormControl>
+                    <div className="flex gap-2">
+                      {sizes.map((item, index) => (
+                        <Button
+                          type="button"
+                          variant={
+                            field?.value?.includes(item) ? "default" : "outline"
+                          }
+                          onClick={() => {
+                            const updatedValue = updateSelectedOptionArray(
+                              field.value,
+                              item
+                            );
+                            field.onChange(updatedValue);
+                          }}
+                          key={index}
+                        >
+                          {item}
+                        </Button>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name={"salePrice" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <span className="capitalize font-medium items-center inline-flex gap-4 tracking-tight text-xl">
+                      <h1>Sale Price</h1>{" "}
+                      <h1 className="text-[#4e75b9] text-sm">Optional</h1>
+                    </span>
+                    <FormDescription className="text-[12px]">
+                      Set a the selling price for this product
+                    </FormDescription>
+                    <FormControl>
+                      <Input placeholder="0.00" {...field} type="number" />
+                    </FormControl>
+                    {field.value && (
+                      <p className="text-sm">{`It will be sold for ${format(
+                        field.value
+                      )} INR`}</p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"variants" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      variants
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      This is the same as colors, upload the types of the
+                      products ithe variant is a product ,paste the link here
+                    </FormDescription>
+                    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                      <DialogTrigger className="inline-block py-2 px-4 bg-[#d2d9e7] text-black whitespace-normal border rounded-md text-[13px]">
+                        Add Variant
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            Input a name and upload a picture
+                          </DialogTitle>
+                          <DialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your account and remove your data from our
+                            servers.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="w-full space-y-4">
+                          <Input
+                            className="w-full"
+                            placeholder="Variant name"
+                            onChange={(e) => {
+                              setDialogInput(e.target.value);
+                            }}
+                            value={dialogInput}
+                            ref={variantInput}
+                          />
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            disabled={!variantInput?.current?.value}
+                            id="file"
+                            className={cn("w-full")}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+
+                                reader.onload = (e: any) => {
+                                  if (reader.readyState === 2) {
+                                    form.setValue("variants", [
+                                      ...form.getValues("variants"),
+                                      {
+                                        variant: variantInput!.current!.value,
+                                        image: reader.result as string,
+                                      },
+                                    ]);
+                                    setOpenDialog(false);
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    {/* <FormControl>
+                      <Input
+                        placeholder="sizes avaliable for this product"
+                        {...field}
+                      />
+                    </FormControl> */}
+                    <div className="max-w-full mx-auto  overflow-hidden hover:overflow-x-auto whitespace-nowrap">
+                      {field.value.map((item: any, index: number) => (
+                        <div
+                          onClick={() =>
+                            form.setValue(
+                              "variants",
+                              form
+                                .getValues("variants")
+                                .filter(
+                                  (i: any) => i.variant !== item.variant
+                                ) as any
+                            )
+                          }
+                          className="cursor-pointer inline-block w-[4.3rem] h-[4.5rem] mr-4"
+                          key={index}
+                        >
+                          <Image
+                            src={item.image}
+                            alt=""
+                            className="object-cover w-full h-full"
+                            width={100}
+                            height={100}
+                          />
+                          <h1 className="text-[12px]">{item.variant}</h1>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"slug" as never}
+                render={({ field }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      Product Slug
+                    </h1>
+                    <FormDescription className={`text-[12px] text-red-400`}>
+                      if no slug is set , it will be set automatically. This is
+                      the product reference, setting an invalid slug will result
+                      in errors laters
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="Leave this field if you dont know what this is"
+                        {...field}
+                        // value={form.getValues("name")?.replaceAll(" ", "-")}
+                        // onChange={(e) => {
+                        //   field.onChange(form.getValues("name")?.replaceAll(" ", "-"));
+                        // }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name={"stock" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      stock in store
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      set the amount of stock availiable in store
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="How much is availiable?"
+                        {...field}
+                        type="number"
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"moreInformation" as never}
+                render={({ field }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <span className="capitalize font-medium items-center inline-flex gap-4 tracking-tight text-xl">
+                      <h1>Additional information</h1>{" "}
+                      <h1 className="text-[#4e75b9] text-sm">Optional</h1>
+                    </span>
+                    <FormDescription className="text-[12px]">
+                      This space is for any Additional information that you want
+                      to add
+                    </FormDescription>
+                    <FormControl>
+                      <Textarea
+                        placeholder="This field is optional"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name={"exchangeAndReturnPolicy" as never}
+                render={({ field }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <span className="capitalize font-medium items-center inline-flex gap-4 tracking-tight text-xl">
+                      <h1>Exchange and return policy</h1>{" "}
+                      <h1 className="text-[#4e75b9] text-sm">Optional</h1>
+                    </span>
+                    <FormDescription className="text-[12px]">
+                      Explain the return policy for this product
+                    </FormDescription>
+                    <FormControl>
+                      {/* <Input
+                      placeholder="what's should the product be called?"
+                      {...field}
+                    /> */}
+                      <Textarea
+                        placeholder="This field is optional"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"offers" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      offers
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      Select an offer from below, if you dont see the offer you
+                      want to add please add it first in the offers page
+                    </FormDescription>
+
+                    <FormControl></FormControl>
+
+                    <div className="max-w-full mx-auto  overflow-hidden hover:overflow-x-auto whitespace-nowrap">
+                      {offers.map((item, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            const updatedValue = () => {
+                              if (
+                                field.value.some(
+                                  (offer: { title: string }) =>
+                                    offer.title === item.title
+                                )
+                              ) {
+                                return field.value.filter(
+                                  (offer: { title: string }) =>
+                                    offer.title !== item.title
+                                );
+                              } else {
+                                return [...field.value, item];
+                              }
+                            };
+                            form.setValue("offers", updatedValue());
+                          }}
+                          className={cn(
+                            " cursor-pointer inline-block z-20  w-72 p-3 h-full text-[14px] break-words whitespace-normal bg-gray-200 rounded-lg mr-4",
+                            field.value.some(
+                              (offer: { title: string }) =>
+                                offer.title === item.title
+                            ) && "bg-[#4e75b9] text-white"
+                          )}
+                        >
+                          {" "}
+                          <span className="inline-flex gap-4 items-center">
+                            <p className="text-left font-medium text-[17px] uppercase">
+                              {item.title}
+                            </p>
+                            <MdOutlineDiscount size={20} />
+                          </span>
+                          <p className="text-left w-full">{item.description}</p>
+                          {item.description2 && (
+                            <p className="text-left">{item.description2}</p>
+                          )}
+                          <span className="inline-flex justify-between w-full">
+                            <p className="text-left">
+                              Discount:{item.discount}%
+                            </p>
+                            <p>Effect: {item.effect}</p>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"tags" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      tags
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      Please fill in a Tag, use a comma "," to insert more than
+                      one or select from below
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        placeholder="tags avaliable for this product"
+                        {...field}
+                      />
+                    </FormControl>
+                    <div className="flex gap-2">
+                      {tags.map((item, index) => (
+                        <Button
+                          type="button"
+                          variant={
+                            field?.value?.includes(item) ? "default" : "outline"
+                          }
+                          onClick={() => {
+                            const updatedValue = updateSelectedOptionArray(
+                              field.value,
+                              item
+                            );
+                            field.onChange(updatedValue);
+                          }}
+                          key={index}
+                        >
+                          {item}
+                        </Button>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name={"images" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <h1 className="capitalize font-medium tracking-tight text-xl">
+                      Upload images
+                    </h1>
+                    <FormDescription className="text-[12px]">
+                      The first image and second image would be used as the
+                      display images respectively
+                    </FormDescription>
+                    <FormControl>
+                      <div className="w-full">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          id="file"
+                          className="hidden"
+                          onChange={(e) => handleFileChange(e, field)}
+                        />
+                        {/* <p className="text-black dark:text-white text-left font-medium text-xl mb-2">
+                        Course Thumbnail:
+                      </p> */}
+                        <label
+                          htmlFor="file"
+                          className={`w-full min-h-[10vh] rounded-md dark:border-white border-[#00000026] p-3 border flex items-center justify-center ${
+                            dragging ? "bg-blue-500" : "bg-transparent"
+                          }`}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          <span className="text-black text-sm dark:text-white">
+                            Drag and drop your image here or click to browse
+                          </span>
+                        </label>
+                      </div>
+                    </FormControl>
+                    {form.getValues("images").length > 0 && (
+                      <div className="text-[12px] text-center">
+                        {" "}
+                        Click on an image to remove it
+                        <div className="grid grid-cols-3 gap-2">
+                          {form.getValues("images").map((img, index) => (
+                            <div key={index} className="w-full">
+                              {imageDimensions[index] && (
+                                <p className="text-[12px] mb-1">{`Image ${
+                                  index + 1
+                                } - ${imageDimensions[index].width} x ${
+                                  imageDimensions[index].height
+                                }`}</p>
+                              )}
+                              <img
+                                src={img}
+                                alt="image"
+                                onClick={() => {
+                                  form.setValue(
+                                    "images",
+                                    form
+                                      .getValues("images")
+                                      .filter((_img, i) => i !== index) as any
+                                  );
+                                }}
+                                onLoad={(e) => handleImageLoad(index, e)}
+                                className="max-h-full w-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {/* <div className="flex gap-2">
                     {tags.map((item, index) => (
                       <Button
                         type="button"
@@ -369,105 +827,35 @@ const page = (props: Props) => {
                         {item}
                       </Button>
                     ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={"tags" as never}
-              render={({ field }: { field: any }) => (
-                <FormItem className="items-start flex w-full flex-col justify-start">
-                  <h1 className="capitalize font-medium tracking-tight text-xl">
-                    tags
-                  </h1>
-                  <FormDescription className="text-[12px]">
-                    Please fill in a Tag, use a comma "," to insert more than one or
-                    select from below
-                  </FormDescription>
-                  <FormControl>
-                  <div className="w-full">
-          <input
-            type="file"
-            accept="image/*"
-            id="file"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <p className="text-black dark:text-white text-left font-medium text-xl mb-2">
-            Course Thumbnail:
-          </p>
-          <label
-            htmlFor="file"
-            className={`w-full min-h-[10vh] dark:border-white border-[#00000026] p-3 border flex items-center justify-center ${
-              dragging ? "bg-blue-500" : "bg-transparent"
-            }`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            {courseInfo.thumbnail ? (
-              <div className="w-full">
-                <img
-                  src={courseInfo.thumbnail}
-                  alt=""
-                  className="max-h-full w-full object-cover"
-                />
-              </div>
-            ) : (
-              <span className="text-black dark:text-white">
-                Drag and drop your thumbnail here or click to browse
-              </span>
-            )}
-          </label>
-        </div>
-                  </FormControl>
-                  <div className="flex gap-2">
-                    {tags.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field?.value?.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          field.onChange(() => {
-                            updateSelectedOptionArray<string[],string>(field.value,item)
-                        });
-                        }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                  </div> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="space-y-2 mx-auto w-fit">
+              <Button
+                // disabled={
+                //   form.formState.isValidating ||
+                //   form.formState.isSubmitting ||
+                //   !form.formState.isValid
+                // }
+                onClick={() => console.log(form.getValues(), form.formState)}
+                type="submit"
+                className="w-full max-w-[400px] text-center py-5 h-none"
+              >
+                {form.formState.isSubmitting ? (
+                  <ClipLoader size={22} color="white" />
+                ) : (
+                  "Preview Product"
+                )}
+              </Button>
+              <p className="text-[12.5px] capitalize text-center">
+                preview it on the next page before upload
+              </p>
+            </div>
           </form>
         </Form>
-        <div className="space-y-2 mx-auto w-fit">
-          <Button
-            disabled={
-              form.formState.isValidating ||
-              form.formState.isSubmitting ||
-              !form.formState.isValid
-            }
-            type="submit"
-            className="w-full max-w-[400px] text-center py-3 h-none"
-          >
-            {form.formState.isSubmitting ? (
-              <ClipLoader size={22} color="white" />
-            ) : (
-              "Upload product"
-            )}
-          </Button>
-          <p className="text-[12.5px] capitalize text-center">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad,
-            repellat.
-          </p>
-        </div>
       </div>
     </>
   );

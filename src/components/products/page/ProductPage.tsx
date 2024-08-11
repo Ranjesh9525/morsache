@@ -9,12 +9,12 @@ import { redirect } from "next/navigation";
 type Props = {
   slug: string;
 };
-export const sampleProducts:Product[] = [
+export const sampleProducts: Product[] = [
   {
     id: "23",
     name: "elementary magenta plain pure linen shirt",
     description: "Description for elementary magenta plain pure linen shirt",
-    price: 20.0,
+    price:" 20.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -27,17 +27,32 @@ export const sampleProducts:Product[] = [
       "summer",
     ],
     variants: [
-      {variant:"red",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"blue",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"green",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"black",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"white",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-  ],
+      {
+        variant: "red",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "blue",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "green",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "black",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "white",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+    ],
     slug: "elementary-magenta-plain-pure-linen-shirt",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["S", "M", "L", "XL"],
     images: [
       "/items/elementary-magenta-plain-pure-linen-shirt1.webp",
@@ -47,19 +62,19 @@ export const sampleProducts:Product[] = [
   {
     id: "14",
     name: "Matteo Grey Checks Shirt",
-    price: 20.0,
+    price:" 20.0",
     category: ["tshirt", "casual", "unisex"],
-    stock: 100,
+    stock: "100",
     rating: 4.5,
-    isFeatured: true,
+
     slug: "matteo-grey-checks-shirt",
     description: "Description for Matteo Grey Checks Shirt",
     purchaseQuantity: 10,
     variants: [
-      {variant:"grey",image:"/items/matteo-grey-checks-shirt2.webp"},
-    {variant:"orange",image:"/items/matteo-grey-checks-shirt2.webp"},
-    {variant:"white",image:"/items/matteo-grey-checks-shirt2.webp"},
-  ],
+      { variant: "grey", image: "/items/matteo-grey-checks-shirt2.webp" },
+      { variant: "orange", image: "/items/matteo-grey-checks-shirt2.webp" },
+      { variant: "white", image: "/items/matteo-grey-checks-shirt2.webp" },
+    ],
     tags: ["polo", "casual", "unisex", "checks", "regular"],
     sizes: ["S", "M", "L", "XL"],
     images: [
@@ -70,20 +85,26 @@ export const sampleProducts:Product[] = [
   {
     id: "15",
     name: "Matteo Light Blue Checks Shirt",
-    price: 35.0,
+    price:" 35.0",
     sizes: ["S", "M", "L"],
     category: ["tshirt", "casual", "unisex"],
-    stock: 100,
+    stock: "100",
     rating: 4.5,
-    isFeatured: true,
+
     slug: "matteo-light-blue-checks-shirt",
     description: "Description for Matteo Light Blue Checks Shirt",
     purchaseQuantity: 10,
     variants: [
-      {variant:"blue",image:"/items/Matteo-Light-Blue-Checks-Shirt2.webp"},
-      {variant:"yellow",image:"/items/Matteo-Light-Blue-Checks-Shirt2.webp"},
-      {variant:"red",image:"/items/Matteo-Light-Blue-Checks-Shirt2.webp"},
-      {variant:"black",image:"/items/Matteo-Light-Blue-Checks-Shirt2.webp"},
+      { variant: "blue", image: "/items/Matteo-Light-Blue-Checks-Shirt2.webp" },
+      {
+        variant: "yellow",
+        image: "/items/Matteo-Light-Blue-Checks-Shirt2.webp",
+      },
+      { variant: "red", image: "/items/Matteo-Light-Blue-Checks-Shirt2.webp" },
+      {
+        variant: "black",
+        image: "/items/Matteo-Light-Blue-Checks-Shirt2.webp",
+      },
     ],
     tags: ["polo", "casual", "unisex", "checks", "oversize"],
     images: [
@@ -94,19 +115,19 @@ export const sampleProducts:Product[] = [
   {
     id: "16",
     name: "brush stroke red shirt",
-    price: 25.0,
+    price:" 25.0",
     sizes: ["S", "M", "L"],
     category: ["tshirt", "casual", "unisex"],
-    stock: 100,
+    stock: "100",
     rating: 4.5,
-    isFeatured: true,
+
     slug: "brush-stroke-red-shirt",
     description: "Description for Matteo Light Blue Checks Shirt",
     purchaseQuantity: 10,
     variants: [
-    {variant:"blue",image:"/items/brush-stroke-red-shirt1.jpg"},
-    {variant:"black",image:"/items/brush-stroke-red-shirt1.jpg"},
-  ],
+      { variant: "blue", image: "/items/brush-stroke-red-shirt1.jpg" },
+      { variant: "black", image: "/items/brush-stroke-red-shirt1.jpg" },
+    ],
     tags: ["polo", "casual", "unisex", "checks", "oversize"],
     images: [
       "/items/brush-stroke-red-shirt1.jpg",
@@ -116,7 +137,7 @@ export const sampleProducts:Product[] = [
   {
     id: "17",
     name: "Carmine mauve knitted shirt",
-    price: 30.0,
+    price:" 30.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -128,18 +149,19 @@ export const sampleProducts:Product[] = [
       "linen",
       "summer",
     ],
-    description:" Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    description:
+      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     variants: [
-      {variant:"red",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-    {variant:"blue",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-    {variant:"green",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-    {variant:"black",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-  ],
+      { variant: "red", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+      { variant: "blue", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+      { variant: "green", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+      { variant: "black", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+    ],
     slug: "carmine-mauve-knitted-shirt",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["M", "L", "XL"],
     images: [
       "/items/carmine-mauve-knitted-shirt1.webp",
@@ -149,7 +171,7 @@ export const sampleProducts:Product[] = [
   {
     id: "27",
     name: "Box Stripe Black Shirt",
-    price: 35.0,
+    price:" 35.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -162,18 +184,19 @@ export const sampleProducts:Product[] = [
       "summer",
     ],
     variants: [
-      {variant:"red",image:"/items/Matteo-Grey-Checks-Shirt-1.webp"},
-    {variant:"blue",image:"/items/Matteo-Grey-Checks-Shirt-1.webp"},
-    {variant:"green",image:"/items/Matteo-Grey-Checks-Shirt-1.webp"},
-    {variant:"black",image:"/items/Matteo-Grey-Checks-Shirt-1.webp"},
-  ],
+      { variant: "red", image: "/items/Matteo-Grey-Checks-Shirt-1.webp" },
+      { variant: "blue", image: "/items/Matteo-Grey-Checks-Shirt-1.webp" },
+      { variant: "green", image: "/items/Matteo-Grey-Checks-Shirt-1.webp" },
+      { variant: "black", image: "/items/Matteo-Grey-Checks-Shirt-1.webp" },
+    ],
     slug: "box-stripe-black-shirt",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["S", "L", "XXL"],
-    description:" Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    description:
+      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     images: [
       "/items/matteo-grey-checks-shirt2.webp",
       "/items/Matteo-Grey-Checks-Shirt-1.webp",
@@ -183,8 +206,9 @@ export const sampleProducts:Product[] = [
   {
     id: "28",
     name: "Double Cuff Royal Blue Shirt",
-    price: 40.0,
-    description:" Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    price:" 40.0",
+    description:
+      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -197,16 +221,16 @@ export const sampleProducts:Product[] = [
       "summer",
     ],
     variants: [
-      {variant:"red",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-    {variant:"blue",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-    {variant:"green",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-    {variant:"black",image:"/items/carmine-mauve-knitted-shirt2.webp"},
-  ],
+      { variant: "red", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+      { variant: "blue", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+      { variant: "green", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+      { variant: "black", image: "/items/carmine-mauve-knitted-shirt2.webp" },
+    ],
     slug: "double-cuff-royal-blue-shirt",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["S", "M", "XL"],
     images: [
       "/items/carmine-mauve-knitted-shirt2.webp",
@@ -216,7 +240,7 @@ export const sampleProducts:Product[] = [
   {
     id: "29",
     name: "Doric Red Shirt",
-    price: 30.0,
+    price:" 30.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -229,30 +253,47 @@ export const sampleProducts:Product[] = [
       "summer",
     ],
     variants: [
-      {variant:"grey",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"orange",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"white",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"red",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-    {variant:"black",image:"/items/elementary-magenta-plain-pure-linen-shirt2.webp"},
-  ],
+      {
+        variant: "grey",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "orange",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "white",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "red",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+      {
+        variant: "black",
+        image: "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
+      },
+    ],
     slug: "doric-red-shirt",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["S", "M", "XL", "XXL"],
     images: [
       "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
       "/items/elementary-magenta-plain-pure-linen-shirt1.webp",
     ],
-    description:" Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    description:
+      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
   },
   {
     id: "30",
     name: "Matteo Grey Checks Shirt",
-    price: 45.0,
+    price:" 45.0",
     category: ["tshirt", "plain"],
-    description:" Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    description:
+      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     tags: [
       "tshirt",
       "casual",
@@ -264,16 +305,22 @@ export const sampleProducts:Product[] = [
       "summer",
     ],
     variants: [
-    {variant:"blue",image:"/items/Matteo-Light-Blue-Checks-Shirt1.webp"},
-    {variant:"white",image:"/items/Matteo-Light-Blue-Checks-Shirt1.webp"},
-    {variant:"red",image:"/items/Matteo-Light-Blue-Checks-Shirt1.webp"},
-    {variant:"black",image:"/items/Matteo-Light-Blue-Checks-Shirt1.webp"},
-  ],
+      { variant: "blue", image: "/items/Matteo-Light-Blue-Checks-Shirt1.webp" },
+      {
+        variant: "white",
+        image: "/items/Matteo-Light-Blue-Checks-Shirt1.webp",
+      },
+      { variant: "red", image: "/items/Matteo-Light-Blue-Checks-Shirt1.webp" },
+      {
+        variant: "black",
+        image: "/items/Matteo-Light-Blue-Checks-Shirt1.webp",
+      },
+    ],
     slug: "matteo-grey-checks-shirt-2",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["M", "L"],
     images: [
       "/items/Matteo-Light-Blue-Checks-Shirt1.webp",
@@ -282,9 +329,10 @@ export const sampleProducts:Product[] = [
   },
   {
     id: "31",
-    name: "Box Stripe White Shirt",   
-      description:" Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
-    price: 45.0,
+    name: "Box Stripe White Shirt",
+    description:
+      " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    price:" 45.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -297,17 +345,17 @@ export const sampleProducts:Product[] = [
       "summer",
     ],
     variants: [
-      {variant:"blue",image:"/items/brush-stroke-red-shirt2.jpg"},
-      {variant:"white",image:"/items/brush-stroke-red-shirt2.jpg"},
-      {variant:"red",image:"/items/brush-stroke-red-shirt2.jpg"},
-      {variant:"green",image:"/items/brush-stroke-red-shirt2.jpg"},
-      {variant:"black",image:"/items/brush-stroke-red-shirt2.jpg"},
+      { variant: "blue", image: "/items/brush-stroke-red-shirt2.jpg" },
+      { variant: "white", image: "/items/brush-stroke-red-shirt2.jpg" },
+      { variant: "red", image: "/items/brush-stroke-red-shirt2.jpg" },
+      { variant: "green", image: "/items/brush-stroke-red-shirt2.jpg" },
+      { variant: "black", image: "/items/brush-stroke-red-shirt2.jpg" },
     ],
     slug: "box-stripe-white-shirt",
     rating: 4,
-    stock: 13,
+    stock: "13",
     purchaseQuantity: 10,
-    isFeatured: true,
+
     sizes: ["M", "L"],
     images: [
       "/items/brush-stroke-red-shirt2.jpg",
@@ -315,39 +363,44 @@ export const sampleProducts:Product[] = [
     ],
   },
 ];
-export const saveRecentlyViewedProduct = (product:any) => {
-  if(product){
-  const recent = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
+export const saveRecentlyViewedProduct = (product: any) => {
+  if (product) {
+    const recent = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
 
- // Check if the product is already in the list of recently viewed products
-const index = recent.findIndex((item:any) => item.id === product.id);
-if (index !== -1) {
-    // If product is already in the list, update viewedOn and bring it to the top
-    recent[index].viewedOn = Date.now();
-    const updatedRecentlyViewed = [
+    // Check if the product is already in the list of recently viewed products
+    const index = recent.findIndex((item: any) => item.id === product.id);
+    if (index !== -1) {
+      // If product is already in the list, update viewedOn and bring it to the top
+      recent[index].viewedOn = Date.now();
+      const updatedRecentlyViewed = [
         recent[index],
         ...recent.slice(0, index),
-        ...recent.slice(index + 1)
-    ];
-    localStorage.setItem("recentlyViewed", JSON.stringify(updatedRecentlyViewed));
-} else {
-    // If product is not in the list.. add it to the top
-    product.viewedOn = Date.now();
-    const updatedRecentlyViewed = [product, ...recent];
-    localStorage.setItem("recentlyViewed", JSON.stringify(updatedRecentlyViewed));
-}}
-return null
+        ...recent.slice(index + 1),
+      ];
+      localStorage.setItem(
+        "recentlyViewed",
+        JSON.stringify(updatedRecentlyViewed)
+      );
+    } else {
+      // If product is not in the list.. add it to the top
+      product.viewedOn = Date.now();
+      const updatedRecentlyViewed = [product, ...recent];
+      localStorage.setItem(
+        "recentlyViewed",
+        JSON.stringify(updatedRecentlyViewed)
+      );
+    }
+  }
+  return null;
 };
 const ProductPage = ({ slug }: Props) => {
   const product = sampleProducts.find((prod) => prod.slug == slug);
 
-  if(!product){
-
-    redirect("/404")
-  
+  if (!product) {
+    redirect("/404");
   }
 
-  saveRecentlyViewedProduct(product)
+  saveRecentlyViewedProduct(product);
   return (
     <>
       <div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5">

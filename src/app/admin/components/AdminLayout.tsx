@@ -50,8 +50,8 @@ const AdminLayout = ({title,description,keywords,children}: Props) => {
   });
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    if (latest > 230) setScrolling(true);
-    if (latest < 230) setScrolling(false);
+    if (latest > 140) setScrolling(true);
+    if (latest < 140) setScrolling(false);
   });
 
   useEffect(()=>{
@@ -99,12 +99,12 @@ const AdminLayout = ({title,description,keywords,children}: Props) => {
         description={description || "Create a Paysup account"}
         keywords={keywords || "online courses,digital skills,marketing,social marketing"}
       />
-      <div>
+      
         <div className="min-h-screen  w-full relative">  
           <Navbar scrolling={scrolling}  />
           <main className="relative">{children}</main>
           <Footer />
-        </div>
+        
       </div>
     </>
   );

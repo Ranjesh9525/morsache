@@ -15,32 +15,34 @@ import { CartContext } from "@/context/cartContext";
 import { Product } from "@/@types/products.d";
 import { CartItem } from "@/@types/cart.d";
 import { cn } from "@/lib/utils";
+import { MdOutlineDiscount } from "react-icons/md";
 type Props = {
   product: Product;
 };
 
- export function format(value: number): string {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-    }).format(value);
-  }
+export function format(value: number): string {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(value);
+}
 
 const ProductInfo = ({ product }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
   const [selectedProduct, setSelectedProduct] = useState<CartItem | null>(null);
-  const [selectedVariant, setSelectedVariant] = useState<string>("");
+  const [selectedVariant, setSelectedVariant] = useState<any>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
 
   const setProductDetails = () => {
     if (
-      selectedVariant !== "" &&
+      selectedVariant.length > 0 &&
       selectedQuantity !== 0 &&
       selectedSize !== ""
     ) {
       const totalPrice =
-        selectedQuantity * (product.salePrice || product.price);
+        selectedQuantity *
+        (parseFloat(product?.salePrice!) || parseFloat(product?.price));
       setSelectedProduct({
         product,
         variant: selectedVariant,
@@ -57,7 +59,7 @@ const ProductInfo = ({ product }: Props) => {
   useEffect(() => {
     if (selectedProduct) {
       console.log("selectedProduct", selectedProduct);
-      dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
+      // dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
     } else {
       console.log("selected product is null");
     }
@@ -65,23 +67,25 @@ const ProductInfo = ({ product }: Props) => {
 
   return (
     <div id="product-information" className="flex flex-col gap-2  h-[200vh]">
-      <h1 className="text-3xl font-medium ">{product.name}</h1>
+      <h1 className="text-3xl font-medium capitalize">{product?.name}</h1>
       <div className="flex text-[13px] gap-0 items-center">
         <StarIcon fill="#f8d122" stroke="0" className="border-0" />
         <StarIcon fill="#f8d122" stroke="0" className="border-none" />
         <StarIcon fill="#f8d122" stroke="0" />
         <StarIcon fill="#f8d122" stroke="0" />
         <StarIcon fill="#f8d122" stroke="0" />
-        {product.purchaseQuantity > 0 ? (
+        {product?.purchaseQuantity > 0 ? (
           <p className="text-[#cfb128] text-[15.5px]">
-            ({product.purchaseQuantity})
+            ({product?.purchaseQuantity})
           </p>
         ) : (
           <p className="text-[#f8d122] text-[15.5px]">({0})</p>
         )}
       </div>
       <div className="mt-5">
-        <h1 className="w-full text-[17px]">{format(product.price)}</h1>
+        <h1 className="w-full text-[17px]">
+          {format(parseFloat(product?.price))}
+        </h1>
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
       <div id="discounts" className="w-[280px] mt-5 ">
@@ -119,11 +123,11 @@ const ProductInfo = ({ product }: Props) => {
         Variants
       </h1>
       <div id="variants" className="flex items-center gap-4">
-        {product.variants &&
-          product?.variants.map((item,index) => {
+        {product?.variants &&
+          product?.variants.map((item, index) => {
             return (
               <Image
-              key={index}
+                key={index}
                 onClick={() => setSelectedVariant(item.variant)}
                 src={item.image}
                 alt={`${item.variant} variant`}
@@ -148,11 +152,11 @@ const ProductInfo = ({ product }: Props) => {
           </h1>
         )}
         <section className="flex items-center gap-4">
-          {product.sizes &&
-            product?.sizes.map((item,index) => {
+          {product?.sizes &&
+            product?.sizes.map((item, index) => {
               return (
                 <span
-                key={index}
+                  key={index}
                   onClick={() => setSelectedSize(item)}
                   className={cn(
                     "py-3 px-4 border text-[12px] font-light cursor-pointer border-gray-900 rounded-xl hover:text-white hover:bg-gray-900 hover:shadow-lg",
@@ -166,7 +170,7 @@ const ProductInfo = ({ product }: Props) => {
         </section>
       </div>
       <div id="buttons" className="my-4 w-full">
-        {!selectedSize || !selectedVariant ? (
+        {!selectedSize || selectedVariant.length === 0 ? (
           <Button
             variant={"ghost"}
             className="w-full mb-3 py-6 bg-gray-100 cursor-text text-gray-500  font-medium tracking-wider"
@@ -192,17 +196,23 @@ const ProductInfo = ({ product }: Props) => {
       </div>
       <div id="accordion">
         <Accordion type="multiple">
-          {product.offers && product.offers.length > 0 && (
+          {product?.offers && product?.offers?.length > 0 && (
             <AccordionItem value="item-1">
               <AccordionTrigger>Offers</AccordionTrigger>
               <AccordionContent>
-                {product?.offers.map((item,index) => {
+                {product?.offers.map((item, index) => {
                   return (
-                    <span   key={index} className="flex flex-col gap-2">
-                      {" "}
-                      <h1>{item.title}</h1>
-                      <p>{item.description}</p>
-                    </span>
+                    <div
+                      key={index}
+                      className={`flex flex-row items-center gap-2 mb-2 ${
+                        index !== product?.offers?.length! - 1 && "border-b"}`}
+                    >
+                      <MdOutlineDiscount size={20} color="#fea12f" />
+                      <div className="flex items-start flex-col gap-1">
+                        <h1 className="font-medium">{item.title}</h1>
+                        <p>{item.description}</p>
+                      </div>
+                    </div>
                   );
                 })}
               </AccordionContent>
@@ -212,22 +222,22 @@ const ProductInfo = ({ product }: Props) => {
           <AccordionItem value="item-2">
             <AccordionTrigger>Description</AccordionTrigger>
             <AccordionContent>
-              {product.description && product.description}
+              {product?.description && product?.description}
             </AccordionContent>
           </AccordionItem>
-          {product.moreInformation && (
+          {product?.moreInformation && (
             <AccordionItem value="item-3">
               <AccordionTrigger>More Information</AccordionTrigger>
-              <AccordionContent>{product.moreInformation}</AccordionContent>
+              <AccordionContent>{product?.moreInformation}</AccordionContent>
             </AccordionItem>
           )}
-          {product.exchangeAndReturnPolicy && (
+          {product?.exchangeAndReturnPolicy && (
             <AccordionItem value="item-4">
               <AccordionTrigger>
                 Exchange {"&"} return information
               </AccordionTrigger>
               <AccordionContent>
-                {product.exchangeAndReturnPolicy}
+                {product?.exchangeAndReturnPolicy}
               </AccordionContent>
             </AccordionItem>
           )}
