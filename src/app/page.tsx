@@ -194,8 +194,8 @@ const defaultTabs= [
     },
   ];
 
+  // <Protected>
   return (
-    <Protected>
 
     <HomeLayout title="Morsache Clothing">
       <Slider />
@@ -207,6 +207,6 @@ const defaultTabs= [
       <DisplayNewAndTrending defaultTabs={defaultTabs} />
       <RecentlyViewed/>
     </HomeLayout>
-    </Protected>
   );
 }
+// </Protected>

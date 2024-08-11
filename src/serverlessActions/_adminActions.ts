@@ -3,6 +3,7 @@ import { connectDB } from "@/utilities/DB";
 import { UserSearch } from "lucide-react";
 import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
+import { Response } from "./responseClass";
 
 export const AdminGetAllUsers = async () => {
   try {
@@ -33,9 +34,11 @@ export const AdminGetSingleUsers = async ({ id }: { id: string }) => {
 export const AdminUploadProduct = async (data: any) => {
   try {
     await connectDB();
+    // console.log(data);
     const product = new ProductsModel(data);
     await product.save();
-    return product;
+    // console.log(product)
+    return Response("Product uploaded successfully", 200, true, product);
   } catch (error) {
     console.error("Error uploading product:", error);
     throw error;

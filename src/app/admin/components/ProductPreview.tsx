@@ -6,19 +6,27 @@ import Recommendation from "@/components/products/Recommendation";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-type Props = {};
+type Props = {
+  setPreview:React.Dispatch<React.SetStateAction<boolean>>
+  preview:boolean
+};
 
-const ProductPreview = (props: Props) => {
+const ProductPreview = ({setPreview,preview}: Props) => {
   const router = useRouter();
   const [values, setValues] = React.useState<Product>();
+  // useEffect(()=>{
+
+  // },[preview])
+
   useEffect(() => {
     const productDraft = localStorage.getItem("product-draft");
-    if (productDraft) {
+    if (productDraft && preview) {
       setValues(JSON.parse(productDraft));
     } else {
-      router.push("/admin/products/create");
+      router.refresh();
+      // setPreview(false)
     }
-  }, []);
+  }, [preview]);
   return (
     <>
       <div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5">

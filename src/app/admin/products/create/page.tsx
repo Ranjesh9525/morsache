@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import ProductPreview from "../../components/ProductPreview";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
@@ -65,28 +66,7 @@ const page = (props: Props) => {
     stock: z.string(),
     moreInformation: z.string().optional(),
   });
-  // rating: z.number().default(0).optional(),
-  // purchasedQuantity: z.number().default(0).optional(),
-  // id: string;
-  // name: string;
-  // description: string;
-  // category?: string[];
-  // price: number;
-  // slug:string;
-  // salePrice?: number;
-  // sizes: string[];
-  // tags?:string[];
-  // variants?: {variant:string,image:string}[];
-  // images: string[];
-  // rating?: number;
-  // purchaseQuantity:number;
-  // stock?: number;
-  // isFeatured?: boolean;
-  // offers?:{title:string,description:string}[];
-  // exchangeAndReturnPolicy?:string;
-  // moreInformation?:string;
-  // createdAt?: Date;
-  // updatedAt?: Date;
+ const router = useRouter()
   const variantInput = React.useRef<HTMLInputElement>(null);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [preview, setPreview] = React.useState(false);
@@ -186,6 +166,7 @@ const page = (props: Props) => {
         title: "Product draft found",
         description: "You can upload or discard it",
       });
+      router.replace("/admin/products/create/?preview=true");
       setPreview(true);
     }
   }, []);
@@ -234,7 +215,7 @@ const page = (props: Props) => {
     },
   ];
   if (preview) {
-    return <ProductPreview />;
+    return <ProductPreview preview={preview}  setPreview={setPreview}/>;
   }
 
   return (
@@ -835,11 +816,11 @@ const page = (props: Props) => {
             </div>
             <div className="space-y-2 mx-auto w-fit">
               <Button
-                // disabled={
-                //   form.formState.isValidating ||
-                //   form.formState.isSubmitting ||
-                //   !form.formState.isValid
-                // }
+                disabled={
+                  form.formState.isValidating ||
+                  form.formState.isSubmitting ||
+                  !form.formState.isValid
+                }
                 onClick={() => console.log(form.getValues(), form.formState)}
                 type="submit"
                 className="w-full max-w-[400px] text-center py-5 h-none"

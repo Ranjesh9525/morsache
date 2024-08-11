@@ -16,6 +16,7 @@ import { Product } from "@/@types/products.d";
 import { CartItem } from "@/@types/cart.d";
 import { cn } from "@/lib/utils";
 import { MdOutlineDiscount } from "react-icons/md";
+import { useRouter } from "next/navigation";
 type Props = {
   product: Product;
 };
@@ -33,7 +34,7 @@ const ProductInfo = ({ product }: Props) => {
   const [selectedVariant, setSelectedVariant] = useState<any>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-
+const router = useRouter()
   const setProductDetails = () => {
     if (
       selectedVariant.length > 0 &&
@@ -59,7 +60,8 @@ const ProductInfo = ({ product }: Props) => {
   useEffect(() => {
     if (selectedProduct) {
       console.log("selectedProduct", selectedProduct);
-      // dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
+      dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
+      router.push('/cart')
     } else {
       console.log("selected product is null");
     }
@@ -159,8 +161,8 @@ const ProductInfo = ({ product }: Props) => {
                   key={index}
                   onClick={() => setSelectedSize(item)}
                   className={cn(
-                    "py-3 px-4 border text-[12px] font-light cursor-pointer border-gray-900 rounded-xl hover:text-white hover:bg-gray-900 hover:shadow-lg",
-                    selectedSize === item && "bg-gray-900 text-white shadow-lg"
+                    "py-3 px-4 border text-[12px] font-light cursor-pointer border-[#545454] rounded-xl hover:text-white hover:bg-[#545454] hover:shadow-lg",
+                    selectedSize === item && "bg-[#545454] text-white shadow-lg"
                   )}
                 >
                   {item}

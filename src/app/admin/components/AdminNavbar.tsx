@@ -1,5 +1,5 @@
 "use client";
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -51,9 +51,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useMutation } from "@tanstack/react-query";
-import { FcUpload } from "react-icons/fc";
+import { FaUpload } from "react-icons/fa6";
+import { FaTimes } from "react-icons/fa";
 import { AdminUploadProduct } from "@/serverlessActions/_adminActions";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ClipLoader } from "react-spinners";
+import { useToast } from "@/components/ui/use-toast";
 
 type Props = {
   scrolling: boolean;
@@ -80,22 +83,54 @@ const scrollingVariants = {
 
 const AdminNavbar = ({ scrolling }: Props) => {
   const { data: Session } = useSession() as any;
-const [savedProduct,setSavedProduct] = useState(false)
+  const [savedProduct, setSavedProduct] = useState(false);
+  const router = useRouter();
   const {
     isPending,
     isError,
     data,
+    isSuccess,
     error,
     mutate: uploadProduct,
   } = useMutation({
     mutationFn: AdminUploadProduct,
   });
+  const { toast } = useToast();
+  const discardProduct = () => {
+    toast({
+      variant: "destructive",
+      title: `Product discarded`,
+    });
+    localStorage.removeItem("product-draft");
+    setSavedProduct(false);
+    router.push("/admin/products/create");
+    router.refresh()
+  };
   const pathname = usePathname();
-  useEffect(()=>{
-    if(localStorage.getItem("product-draft")){
-      setSavedProduct(JSON.parse(localStorage.getItem("product-draft")!))
+  const isPreview = useSearchParams()?.get("preview");
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        variant: "success",
+        title: `Product uploaded`,
+      });
+      localStorage.removeItem("product-draft");
+      setSavedProduct(false);
+      router.push("/admin/products/create");
     }
-  },[])
+    if (isError) {
+      console.log(error);
+    }
+    if (data) {
+      console.log(data);
+    }
+  }, [data, isError, isSuccess]);
+
+  useEffect(() => {
+    if (localStorage.getItem("product-draft") && isPreview) {
+      setSavedProduct(JSON.parse(localStorage.getItem("product-draft")!));
+    }
+  }, [isPreview]);
   return (
     <motion.div
       // variants={scrollingVariants}
@@ -298,16 +333,34 @@ const [savedProduct,setSavedProduct] = useState(false)
               </NavigationMenuList>
             </NavigationMenu>{" "}
           </div>
-          {pathname === "/admin/products/create" && savedProduct &&
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => uploadProduct(savedProduct)}
-            className="mr-8 gap-4 bg-[#665a47] text-white tracking-wider hover:bg-[#e6e6e6]"
-          >
-            Upload Product
-            <FcUpload color="#fff" />
-          </Button>}
+          {pathname === "/admin/products/create" && savedProduct && (
+            <div id="action-btns">
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={isPending}
+                onClick={() => discardProduct()}
+                className="mr-8 gap-4 border border-[#665a47] text-black tracking-wider hover:bg-[#e6e6e6]"
+              >
+                Discard
+                <FaTimes color="red" />
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={isPending}
+                onClick={() => uploadProduct(savedProduct)}
+                className="mr-8 gap-4 bg-[#665a47] text-white tracking-wider hover:bg-[#665000a9] "
+              >
+                Upload Product
+                {!isPending ? (
+                  <FaUpload color="#fff" />
+                ) : (
+                  <ClipLoader color="#fff" />
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </nav>
     </motion.div>
