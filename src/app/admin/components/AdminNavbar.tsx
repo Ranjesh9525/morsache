@@ -301,12 +301,12 @@ const [savedProduct,setSavedProduct] = useState(false)
           {pathname === "/admin/products/create" && savedProduct &&
           <Button
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => uploadProduct(savedProduct)}
-            className="mr-4 gap-4"
+            className="mr-8 gap-4 bg-[#665a47] text-white tracking-wider hover:bg-[#e6e6e6]"
           >
             Upload Product
-            <FcUpload />
+            <FcUpload color="#fff" />
           </Button>}
         </div>
       </nav>
