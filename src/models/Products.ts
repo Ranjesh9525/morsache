@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema(
       }],
       default: []
   },
+  SKU: { type: String ,unique: true},
   images: { type: [String], default: [] },
   rating: { type: Number ,default: 0},
   purchaseQuantity: { type: Number, required: true ,default: 0},

@@ -139,7 +139,17 @@ const page = (props: Props) => {
     e.preventDefault();
     setDragging(false);
   };
+const SKUgenerator = (amount:number)=>{
+const characters = '1234567890qwertyuiopasdfghjklzxcvbnm';
+let random = ''
+for(let i= 0;i < amount; i++){
+  random += characters.charAt(Math.floor(Math.random()*characters.length))
 
+}
+// return charAt(Math.random*characters.length)
+      //  return Math.floor(Math.random() * amount).toString(36).substring(2, 9);
+      
+}
   const handleDrop = (e: any) => {
     e.preventDefault();
     setDragging(false);

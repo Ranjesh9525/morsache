@@ -14,7 +14,7 @@ export const sampleProducts: Product[] = [
     id: "23",
     name: "elementary magenta plain pure linen shirt",
     description: "Description for elementary magenta plain pure linen shirt",
-    price:" 20.0",
+    price: " 20.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -52,7 +52,7 @@ export const sampleProducts: Product[] = [
     rating: 4,
     stock: "13",
     purchaseQuantity: 10,
-
+    SKU: "PQWONEFK",
     sizes: ["S", "M", "L", "XL"],
     images: [
       "/items/elementary-magenta-plain-pure-linen-shirt1.webp",
@@ -62,11 +62,11 @@ export const sampleProducts: Product[] = [
   {
     id: "14",
     name: "Matteo Grey Checks Shirt",
-    price:" 20.0",
+    price: " 20.0",
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
     rating: 4.5,
-
+    SKU: "CSBDWONUDF",
     slug: "matteo-grey-checks-shirt",
     description: "Description for Matteo Grey Checks Shirt",
     purchaseQuantity: 10,
@@ -85,12 +85,12 @@ export const sampleProducts: Product[] = [
   {
     id: "15",
     name: "Matteo Light Blue Checks Shirt",
-    price:" 35.0",
+    price: " 35.0",
     sizes: ["S", "M", "L"],
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
     rating: 4.5,
-
+    SKU: "MCALSKDWPD",
     slug: "matteo-light-blue-checks-shirt",
     description: "Description for Matteo Light Blue Checks Shirt",
     purchaseQuantity: 10,
@@ -115,12 +115,12 @@ export const sampleProducts: Product[] = [
   {
     id: "16",
     name: "brush stroke red shirt",
-    price:" 25.0",
+    price: " 25.0",
     sizes: ["S", "M", "L"],
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
     rating: 4.5,
-
+    SKU: "VDJSOWNEAL",
     slug: "brush-stroke-red-shirt",
     description: "Description for Matteo Light Blue Checks Shirt",
     purchaseQuantity: 10,
@@ -137,7 +137,7 @@ export const sampleProducts: Product[] = [
   {
     id: "17",
     name: "Carmine mauve knitted shirt",
-    price:" 30.0",
+    price: " 30.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -161,7 +161,7 @@ export const sampleProducts: Product[] = [
     rating: 4,
     stock: "13",
     purchaseQuantity: 10,
-
+    SKU: "JWENEPWMQ",
     sizes: ["M", "L", "XL"],
     images: [
       "/items/carmine-mauve-knitted-shirt1.webp",
@@ -171,7 +171,7 @@ export const sampleProducts: Product[] = [
   {
     id: "27",
     name: "Box Stripe Black Shirt",
-    price:" 35.0",
+    price: " 35.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -193,7 +193,7 @@ export const sampleProducts: Product[] = [
     rating: 4,
     stock: "13",
     purchaseQuantity: 10,
-
+    SKU: "MQWKEEMFEC",
     sizes: ["S", "L", "XXL"],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
@@ -206,7 +206,7 @@ export const sampleProducts: Product[] = [
   {
     id: "28",
     name: "Double Cuff Royal Blue Shirt",
-    price:" 40.0",
+    price: " 40.0",
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     category: ["tshirt", "plain"],
@@ -230,7 +230,7 @@ export const sampleProducts: Product[] = [
     rating: 4,
     stock: "13",
     purchaseQuantity: 10,
-
+    SKU: "KRMNWDD",
     sizes: ["S", "M", "XL"],
     images: [
       "/items/carmine-mauve-knitted-shirt2.webp",
@@ -240,7 +240,7 @@ export const sampleProducts: Product[] = [
   {
     id: "29",
     name: "Doric Red Shirt",
-    price:" 30.0",
+    price: " 30.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -278,7 +278,7 @@ export const sampleProducts: Product[] = [
     rating: 4,
     stock: "13",
     purchaseQuantity: 10,
-
+    SKU: "NMMLECOD",
     sizes: ["S", "M", "XL", "XXL"],
     images: [
       "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
@@ -290,10 +290,11 @@ export const sampleProducts: Product[] = [
   {
     id: "30",
     name: "Matteo Grey Checks Shirt",
-    price:" 45.0",
+    price: " 45.0",
     category: ["tshirt", "plain"],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
+    SKU: "SPMEINI",
     tags: [
       "tshirt",
       "casual",
@@ -332,7 +333,7 @@ export const sampleProducts: Product[] = [
     name: "Box Stripe White Shirt",
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
-    price:" 45.0",
+    price: " 45.0",
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -351,6 +352,7 @@ export const sampleProducts: Product[] = [
       { variant: "green", image: "/items/brush-stroke-red-shirt2.jpg" },
       { variant: "black", image: "/items/brush-stroke-red-shirt2.jpg" },
     ],
+    SKU: "SPMECOD",
     slug: "box-stripe-white-shirt",
     rating: 4,
     stock: "13",

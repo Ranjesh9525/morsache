@@ -5,6 +5,18 @@ import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
 import { Response } from "./responseClass";
 
+async function SKUgenerator(amount: number, characters: string) {
+  let result = "";
+  let formattedCharacters = characters.replaceAll(" ", "");
+  const charactersLength = characters.length;
+  for (let i = 0; i < amount; i++) {
+    result += formattedCharacters.charAt(
+      Math.floor(Math.random() * charactersLength)
+    );
+  }
+  return result;
+}
+
 export const AdminGetAllUsers = async () => {
   try {
     await connectDB();
@@ -34,6 +46,10 @@ export const AdminGetSingleUsers = async ({ id }: { id: string }) => {
 export const AdminUploadProduct = async (data: any) => {
   try {
     await connectDB();
+    // const characters = '1234567890qwertyuiopasdfghjklzxcvbnm';
+
+    const SKU = SKUgenerator(6, data.name);
+    data.SKU = SKU;
     // console.log(data);
     const product = new ProductsModel(data);
     await product.save();
@@ -44,4 +60,3 @@ export const AdminUploadProduct = async (data: any) => {
     throw error;
   }
 };
-
