@@ -150,7 +150,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
       >
         <span className="p-4 px-6 pt-6 inline-flex justify-between items-center w-full font-light uppercase">
           {!session?.user ? (
-            <Link href="/auth/login" className="inline-flex font-semibold items-center gap-2">
+            <Link href="/auth/login"  scroll={true} className="inline-flex font-semibold items-center gap-2">
               {" "}
               <User2
                 size={28}
@@ -159,7 +159,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
               Login
             </Link>
           ) : (
-            <Link href="/account" className="inline-flex font-medium items-center gap-2">
+            <Link href="/account"  scroll={true} className="inline-flex font-medium items-center gap-2">
               {" "}
               <User2
                 size={30}
@@ -237,6 +237,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
                                   <li key={index}>
                                     <Link
                                       key={index}
+                                      scroll={true}
                                       href={section.path}
                                       onClick={() =>
                                         setSideNav({ open: false })

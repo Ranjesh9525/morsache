@@ -1,19 +1,10 @@
-"use client"
+"use client";
 import { Cart, CartAction } from "@/@types/cart";
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import { createContext, useState } from "react";
 import { cartReducer } from "./reducers/cartReducer";
 
-const cartInitialState: Cart = {
-  items: [],
-  totalItems: 0,
-  totalAmount: 0,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  shippingAddress: "",
-  paymentMethod: "",
-  isPaid: false,
-};
+// const cartInitialState: Cart =
 
 export const CartContext = React.createContext<{
   cart: Cart;
@@ -23,7 +14,22 @@ export const CartContext = React.createContext<{
 const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // const [cart, setCarts] = useState<Cart | []>([]);
+  const [cartInitialState, setCartInitialState] = useState<Cart>({
+    items: [],
+    totalItems: 0,
+    totalAmount: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    shippingAddress: "",
+    paymentMethod: "",
+    isPaid: false,
+  });
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      setCartInitialState(JSON.parse(savedCart));
+    }
+  }, []);
   const [cart, dispatch] = useReducer(cartReducer, cartInitialState);
   // const saveCart = (Cart: ICart) => {
   //   const newCart: ICart = {

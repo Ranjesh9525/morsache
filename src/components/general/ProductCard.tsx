@@ -25,6 +25,7 @@ const ProductCard = ({ item, index,isLoading,nameOnly }: Props) => {
     <Link
       href={`/products/${item.name.toLowerCase().replaceAll(" ", "-")}`}
       key={index}
+      scroll={true}
       className={`w-full flex flex-col gap-1`}
       //   className={`w-full ${
       //     index % 2 === 0 ? "col-span-3 bg-red-200" : "col-span-2 bg-blue-200"
