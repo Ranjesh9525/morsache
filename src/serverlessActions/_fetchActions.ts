@@ -3,6 +3,7 @@ import { connectDB } from "@/utilities/DB";
 import mongoose from "mongoose";
 import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
+import { Response } from "./responseClass";
 
 // Import the Product model
 
@@ -88,6 +89,21 @@ export const FetchAllCategories = async ({ id }: { id: string }) => {
     return JSON.parse(JSON.stringify(categories));
   } catch (error) {
     console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+export const FetchSimilarProducts = async (tags:  string[] ) => {
+  try {
+    await connectDB();
+
+    const similarProducts = await ProductsModel.find({ tags: { $in: tags } })
+        .sort({ tags: { $size: -1 } }) //here we sort by the number of matching tags in descending order
+        .limit(12);//im sendiog back only 12 items
+
+    return Response("similar products", 200, true, similarProducts );
+  } catch (error) {
+    console.error("Error fetching similar products:", error);
     throw error;
   }
 };

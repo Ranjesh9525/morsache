@@ -1,7 +1,8 @@
 
 export type category = {
-    name:string,
-    image:string,
+    id?:string;
+    name:string;
+    image:string;
     tags:{
         tag:string,
         values:string[]
@@ -9,6 +10,7 @@ export type category = {
 }
 
 export const tShirtCategory:category={
+    id:"2mfomofm2fmewmcdf43043fpodmc3534m",
     name:"T-Shirts",
     image:"/items/cut-leaf-navy-shirt2.jpg",
     tags:[

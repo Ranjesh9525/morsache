@@ -13,7 +13,7 @@ export interface UserDocument extends Document {
     street: string;
     city: string;
     state: string;
-    zipCode: string;
+    postalCode: string;
     country: string;
   };
   phoneNumber?: string;
@@ -28,6 +28,71 @@ export interface UserDocument extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
+export const cartItemSchema = new mongoose.Schema({
+  productId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+  },
+  quantity: {
+    type: Number,
+  },
+  size: {
+    type: String,
+  },
+  variant: {
+    type: String,
+  },
+  totalPrice: {
+    type: Number,
+  },
+});
+const cartSchema = new mongoose.Schema({
+  items: [cartItemSchema],
+  totalItems: Number,
+  totalAmount: Number,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+  shippingAddress: {
+    street:String,
+    city:  String,
+    
+    state:  String,
+    
+    zipCode:  String,
+    
+    country: String,
+    
+  },
+  paymentMethod: {
+    type: {
+      type: String,
+      enum: ['creditCard', 'razorPay', 'stripe', 'payOnDelivery' ],
+    },
+    cardNumber: {
+      type: String,
+    },
+    cardExpiry: {
+      type: String,
+    },
+    cardCVV: {
+      type: String,
+    },
+    // paypalEmail: {
+    //   type: String,
+    // },
+  },
+  isPaid: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const userSchema = new mongoose.Schema(
   {
     firstName: {
@@ -40,21 +105,15 @@ const userSchema = new mongoose.Schema(
     emailVerified: Date,
     image: String,
     address: {
-      street: {
-        type: String,
-      },
-      city: {
-        type: String,
-      },
-      state: {
-        type: String,
-      },
-      zipCode: {
-        type: String,
-      },
-      country: {
-        type: String,
-      },
+      street:String,
+      city:  String,
+      
+      state:  String,
+      
+      zipCode:  String,
+      
+      country: String,
+      
     },
     phoneNumber: {
       type: String,
@@ -77,6 +136,7 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    carts: [cartSchema],
     wishlist: [
       {
         productId: {

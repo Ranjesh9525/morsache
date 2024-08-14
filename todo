@@ -28,3 +28,33 @@ Thing to note:
 if admin is authenticated his call back url should be /admin
 users who's order status has been chnaged to delivered can leave a review for the product
 in admin users page make function for admin to email user (optional)
+if varaint title is a link then when user clicks it he should be redirected to that product
+
+
+Tuesday:
+-complete ordering system
+-admin functions: refund policy page 
+                  -view team and edit
+                  -edit products
+                  -build categories THIS
+-filter should send filter details back to backend and recieve response
+-filter should fetch categories THIS
+-images should be uploaded to cloudinary when saving products Done
+-items should load recommendations based on similar tags Done
+-admin can add offers Done
+
+Wednesday:
+-admin can edit client images
+-admin view users and update
+-admin view orders and update
+-client fetches details from backend
+-user can add wishlist
+-user can update address information
+-user can update profile information
+-user can view orders history
+
+Thursday:
+-admin charts working
+-admin can edit profile info
+-start responsiveness
+-users can leave review for products

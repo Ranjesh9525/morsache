@@ -8,10 +8,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { AiOutlineUser } from "react-icons/ai";
+import { CartContext } from "@/context/cartContext";
+import { cn } from "@/lib/utils";
 
 type Props = {
   scrolling: boolean;
@@ -38,7 +40,8 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
   };
 
   const { data: session }: any = useSession();
-  console.log(session);
+  const { cart, dispatch } = useContext(CartContext)!;
+  // console.log(session);
   return (
     <div className="min-h-[36px]">
       <motion.div
@@ -90,8 +93,18 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
             <Link scroll={true} href={"/account/wishlist"}>
               <Heart />
             </Link>
-            <Link scroll={true} href={"/cart"}>
+            <Link
+              scroll={true}
+              href={"/cart"}
+              data-content={cart.totalItems}
+              className={cn(
+                "relative",
+                cart?.totalItems > 0 &&
+                  `after:bg-red-500 after:p-[0.15rem] after:px-[0.45rem] after:absolute after:text-white after:top-[-12px] after:right-[-12.5px] after:text-[11px] after:rounded-full after:width-1 after:height-1 after:content-[attr(data-content)]`
+              )}
+            >
               <ShoppingBagIcon />
+            
             </Link>
           </span>
         </div>

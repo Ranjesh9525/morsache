@@ -16,7 +16,9 @@ const Header = ({ cart }: Props) => {
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-900">
             continue shopping
           </Link>
-          <p className="text-lg">{cart?.totalItems || 0} items</p>
+          <p className="text-lg">
+            {cart?.totalItems || 0} {cart.totalItems === 1 ? "item" : "items"}
+          </p>
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-900">
             Need help?
           </Link>

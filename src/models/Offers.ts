@@ -5,6 +5,8 @@ const offersSchema = new mongoose.Schema({
   description2: String,
   discount: { type: Number, default: 0 },
   image: String,
+  code:String,
+  quantityEffect: { type: Number, default: 5 },
   effect: {
     type: String,
     enum: ["flat", "percentage", "quantity"],

@@ -32,6 +32,8 @@ import Image from "next/image";
 import ProductPreview from "../../components/ProductPreview";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { Switch } from "@/components/ui/switch";
+
 
 type Props = {};
 
@@ -64,6 +66,7 @@ const page = (props: Props) => {
       .optional(),
     images: z.array(z.string()).nonempty(),
     stock: z.string(),
+    payOnDelivery:z.boolean(),
     moreInformation: z.string().optional(),
   });
  const router = useRouter()
@@ -191,9 +194,29 @@ for(let i= 0;i < amount; i++){
   };
   //FetchAllCategories
   const categories = ["men", "unisex", "women", "cite", "edef"];
-  const tags = ["washable", "grey", "clean"];
-  const sizes = ["xl", "l", "sm"];
-  const variants = ["men", "unisex"];
+  const tags = [
+    "casual",
+    "formal",
+    "striped",
+    "plain",
+    "graphic",
+    "v-neck",
+    "round neck",
+    "long sleeve",
+    "short sleeve",
+    "printed",
+    "solid color",
+    "collared",
+    "button-down",
+    "slim fit",
+    "loose fit",
+    "cotton",
+    "polyester",
+    "denim",
+    "floral",
+    "plaid"
+];
+  const sizes = ["xxl","xl", "l", "m","sm","xs"];
   const offers = [
     {
       title: "10% off",
@@ -412,6 +435,7 @@ for(let i= 0;i < amount; i++){
                   </FormItem>
                 )}
               />
+          
               <FormField
                 control={form.control}
                 name={"variants" as never}
@@ -434,9 +458,8 @@ for(let i= 0;i < amount; i++){
                             Input a name and upload a picture
                           </DialogTitle>
                           <DialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete your account and remove your data from our
-                            servers.
+                            This will be displayed in the variants section of the products
+                            if the variant is a product in the store, just paste the link in the input field below
                           </DialogDescription>
                         </DialogHeader>
                         <div className="w-full space-y-4">
@@ -613,6 +636,29 @@ for(let i= 0;i < amount; i++){
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+                  <FormField
+                control={form.control}
+                name={"payOnDelivery" as never}
+                render={({ field }: { field: any }) => (
+                  <FormItem className="items-start flex w-full flex-col justify-start">
+                    <span className="capitalize font-medium items-center inline-flex gap-4 tracking-tight text-xl">
+                      <h1>Accept pay on delivery?</h1>{" "}
+                      <h1 className="text-[#4e75b9] text-sm">Optional</h1>
+                    </span>
+                    <FormDescription className="text-[12px]">
+                      Default is true
+                    </FormDescription>
+                    <FormControl>
+                    <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                    </FormControl>
+                 
                     <FormMessage />
                   </FormItem>
                 )}
@@ -831,7 +877,6 @@ for(let i= 0;i < amount; i++){
                   form.formState.isSubmitting ||
                   !form.formState.isValid
                 }
-                onClick={() => console.log(form.getValues(), form.formState)}
                 type="submit"
                 className="w-full max-w-[400px] text-center py-5 h-none"
               >

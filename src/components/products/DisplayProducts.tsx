@@ -156,7 +156,7 @@ const DisplayProducts = (props: Props) => {
     mutationFn: getProducts,
   });
   //  server_insertSampleProducts()
-  console.log(data);
+  //console.log(data);
   //const { isOpen, open, close } = useDropdownMenu({ id: "basic-filter-setting" });
 
   // console.log(data)

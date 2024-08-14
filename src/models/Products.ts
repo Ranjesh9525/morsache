@@ -31,6 +31,7 @@ const productSchema = new mongoose.Schema(
       }],
       default: []
   },
+  payOnDelivery:{type:Boolean,default:true},
   exchangeAndReturnPolicy: { type: String },
   moreInformation: { type: String }
 

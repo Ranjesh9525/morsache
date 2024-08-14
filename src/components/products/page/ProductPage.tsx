@@ -3,18 +3,59 @@ import React from "react";
 import ProductGallery from "../ProductGallery";
 import ProductInfo from "../ProductInfo";
 import Recommendation from "../Recommendation";
-import { Product } from "@/@types/products.d";
+import { Offer, Product } from "@/@types/products.d";
 import { redirect } from "next/navigation";
 
 type Props = {
   slug: string;
 };
+
+function generateRandomTitle() {
+  const titles = ["Special Offer", "Discount Deal", "Limited Time Offer", "Big Sale", "Seasonal Discount"];
+  return titles[Math.floor(Math.random() * titles.length)];
+}
+
+function generateRandomDescription() {
+  const descriptions = ["Great discount on selected items", "Buy one get one free", "Exclusive offer for members"];
+  return descriptions[Math.floor(Math.random() * descriptions.length)];
+}
+
+function generateRandomImage() {
+  const images = ["https://picsum.photos/200","https://picsum.photos/250","https://picsum.photos/260","https://picsum.photos/270","https://picsum.photos/190","https://picsum.photos/220","https://picsum.photos/240","https://picsum.photos/230"];
+  return images[Math.floor(Math.random() * images.length)];
+}
+
+function generateRandomOffer(numberOfOffers:number):Offer[] {
+  function offers() {
+    return {
+      title: generateRandomTitle(),
+      id:Math.random().toString(36).substring(2, 9),
+        description: generateRandomDescription(),
+        description2: "Additional description here",
+        discount: Math.floor(Math.random() * 51), // Generate random discount between 0 and 50
+        code:Math.random().toString(36).substring(2, 9),
+        image: generateRandomImage(),
+        quantityEffect: Math.floor(Math.random() * 10) + 1, // Generate random quantity effect between 1 and 10
+        effect: ["flat", "percentage", "quantity"][Math.floor(Math.random() * 3)]  as "flat" | "percentage" | "quantity",
+        active: Math.random() > 0.5 // Randomly set active to true or false
+    }
+  }
+  const randomOffers:Offer[] = Array.from({ length: numberOfOffers }, offers)
+  return randomOffers
+} 
+
+// Generate multiple random offers
+ // Define the number of random offers to generate
+
+
+// console.log(randomOffers);
 export const sampleProducts: Product[] = [
   {
     id: "23",
     name: "elementary magenta plain pure linen shirt",
     description: "Description for elementary magenta plain pure linen shirt",
     price: " 20.0",
+     offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -63,6 +104,7 @@ export const sampleProducts: Product[] = [
     id: "14",
     name: "Matteo Grey Checks Shirt",
     price: " 20.0",
+     offers: generateRandomOffer(5),
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
     rating: 4.5,
@@ -87,6 +129,7 @@ export const sampleProducts: Product[] = [
     name: "Matteo Light Blue Checks Shirt",
     price: " 35.0",
     sizes: ["S", "M", "L"],
+     offers: generateRandomOffer(5),
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
     rating: 4.5,
@@ -117,6 +160,7 @@ export const sampleProducts: Product[] = [
     name: "brush stroke red shirt",
     price: " 25.0",
     sizes: ["S", "M", "L"],
+     offers: generateRandomOffer(3),
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
     rating: 4.5,
@@ -138,6 +182,7 @@ export const sampleProducts: Product[] = [
     id: "17",
     name: "Carmine mauve knitted shirt",
     price: " 30.0",
+     offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -172,6 +217,7 @@ export const sampleProducts: Product[] = [
     id: "27",
     name: "Box Stripe Black Shirt",
     price: " 35.0",
+     offers: generateRandomOffer(4),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -209,7 +255,8 @@ export const sampleProducts: Product[] = [
     price: " 40.0",
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
-    category: ["tshirt", "plain"],
+     offers: generateRandomOffer(5),
+      category: ["tshirt", "plain"],
     tags: [
       "tshirt",
       "casual",
@@ -241,6 +288,7 @@ export const sampleProducts: Product[] = [
     id: "29",
     name: "Doric Red Shirt",
     price: " 30.0",
+     offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -291,6 +339,7 @@ export const sampleProducts: Product[] = [
     id: "30",
     name: "Matteo Grey Checks Shirt",
     price: " 45.0",
+     offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
@@ -334,6 +383,7 @@ export const sampleProducts: Product[] = [
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     price: " 45.0",
+     offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -409,7 +459,7 @@ const ProductPage = ({ slug }: Props) => {
         <ProductGallery product={product} />
         <ProductInfo product={product} />
       </div>
-      <Recommendation />
+      <Recommendation tags={product.tags!} />
     </>
   );
 };

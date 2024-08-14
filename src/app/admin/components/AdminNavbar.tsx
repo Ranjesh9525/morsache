@@ -274,6 +274,16 @@ const AdminNavbar = ({ scrolling }: Props) => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
+                  <Link href="/admin/shipping" legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      {/* <Users size={20} className="mr-2"/>  */}
+                      Shipping
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                   <NavigationMenuTrigger>
                     {/* <Cloud size={20} className="mr-2"/> */}
                     Categories

@@ -14,23 +14,29 @@ export const CartContext = React.createContext<{
 const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [cartInitialState, setCartInitialState] = useState<Cart>({
-    items: [],
-    totalItems: 0,
-    totalAmount: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    shippingAddress: "",
-    paymentMethod: "",
-    isPaid: false,
-  });
-  useEffect(() => {
+  const [cartInitialState, setCartInitialState] = useState<Cart>(() => {
     const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      setCartInitialState(JSON.parse(savedCart));
-    }
-  }, []);
+    return savedCart ? JSON.parse(savedCart) : {
+      items: [],
+      totalItems: 0,
+      totalAmount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      shippingAddress: "",
+      paymentMethod: "",
+      isPaid: false,
+    };
+  });
+  // useEffect(() => {
+  //   const savedCart = localStorage.getItem("cart");
+  //   if (savedCart) {
+  //     setCartInitialState(JSON.parse(savedCart));
+  //   }
+  // }, []);
   const [cart, dispatch] = useReducer(cartReducer, cartInitialState);
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
   // const saveCart = (Cart: ICart) => {
   //   const newCart: ICart = {
   //     id: Math.random(), // not really unique - but fine for this example

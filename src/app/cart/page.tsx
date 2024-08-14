@@ -25,7 +25,7 @@ const Page = (props: Props) => {
 
   //note that when you're viewing your cart it should fetch these products from the server
   //so it can update them in the case of an item going out of stock
-  console.log(cart);
+ // console.log(cart);
   return (
     <HomeLayout title="Cart - Morsache Clothing">
       <div className="min-h-screen p-9 ">
@@ -41,7 +41,7 @@ const Page = (props: Props) => {
                 ))}
             </section>
             <section className="col-span-3">
-              <CheckoutCard />
+              <CheckoutCard cart={cart} />
             </section>
           </div>
         )}

@@ -1,59 +1,57 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import { cartItemSchema } from "./User";
 
-const orderSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema(
+  {
     orderNumber: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     customer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customer',
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    products: [
-        {
-            product: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
-                required: true
-            },
-            quantity: {
-                type: Number,
-                required: true
-            },
-            price: {
-                type: Number,
-                required: true
-            }
-        }
-    ],
+    items: [cartItemSchema],
+    totalItems: Number,
     totalAmount: {
-        type: Number,
-        required: true
+      type: Number,
+      required: true,
     },
     status: {
-        type: String,
-        enum: ['pending', 'confirmed', 'shipped', 'delivered'],
-        default: 'pending'
+      type: String,
+      enum: ["pending", "confirmed", "shipped", "delivered"],
+      default: "pending",
     },
     shippingAddress: {
-        street: String,
-        city: String,
-        state: String,
-        country: String,
-        postalCode: String
+      street: String,
+      city: String,
+      state: String,
+      postalCode: String,
+      country: String,
     },
     paymentMethod: {
+      type: {
         type: String,
-        enum: ['credit card', 'debit card', 'paypal', 'cash on delivery']
+        enum: ["creditCard", "razorPay", "stripe", "payOnDelivery"],
+      },
+      cardNumber: {
+        type: String,
+      },
+      cardExpiry: {
+        type: String,
+      },
+      cardCVV: {
+        type: String,
+      },
     },
     paymentStatus: {
-        type: String,
-        enum: ['pending', 'paid'],
-        default: 'pending'
+      type: String,
+      enum: ["pending", "paid"],
+      default: "pending",
     },
+  },
+  { timestamps: true }
+);
 
-},{timestamps:true});
-
-
-export default mongoose.models.Orders = mongoose.model('Order', orderSchema);
+export default mongoose.models.Orders = mongoose.model("Order", orderSchema);

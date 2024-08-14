@@ -8,7 +8,7 @@ const EmptyCart = (props: Props) => {
   return (
     <div className="w-full flex flex-col items-center my-auto lg:gap-4 sm:gap-2 lg:mt-16 md:mt-10 sm:mt-7">
       <p className="text-4xl font-semibold">Your cart is empty</p>
-      <LucidePackageOpen size={100} strokeWidth={1} />
+      <LucidePackageOpen size={100} strokeWidth={0.7} />
       <p>{"Looks like you haven't added any items to your cart."}</p>{" "}
       <Link
         href="/"

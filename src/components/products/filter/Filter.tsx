@@ -78,7 +78,7 @@ const Filter = ({ category }: Props) => {
   //   }
   // };
 
-  console.log(currentFilter);
+  // console.log(currentFilter);
 
   return (
     <div id="filter-container" className="w-full sticky top-0">
