@@ -9,9 +9,9 @@ import { Response } from "./responseClass";
 import { Offer } from "@/@types/products";
 
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_API_KEY,
-  api_secret: process.env.CLOUD_SECRET_KEY
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
 async function SKUgenerator(amount: number, characters: string) {
@@ -78,7 +78,7 @@ export const AdminUploadProduct = async (data: any) => {
       }
       data.images = imageUrls;
   }
-    const SKU = SKUgenerator(6, data.name);
+    const SKU = await SKUgenerator(6, data.name);
     data.SKU = SKU;
     const product = new ProductsModel(data);
     await product.save();

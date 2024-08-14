@@ -120,6 +120,11 @@ const AdminNavbar = ({ scrolling }: Props) => {
     }
     if (isError) {
       console.log(error);
+      toast({
+        variant:"destructive",
+        title:"Upload failed",
+        description:<p>{error?.message}</p>
+      })
     }
     if (data) {
       console.log(data);

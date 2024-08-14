@@ -751,7 +751,7 @@ for(let i= 0;i < amount; i++){
                         {...field}
                       />
                     </FormControl>
-                    <div className="flex gap-2">
+                    <div className="max-w-full mx-auto  overflow-hidden hover:overflow-x-auto whitespace-nowrap">
                       {tags.map((item, index) => (
                         <Button
                           type="button"
