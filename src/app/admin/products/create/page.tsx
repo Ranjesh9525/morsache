@@ -84,6 +84,7 @@ const page = (props: Props) => {
       tags: [],
       images: [],
       stock: "1",
+      payOnDelivery:true
     },
   });
 

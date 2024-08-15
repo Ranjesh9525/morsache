@@ -8,6 +8,9 @@ import { ArrowRightIcon, User2 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { FaInstagram,FaFacebook,FaLinkedinIn,FaTwitter } from "react-icons/fa6";
 import { MdLogout} from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
+import { FetchCategoriesNamesOnly } from "@/serverlessActions/_fetchActions";
+import { ClipLoader } from "react-spinners";
 
 
 
@@ -45,24 +48,24 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
         },
       ],
     },   
-    // {
-    //   sectionName: "Categories",
-    //   section: [
-    //     {
-    //       name: "T-shirts",
-    //       path: "/products/category/t-shirts",
-    //       showIfNotLoggedIn: true,
-    //       exact: true,
-    //     },
-    //     {
-    //       name: "Casual Shirts",
-    //       path: "/products/category/casual",
-    //       showIfNotLoggedIn: true,
-    //       exact: true,
-    //     },
+    {
+      sectionName: "Categories",
+      section: [
+        // {
+        //   name: "T-shirts",
+        //   path: "/products/category/t-shirts",
+        //   showIfNotLoggedIn: true,
+        //   exact: true,
+        // },
+        // {
+        //   name: "Casual Shirts",
+        //   path: "/products/category/casual",
+        //   showIfNotLoggedIn: true,
+        //   exact: true,
+        // },
 
-    //   ],
-    // },
+      ],
+    },
     {
       sectionName: "",
       section: [
@@ -94,6 +97,25 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
       ],
     },
   ];
+  const {isPending,data:response,error,isError}=useQuery({
+    queryKey: ["categories"],
+    queryFn: () => FetchCategoriesNamesOnly(),
+  })
+  useEffect(() => {
+    if(response?.data){
+      console.log(response)
+      response.data.forEach((item: any) => {
+        userNavItems[response.data.length > 1 ? 1 : 0].section.push({ name: item.name, path: `/products/category/${item.name.replaceAll(" ", "-")}`, showIfNotLoggedIn: true, exact: true })
+      })
+      setNavItems(userNavItems);
+    }
+  },[response])
+  useEffect(() => {
+    if(isError){
+      console.log(error)
+    }
+    
+  },[isError])
   const sideNavVariants = {
     open: {
       x: 0,
@@ -180,8 +202,8 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
             "  h-screen text-text-theme-color overflow-y-hidden hover:overflow-y-auto  z-40 top-0 left-0  "
           }
         >
-          <section className=" flex flex-col gap-4 justify-between h-full ">
-            <ul className="flex flex-col py-2 px-3 text-lg font-medium uppercase">
+         { isPending? <ClipLoader className="mx-auto my-auto"/>: <section className=" flex flex-col gap-4 justify-between h-full ">
+            <section className="flex flex-col py-2 px-3 text-lg font-medium uppercase">
               {navItems.map((items, itemsIndex) => {
                 const accordionOpen = openAccordions.find(
                   (accordionIndex) => accordionIndex == itemsIndex
@@ -302,7 +324,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
                   >
                    <p>Logout</p> <ArrowRightIcon size={21}/>
                   </button>}
-            </ul>
+            </section>
     
             <div className="flex flex-row w-full pb-5 px-2">
            
@@ -316,7 +338,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
             </div>
             
                       <div>    </div>
-          </section>
+          </section>}
         </div>
       </motion.div>
       <div

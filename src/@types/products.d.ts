@@ -19,12 +19,13 @@ export interface Product {
     category?: string[];
     price: string;
     slug:string;
+    reviews?: {rating?: number,userId:string,review:string}[]
     salePrice?: string;
     sizes: string[];
     tags?:string[];
     variants?: {variant:string,image:string}[];
     images: string[];
-    rating?: number;
+    
     purchaseQuantity:number;
     stock?: string;
     offers?:Offer[];

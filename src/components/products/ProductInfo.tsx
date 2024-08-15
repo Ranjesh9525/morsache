@@ -17,6 +17,9 @@ import { CartItem } from "@/@types/cart.d";
 import { cn } from "@/lib/utils";
 import { MdOutlineDiscount } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useMutation } from "@tanstack/react-query";
+import { UserAddToWishList } from "@/serverlessActions/_userActions";
 type Props = {
   product: Product;
 };
@@ -34,7 +37,24 @@ const ProductInfo = ({ product }: Props) => {
   const [selectedVariant, setSelectedVariant] = useState<any>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-const router = useRouter()
+  const { data: session } = useSession();
+  const router = useRouter();
+  // const {isPending, isError,isSuccess, data: response, error, mutate: server_addToWishList} = useMutation({
+  //   mutationFn: UserAddToWishList,
+  // })
+  // const session = await getSession({ req });
+
+  console.log(session);
+
+  async function handleAddToWishlist() {
+    if (!session) {
+      router.push("/auth/login");
+    } else {
+      // server_addToWishList(session.user._id,product.id)
+      // const res = await UserAddToWishList(session!.user?._id,product.id)
+      // console.log(res)
+    }
+  }
   const setProductDetails = () => {
     if (
       selectedVariant.length > 0 &&
@@ -61,7 +81,7 @@ const router = useRouter()
     if (selectedProduct) {
       console.log("selectedProduct", selectedProduct);
       dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
-      router.push('/cart')
+      router.push("/cart");
     } else {
       console.log("selected product is null");
     }
@@ -190,6 +210,7 @@ const router = useRouter()
         )}
         <Button
           variant={"outline"}
+          onClick={handleAddToWishlist}
           className="w-full py-6 border-gray-900 font-medium tracking-wider"
         >
           {" "}
@@ -207,7 +228,8 @@ const router = useRouter()
                     <div
                       key={index}
                       className={`flex flex-row items-center gap-2 mb-2 ${
-                        index !== product?.offers?.length! - 1 && "border-b"}`}
+                        index !== product?.offers?.length! - 1 && "border-b"
+                      }`}
                     >
                       <MdOutlineDiscount size={20} color="#fea12f" />
                       <div className="flex items-start flex-col gap-1">

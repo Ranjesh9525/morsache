@@ -1,15 +1,20 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "../components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import PageHeadingText from "../components/PageHeadingText";
 import { DataTableColumnHeader } from "../components/DataTableColumnHeader";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AdminGetAllUsers } from "@/serverlessActions/_adminActions";
+import {
+  AdminGetAllCategories,
+  AdminGetAllUsers,
+} from "@/serverlessActions/_adminActions";
 import { category } from "@/@types/categories.d";
 import { tShirtCategory } from "@/@types/categories.d";
 import Image from "next/image";
-import {Button} from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import { ClipLoader } from "react-spinners";
 
 export type Users = {
   id: string;
@@ -38,6 +43,7 @@ export const columns: ColumnDef<category>[] = [
 type Props = {};
 
 const page = (props: Props) => {
+  const [categories, setCategories] = useState([]);
   // const data = await getData()
   // const {
   //   isPending,
@@ -49,10 +55,15 @@ const page = (props: Props) => {
   //   mutationFn: AdminGetAllUsers,
   // });
 
-  // const { isPending, isError, data, error } = useQuery({
-  //   queryKey: ["users"],
-  //   queryFn:()=> AdminGetAllUsers(),
-  // });
+  const {
+    isPending,
+    isError,
+    data: response,
+    error,
+  } = useQuery({
+    queryKey: ["categories-admin"],
+    queryFn: () => AdminGetAllCategories(),
+  });
 
   // const [randomData, setData] = React.useState<Users[]>([]);
 
@@ -76,10 +87,19 @@ const page = (props: Props) => {
   //     return randomUsers;
   //   }
 
-  // useEffect(()=>{
-  //  setData( generateRandomUsers(25))
-
-  // },[])
+  useEffect(() => {
+    if (response?.data) {
+      setCategories(response.data);
+    }
+    if (isError) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `${error}`,
+      });
+    }
+  }, [response, isError]);
 
   //    useEffect(() => {
 
@@ -100,7 +120,7 @@ const page = (props: Props) => {
   //           console.log(error)
   //         }
   //  }, [data,isError,isPending]);
-  const categories = [tShirtCategory, tShirtCategory];
+  // const categories = [tShirtCategory, tShirtCategory];
   return (
     <>
       <PageHeadingText
@@ -109,13 +129,13 @@ const page = (props: Props) => {
       />
       <div className="container mx-auto min-h-[70vh] space-y-10 py-10">
         {/* <DataTable columns={columns} data={randomData} /> */}
-        {categories ? (
-          categories.map((item) => {
+        {isPending?<div className="w-full inline-flex items-center justify-center h-full"> <ClipLoader className="" size={30}/> </div>:categories ? (
+          categories?.map((item) => {
             return <CategoryCardAdmin category={item} />;
           })
         ) : (
-          <span>
-            <h1>
+          <span >
+            <h1 className="text-center">
               You dont have any categories...This is bad...Add one quickly!
             </h1>
           </span>
@@ -127,64 +147,74 @@ const page = (props: Props) => {
 
 export default page;
 
-export const CategoryCardAdmin = ({ category }: {category:category}) => {
+export const CategoryCardAdmin = ({ category }: { category: category }) => {
   return (
     <div id="category" className="group">
-      <section id="category-header" className="w-full hidden my-2 group-hover:flex justify-between items-center transition-all duration-200">
-      <h1 className="text-xl font-semibold">Category Name : {category.name}</h1>
-      <section id="category-action-btns" className="space-x-3"><Button variant="outline">Edit</Button><Button variant="destructive">Delete</Button></section>
+      <section
+        id="category-header"
+        className="w-full hidden my-2 group-hover:flex justify-between items-center transition-all duration-200"
+      >
+        <h1 className="text-xl font-semibold">
+          Category Name : {category.name}
+        </h1>
+        <section id="category-action-btns" className="space-x-3">
+          <Button variant="outline">Edit</Button>
+          <Button variant="destructive">Delete</Button>
+        </section>
       </section>
       <div className="w-full flex">
-      <div className="flex-[3] relative cursor-pointer">
-        <div id="category-image " className="h-[450px]  relative  ">
-          <Image
-            src={category.image}
-            alt=""
-            width={280}
-            height={280}
-            className="shadow-lg w-full h-full object-contain absolute"
-          />
-          <div className="absolute inset-0 bg-black opacity-[12%] "></div>
+        <div className="flex-[3] relative cursor-pointer">
+          <div id="category-image " className="h-[450px]  relative  ">
+            <Image
+              src={category.image}
+              alt=""
+              width={280}
+              height={280}
+              className="shadow-lg w-full h-full object-contain absolute"
+            />
+            <div className="absolute inset-0 bg-black opacity-[12%] "></div>
+          </div>
+          <div
+            id="category-name"
+            className="absolute text-xl font-medium uppercase bottom-[20px] tracking-wider left-[10px] text-white"
+          >
+            {" "}
+            {category.name}
+          </div>
         </div>
-        <div
-          id="category-name"
-          className="absolute text-xl font-medium uppercase bottom-[20px] tracking-wider left-[10px] text-white"
-        >
-          {" "}
-          {category.name}
-        </div>
-      </div>
-      <div className="flex-[9] border grid grid-cols-4 p-2.5">
-        <section >
-          <h1 className="uppercase font-medium text-lg underline">Id</h1>
-          <span className="text-[14.5px] pr-4 whitespace-break-spaces break-words">
-            {category.id}
-          </span>
-        </section>
-        {category.tags &&
-          category.tags.length > 0 &&
-          category.tags.map((tag, index: number) => (
-            <section key={index}>
-              <h1 className="uppercase font-medium text-lg underline">{tag.tag}</h1>
-              <section>
-                {tag.values.map((value, subindex: number) => (
-                  <span
-                    key={subindex}
-                    className="flex items-center text-[14.5px] gap-2"
-                  >
-                    {/* <Checkbox
+        <div className="flex-[9] border grid grid-cols-4 p-2.5">
+          <section>
+            <h1 className="uppercase font-medium text-lg underline">Id</h1>
+            <span className="text-[14.5px] pr-4 whitespace-break-spaces break-words">
+              {category._id}
+            </span>
+          </section>
+          {category.tags &&
+            category.tags.length > 0 &&
+            category.tags.map((tag, index: number) => (
+              <section key={index}>
+                <h1 className="uppercase font-medium text-lg underline">
+                  {tag.tag}
+                </h1>
+                <section>
+                  {tag.values.map((value, subindex: number) => (
+                    <span
+                      key={subindex}
+                      className="flex items-center text-[14.5px] gap-2"
+                    >
+                      {/* <Checkbox
                           onCheckedChange={() =>
                             handleFilter({ tag: tag.tag, value })
                           }
                           className="w-4 h-4 rounded-none"
                         /> */}
-                    {value}
-                  </span>
-                ))}
+                      {value}
+                    </span>
+                  ))}
+                </section>
               </section>
-            </section>
-          ))}
-      </div>
+            ))}
+        </div>
       </div>
     </div>
   );

@@ -1,18 +1,20 @@
 "use server";
 import { connectDB } from "@/utilities/DB";
 import { UserSearch } from "lucide-react";
-import {v2 as cloudinary} from "cloudinary"
+import { v2 as cloudinary } from "cloudinary";
 import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
+import CategoryModel from "../models/Category";
 import OffersModel from "../models/Offers";
 import { Response } from "./responseClass";
-import { Offer } from "@/@types/products";
+import { Offer, Product } from "@/@types/products";
+import { category } from "@/@types/categories";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-})
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -37,7 +39,7 @@ export const AdminGetAllUsers = async () => {
     throw error;
   }
 };
-export const AdminGetSingleUsers = async ({ id }: { id: string }) => {
+export const AdminGetSingleUsers = async (id: string) => {
   try {
     await connectDB();
     const user = await UserModel.find({ _id: id });
@@ -51,7 +53,7 @@ export const AdminGetSingleUsers = async ({ id }: { id: string }) => {
     throw error;
   }
 };
-  //We delete previous image if user already have image
+//We delete previous image if user already have image
 //   await cloudinary.v2.uploader.destroy(user?.profilePhoto?.public_id);
 //   const cloudPhoto = await cloudinary.v2.uploader.upload(profilePhoto, {
 //     folder: "profilePhotos",
@@ -65,19 +67,34 @@ export const AdminGetSingleUsers = async ({ id }: { id: string }) => {
 export const AdminUploadProduct = async (data: any) => {
   try {
     await connectDB();
-     if (data.images && Array.isArray(data.images)) {
+    if (data.images && Array.isArray(data.images)) {
       const imageUrls = [];
       for (let i = 0; i < data.images.length; i++) {
         const base64Image = data.images[i];
         const publicId = `${data.slug || data.name}-${i}`;
         const uploadedImage = await cloudinary.uploader.upload(base64Image, {
-            folder: `products/${data.slug || "unknown"}`,
-            public_id: publicId
+          folder: `products/${data.slug || "unknown"}`,
+          public_id: publicId,
         });
-          imageUrls.push(uploadedImage.secure_url);
+        imageUrls.push(uploadedImage.secure_url);
       }
       data.images = imageUrls;
-  }
+    }
+    if (data.variants && Array.isArray(data.variants)) {
+      const varaintsModified: { variant: string; image: string }[] = [];
+      data.variants.forEach(async (variant: any) => {
+        const publicId = `${data.slug || data.name}-${variant.variant}`;
+        const uploadedImage = await cloudinary.uploader.upload(variant.image, {
+          folder: `products/${data.slug || "unknown"}/variants`,
+          public_id: publicId,
+        });
+        varaintsModified.push({
+          variant: variant.variant,
+          image: uploadedImage.secure_url,
+        });
+      });
+      data.variants = varaintsModified;
+    }
     const SKU = await SKUgenerator(6, data.name);
     data.SKU = SKU;
     const product = new ProductsModel(data);
@@ -89,18 +106,30 @@ export const AdminUploadProduct = async (data: any) => {
     throw error;
   }
 };
-// title: z.string(),
-// description: z.string(),
-// description2: z.string().optional(),
-// discount: z.string(),
-// code: z.string({
-//   required_error:
-//     "This code is important, its how users can access this offer",
-// }),
-// quantityEffect: z.string(),
-// effect: z.enum(["flat", "percentage", "quantity"]),
-// active: z.boolean(),
 
+export const AdminGetAllProducts = async () => {
+  try {
+    await connectDB();
+    const products: Product[] = await ProductsModel.find();
+    return Response("Products fetched successfully", 200, true, products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};
+export const AdminGetSingleProduct = async (id: string) => {
+  try {
+    await connectDB();
+    const product: Product = await ProductsModel.findOne({ _id: id });
+    if (!product) {
+      throw new Error("Product not found");
+    }
+    return Response("Product fetched successfully", 200, true, product);
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+};
 export const AdminCreateOffer = async (data: Offer) => {
   try {
     // Add your validation logic based on the offer properties
@@ -119,7 +148,7 @@ export const AdminCreateOffer = async (data: Offer) => {
         "Invalid quantity discount,quantity effect cannot be 0 or less than 0"
       );
     }
-    console.log("creating offer...")
+    console.log("creating offer...");
     await connectDB();
     const offer = new OffersModel(data);
     await offer.save();
@@ -129,3 +158,62 @@ export const AdminCreateOffer = async (data: Offer) => {
     throw error;
   }
 };
+
+export const AdminGetAllOffers = async () => {
+  try {
+    await connectDB();
+    const offers: Offer[] = await OffersModel.find();
+    return Response("Offers fetched successfully", 200, true, offers);
+  } catch (error) {
+    console.error("Error fetching offers:", error);
+    throw error;
+  }
+};
+
+
+export const AdminCreateCategory = async (data: category) => {
+  try {
+    await connectDB();
+    console.log(data)
+    if(!data.tags || data.tags.length < 1){
+      throw new Error("Tags cannot be empty");
+    }
+    if(data.image){
+      const cloudPhoto = await cloudinary.uploader.upload(data.image, {
+        folder: "categories",
+        public_id: data.name,
+        // width: 150,
+      });
+      data.image = cloudPhoto.secure_url;
+    }
+    const category = new CategoryModel(data);
+    await category.save();
+    return Response("Category created successfully", 200, true, category);
+  } catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
+  }
+}
+
+export const AdminGetAllCategories = async () => {
+  try {
+    await connectDB();
+    const categories: category[] = await CategoryModel.find();
+    return Response("Categories fetched successfully", 200, true, categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+}
+
+export const AdminDeleteCategory = async(id:string)=>{
+  try{
+await connectDB();
+const category = await CategoryModel.findByIdAndDelete(id);
+return null
+
+  }catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
+  }
+}

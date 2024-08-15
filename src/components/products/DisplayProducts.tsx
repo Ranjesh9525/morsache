@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 
 import { Button } from "@/components/ui/button";
@@ -17,16 +17,16 @@ import ProductCard from "../general/ProductCard";
 import { ChevronDown, RectangleVertical } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
-  test,
-  insertSampleProducts,
-  getProducts,
+  GetProductsByCategory
 } from "@/serverlessActions/_fetchActions";
 import { sampleProducts } from "./page/ProductPage";
 
-type Props = {};
+type Props = {
+  category: string;
+};
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
-const DisplayProducts = (props: Props) => {
+const DisplayProducts = ({ category }: Props) => {
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
@@ -149,20 +149,28 @@ const DisplayProducts = (props: Props) => {
   const {
     isPending,
     isError,
-    data,
+    data:response,
     error,
-    mutate: server_insertSampleProducts,
+    mutate: server_getProductsByCategory,
   } = useMutation({
-    mutationFn: getProducts,
+    mutationFn: GetProductsByCategory,
   });
   //  server_insertSampleProducts()
   //console.log(data);
   //const { isOpen, open, close } = useDropdownMenu({ id: "basic-filter-setting" });
 
   // console.log(data)
-  const d = {
-    data: "oevn",
-  };
+useEffect(() => {
+  server_getProductsByCategory(category)
+},[])
+useEffect(() => {
+  if( !isError && response?.data) {
+    console.log("data", response);
+  }
+  if(error) {
+    console.log("error", error);
+  }
+},[ isError, response, error])
   return (
     <div>
       <section
@@ -170,7 +178,7 @@ const DisplayProducts = (props: Props) => {
         className="flex items-center justify-between w-full mb-7"
       >
         <section className="text-[14px] flex items-center gap-2">
-          <h1 onClick={() => server_insertSampleProducts()}> View as</h1>
+          <h1 > View as</h1>
           <span
             className="flex border p-[0.15rem] cursor-pointer"
             onClick={() => setViewAs(2)}
@@ -269,8 +277,8 @@ const DisplayProducts = (props: Props) => {
         id="products"
         className={`grid grid-cols-${viewAs} gap-x-4 gap-y-7`}
       >
-        {data
-          ? data.map((item: Product, index: number) => (
+        {response?.data
+          ? response?.data.map((item: Product, index: number) => (
               <ProductCard
                 item={item}
                 index={index}

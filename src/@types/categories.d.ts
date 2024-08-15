@@ -1,6 +1,6 @@
 
 export type category = {
-    id?:string;
+    _id?:string;
     name:string;
     image:string;
     tags:{
@@ -10,7 +10,7 @@ export type category = {
 }
 
 export const tShirtCategory:category={
-    id:"2mfomofm2fmewmcdf43043fpodmc3534m",
+    _id:"2mfomofm2fmewmcdf43043fpodmc3534m",
     name:"T-Shirts",
     image:"/items/cut-leaf-navy-shirt2.jpg",
     tags:[

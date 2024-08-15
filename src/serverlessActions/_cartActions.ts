@@ -96,3 +96,5 @@ export async function validateOffers(data:any) {
 //         throw error;
 //     }
 // }
+
+// export const createCart = async (data: any) => {

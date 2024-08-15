@@ -10,6 +10,7 @@ import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import { format } from "@/components/products/ProductInfo";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import {
   Form,
   FormField,
@@ -40,9 +41,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { Offer } from "@/@types/products";
-import { AdminCreateOffer } from "@/serverlessActions/_adminActions";
+import { AdminCreateCategory, AdminCreateOffer } from "@/serverlessActions/_adminActions";
 import { category } from "@/@types/categories";
 import { PlusCircleIcon } from "lucide-react";
+import Image from "next/image";
 
 type Props = {};
 
@@ -141,7 +143,17 @@ const offersData: Offer[] = [
 //     values:string[]
 // }[]
 const page = (props: Props) => {
- 
+  const [categoryTags, setCategorytags] = React.useState<
+  {
+    values:string[];
+    tag: string;
+}[] 
+>([
+  {
+    tag: "",
+    values: ["", ""],
+  },
+]);
   const categorySchema = z.object({
     name: z.string(),
     image: z.string({
@@ -152,48 +164,58 @@ const page = (props: Props) => {
       .array(
         z.object({
           tag: z.string(),
-          values: z.array(z.string()).nonempty(),
+          values: z.array(z.string()),
         })
       )
-      .nonempty(),
+      .optional(),
   });
 
-  const form = useForm<category>({
+  const form = useForm<z.infer<typeof categorySchema>>({
     resolver: zodResolver(categorySchema),
-    defaultValues: {},
+
   });
-  //   const {
-  //     isPending,
-  //     isError,
-  //     data: categorysData,
-  //     isSuccess,
-  //     error,
-  //     mutate: server_AdminCreatecategory,
-  //   } = useMutation({
-  //     mutationFn: AdminCreatecategory,
-  //   });
-  function onSubmit(values: category) {
+  
+    const {
+      isPending,
+      isError,
+      data: categorysData,
+      isSuccess,
+      error,
+      mutate: server_AdminCreateCategory,
+    } = useMutation({
+      mutationFn: AdminCreateCategory,
+    });
+  function onSubmit(values: z.infer<typeof categorySchema>) {
     // server_AdminCreatecategory(values)
+    values.tags = categoryTags
+
     console.log(values);
+    server_AdminCreateCategory(values as category)
+    
   }
-  //   useEffect(() => {
-  //     if (isSuccess) {
-  //       toast({
-  //         variant: "success",
-  //         title: "category created ",
-  //         description: "category has been created successfully",
-  //       });
-  //     }
-  //     if (error) {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Error:category creation failed",
-  //         description: <p>{error?.message}</p>,
-  //       });
-  //     }
-  //   }, [isSuccess, error]);
-  const [categoryTags, setCategorytags] = React.useState([]);
-  const [dragging, setDragging] = React.useState(false)
+    useEffect(() => {
+      if (isSuccess) {
+        form.reset()
+        toast({
+          variant: "success",
+          title: "category created ",
+          description: "category has been created successfully",
+        });
+      }
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error:category creation failed",
+          description: <p>{error?.message}</p>,
+        });
+      }
+    }, [isSuccess, error]);
+
+  const [dragging, setDragging] = React.useState(false);
+  const [imageDimensions, setImageDimensions] = React.useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
   const handleFileChange = (e: any, field: string) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -201,11 +223,20 @@ const page = (props: Props) => {
 
       reader.onload = (e: any) => {
         if (reader.readyState === 2) {
-          form.setValue("image",reader.result as string);
+          form.setValue("image", reader.result as string);
         }
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+    const newImageDimensions: {
+      width: number;
+      height: number;
+    } = { width: naturalWidth, height: naturalHeight };
+    setImageDimensions(newImageDimensions);
   };
 
   const handleDragOver = (e: any) => {
@@ -217,6 +248,45 @@ const page = (props: Props) => {
     e.preventDefault();
     setDragging(false);
   };
+
+  const handleDrop = (e: any) => {
+    e.preventDefault();
+    setDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        form.setValue("image", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const updateCategoryTagValues = (
+    index: number,
+    e: React.SyntheticEvent<HTMLInputElement>,
+    valueIndex: number
+  ) => {
+    const newCategoryTags = [...categoryTags!];
+    newCategoryTags[index].values[valueIndex] = e.currentTarget.value;
+    setCategorytags( newCategoryTags);
+  };
+  const addCategoryTagValue = (index: number) => {
+    const newCategoryTags = [...categoryTags!];
+    newCategoryTags[index].values.push("");
+    setCategorytags( newCategoryTags);
+  };
+  const addCategoryTag = () => {
+    const newCategoryTags = [...categoryTags!];
+    newCategoryTags.push({
+      tag: "",
+      values: ["", ""],
+    });
+    setCategorytags( newCategoryTags);
+  };
   return (
     <>
       <PageHeadingText
@@ -225,7 +295,7 @@ const page = (props: Props) => {
       />
 
       <div className="container mx-auto min-h-[70vh] py-6">
-        <div className="mb-4">
+        <div className="mb-7 text-center">
           This Category will be seen on the create products tab , to add it use
           the name exactly as its written, also it can be added to already
           existing products and they will fall under this category when the
@@ -237,9 +307,8 @@ const page = (props: Props) => {
               onSubmit={form.handleSubmit(onSubmit)}
               className="w-full space-y-12"
             >
-              <div className="w-full grid grid-cols-5 gap-3 items-start">
+              <div className="w-full grid grid-cols-6 gap-3 items-start">
                 <div className="col-span-2">
-                  {" "}
                   <FormField
                     control={form.control}
                     name={"image" as never}
@@ -259,83 +328,62 @@ const page = (props: Props) => {
                               accept="image/*"
                               id="file"
                               className="hidden"
-                              //   onChange={(e) => handleFileChange(e, field)}
+                              onChange={(e) => handleFileChange(e, field)}
                             />
                             {/* <p className="text-black dark:text-white text-left font-medium text-xl mb-2">
                         Course Thumbnail:
                       </p> */}
-                            <label
-                              htmlFor="file"
-                              // className={`w-full min-h-[10vh] rounded-md dark:border-white border-[#00000026] p-3 border flex items-center justify-center ${
-                              // dragging ? "bg-blue-500" : "bg-transparent"
-                              // }`}
-                              //   onDragOver={handleDragOver}
-                              //   onDragLeave={handleDragLeave}
-                              //   onDrop={handleDrop}
-                            >
-                              <span className="text-black text-sm dark:text-white">
-                                Drag and drop your image here or click to browse
-                              </span>
-                            </label>
+                            {!form.getValues("image") ? (
+                              <label
+                                htmlFor="file"
+                                className={`w-full min-h-[40vh] rounded-md dark:border-white border-[#00000026] p-3 border flex items-center justify-center ${
+                                  dragging ? "bg-blue-500" : "bg-transparent"
+                                }`}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                              >
+                                <span className="text-black text-sm dark:text-white">
+                                  Drag and drop your image here or click to
+                                  browse
+                                </span>
+                              </label>
+                            ) : (
+                              <div className="text-[12px] text-center">
+                                Click on the image to remove it
+                                <div className="">
+                                  <p className="text-[12px] mb-1">{`Image  - ${imageDimensions.width} x ${imageDimensions.height}`}</p>
+                                  <Image
+                                    src={form.getValues("image")!}
+                                    alt="image"
+                                    height={200}
+                                    width={200}
+                                    onClick={() => {
+                                      form.setValue("image", "");
+                                    }}
+                                    onLoad={(e) => handleImageLoad(e)}
+                                    className="max-h-full w-full object-cover"
+                                  />
+                                </div>
+                              </div>
+                            )}{" "}
                           </div>
                         </FormControl>
-                        {/* {form.getValues("image").length > 0 && ( 
-                    //   <div className="text-[12px] text-center">
-                    //     {" "}
-                    //     Click on an image to remove it
-                    //     <div className="grid grid-cols-3 gap-2">
-                    //       {form.getValues("image").map((img, index) => (
-                    //         <div key={index} className="w-full">
-                    //           {imageDimensions[index] && (
-                    //             <p className="text-[12px] mb-1">{`Image ${
-                    //               index + 1
-                    //             } - ${imageDimensions[index].width} x ${
-                    //               imageDimensions[index].height
-                    //             }`}</p>
-                    //           )}
-                    //           <img
-                    //             src={img}
-                    //             alt="image"
-                    //             onClick={() => {
-                    //               form.setValue(
-                    //                 "images",
-                    //                 form
-                    //                   .getValues("images")
-                    //                   .filter((_img, i) => i !== index) as any
-                    //               );
-                    //             }}
-                    //             onLoad={(e) => handleImageLoad(index, e)}
-                    //             className="max-h-full w-full object-cover"
-                    //           />
-                    //         </div>
-                    //       ))}
-                    //     </div>
-                    //   </div>
-                    // )}
-                    {/* <div className="flex gap-2">
-                    {tags.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field?.value?.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          field.onChange(() => {
-                            updateSelectedOptionArray<string[],string>(field.value,item)
-                        });
-                        }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
-                  </div> */}
+
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <div className="col-span-3 grid grid-cols-2 gap-3 items-center">
+                <motion.div
+                  initial="hidden" // Set initial animation state
+                  animate="visible" // Set animation state when component mounts
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { duration: 0.5 } }, // Add transition for smooth animation
+                  }}
+                  className="col-span-4 grid grid-cols-2 gap-3 items-center"
+                >
                   <FormField
                     control={form.control}
                     name="name"
@@ -355,59 +403,92 @@ const page = (props: Props) => {
                       </FormItem>
                     )}
                   />
-                  {categoryTags.map((tag) => {
-                    
+                  {categoryTags!.map((tag, index) => {
                     return (
-                      <section className="items-start flex w-full flex-col justify-start">
+                      <motion.section
+                        key={index}
+                        className="items-start flex w-full flex-col justify-start"
+                      >
                         <h1 className="capitalize font-medium tracking-tight text-xl">
-                          Category name
+                          Tag {index + 1}
                         </h1>
-                        <span className="text-[12px]">
-                          This will be displayed as it is in the navbar and in
-                          url
+                        <span className="flex  gap-2 items-center w-full">
+                          <h1 className="w-full text-[14px] whitespace-nowrap">
+                            Tag Name
+                          </h1>
+                          <Input
+                            placeholder="e.g. Size"
+                            onChange={(
+                              e: React.SyntheticEvent<HTMLInputElement>
+                            ) => {
+                              const modifiedCategoryTags = [
+                                ...categoryTags!
+                              ];
+                              modifiedCategoryTags[index].tag =
+                                e.currentTarget.value;
+                              setCategorytags( modifiedCategoryTags);
+                            }}
+                          />
                         </span>
-                        <Input placeholder="e.g. Shirts" />
-                      </section>
+                        <h1 className="w-full text-[14px]">Values</h1>
+                        <span className="grid grid-cols-2 gap-2 items-center">
+                          {tag.values.map((value, valueIndex) => (
+                            <Input
+                              key={valueIndex}
+                              onChange={(e) =>
+                                updateCategoryTagValues(index, e, valueIndex)
+                              }
+                              placeholder="e.g xl,l,sm"
+                            />
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="col-span-2"
+                            onClick={() => addCategoryTagValue(index)}
+                          >
+                            <PlusCircleIcon strokeWidth={1} size={30} />
+                          </Button>
+                        </span>
+                      </motion.section>
                     );
                   })}
-                  <div className="border rounded-lg flex flex-col items-center justify-center w-full h-full py-4 gap-1 hover:bg-gray-200 cursor-pointer">
-                    <PlusCircleIcon size={30} />
+                  <motion.div
+                    onClick={addCategoryTag}
+                    className="border rounded-lg flex flex-col items-center justify-center w-full h-full py-4 gap-1 hover:bg-gray-200 cursor-pointer"
+                  >
+                    <PlusCircleIcon strokeWidth={1} size={30} />
                     <h1>Add Tag</h1>
                     <p className="text-gray-500 font-medium text-[14px]">
                       Click here to add a new tag
                     </p>
-                  </div>
-                </div>
-              </div>{" "}
+                  </motion.div>
+                </motion.div>
+              </div>
               <div className="space-y-2 mx-auto w-fit">
                 <Button
                   disabled={
                     form.formState.isValidating ||
                     form.formState.isSubmitting ||
-                    !form.formState.isValid
+                    !form.formState.isValid || isPending
                   }
-                  //   onClick={() =>
-                  //  console.log(form.getValues(), form.formState)
-                  //   }
+                  // onClick={() => console.log(form.getValues(), categoryTags)}
                   type="submit"
                   className="w-full max-w-[400px] text-center py-5 h-none"
                 >
-                  {form.formState.isSubmitting ? (
+                  {form.formState.isSubmitting || isPending ? (
                     <ClipLoader size={22} color="white" />
                   ) : (
-                    "Create offer"
+                    "Create Category"
                   )}
                 </Button>
-                <p className="text-[12.5px] capitalize text-center">
-                  This offer will only be activated for products you add it to
-                  their offer list
-                </p>
+                {/* <p className="text-[12.5px] capitalize text-center">
+                  
+                </p> */}
               </div>
             </form>
           </Form>
         </div>
-
-        {/* <DataTable columns={columns} data={offersData} /> */}
       </div>
     </>
   );

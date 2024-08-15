@@ -15,7 +15,7 @@ const page = (props: Props) => {
           <Filter category={props.params.name}/>
         </section>
         <section id="filter-results" className="col-span-7 p-9">
-          <DisplayProducts />
+          <DisplayProducts  category={props.params.name.toString().replaceAll("-"," ")}/>
         </section>
       </div>
     </HomeLayout>

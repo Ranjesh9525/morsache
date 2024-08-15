@@ -5,8 +5,9 @@ import { MongooseAdapter } from "@choutkamartin/mongoose-adapter";
 import { randomInt } from "crypto";
 import { createTransport } from "nodemailer";
 import { JWT } from "next-auth/jwt";
-import UserModel , { UserDocument }  from "@/models/User";
+import UserModel  from "@/models/User";
 import { connectDB, disconnectDB } from "@/utilities/DB";
+import { UserDocument } from "@/@types/user";
 
 //   adapter: PrismaAdapter(prisma as PrismaClient) as Adapter,
 const senderName = process.env.SMTP_FROM_NAME;
@@ -57,7 +58,7 @@ export const authOptions: AuthOptions = {
   ],
   pages: {
     signIn: "/auth/login",
-    signOut:"/products"
+    signOut:"/"
   },
   callbacks: {
     async signIn({ user,email }) {
@@ -91,34 +92,12 @@ export const authOptions: AuthOptions = {
       }
     },
    
-    // async signIn({ user, account, profile, email, credentials }) {
-    //   const verificationRequest = email.verificationRequest;
-    //   if (verificationRequest) {
-    //     const EMAIL_WHITELIST = ["whitelisted_email.hotmail.com"];
-    //     const { email: emailAddress } = user;
-    //     if (!EMAIL_WHITELIST.includes(emailAddress)) {
-    //       console.log("Invalid email address - not allowed to sign in");
-    //       return false;
-    //     }
-    //   }
-
-    //   return true;
-    // async signIn(user, account, profile) {
-    //   // Perform actions after user signs in
-    // },
-    // async session(session, user) {
-    //   // Fetch user data from the database and set it in the session
-    //   const userData = await User.findOne({ email: user.email });
-    //   if (userData) {
-    //     session.user = userData;
-    //   }
-    //   return session;
-    // },
+  
     jwt: async({token, user}: { token: JWT; user: User}) => {
-        const userData = await UserModel.findOne({ email: user.email });
+        const userData: UserDocument = await UserModel.findOne({ email: user.email });
         user && (token.user = userData);
         console.log("token - User:", token);
-        return token
+        return Promise.resolve(token );
     }
     }
 }
@@ -177,3 +156,26 @@ function text(params: { token: string; host: string }) {
   Keep in mind that this code will expire after 3 minutes. If you did not request this email you can safely ignore it.
   `;
 }
+  // async signIn({ user, account, profile, email, credentials }) {
+    //   const verificationRequest = email.verificationRequest;
+    //   if (verificationRequest) {
+    //     const EMAIL_WHITELIST = ["whitelisted_email.hotmail.com"];
+    //     const { email: emailAddress } = user;
+    //     if (!EMAIL_WHITELIST.includes(emailAddress)) {
+    //       console.log("Invalid email address - not allowed to sign in");
+    //       return false;
+    //     }
+    //   }
+
+    //   return true;
+    // async signIn(user, account, profile) {
+    //   // Perform actions after user signs in
+    // },
+    // async session(session, user) {
+    //   // Fetch user data from the database and set it in the session
+    //   const userData = await User.findOne({ email: user.email });
+    //   if (userData) {
+    //     session.user = userData;
+    //   }
+    //   return session;
+    // },

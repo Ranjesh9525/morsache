@@ -46,11 +46,6 @@ const sampleProducts = [
   // Add more sample products as needed
 ];
 
-export const test = async () => {
-  //console.log(data)
-  console.log("working");
-  return JSON.parse(JSON.stringify({ name: "yourData" }));
-};
 
 // Function to insert sample products into the database
 export const insertSampleProducts = async () => {
@@ -78,15 +73,40 @@ export const getProducts = async () => {
   }
 };
 
-export const FetchAllCategories = async ({ id }: { id: string }) => {
+
+export const GetProductsByCategory = async (category: string) => {
   try {
     await connectDB();
-    const categories = await CategoryModel.find();
-    if (!categories) {
+    const products = await ProductsModel.find({ category: category });
+    return Response("products", 200, true, products );
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+}
+
+export const FetchSingleProduct = async(slug:string) => {
+  try{
+    await connectDB();
+    const product = await ProductsModel.findOne({slug:slug})
+    if (!product) {
       return null;
     }
-    // console.log(categories);
-    return JSON.parse(JSON.stringify(categories));
+    return Response("product", 200, true, product );
+  }catch(error){  
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+}
+
+export const FetchCategoryData = async (name:string) => {
+  try {
+    await connectDB();
+    const category = await CategoryModel.findOne({name:name})
+    if (!category) {
+      return null;
+    }
+    // console.log(category);
+    return Response("category", 200, true, category );
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
@@ -107,3 +127,17 @@ export const FetchSimilarProducts = async (tags:  string[] ) => {
     throw error;
   }
 };
+
+export const FetchCategoriesNamesOnly = async()=>{
+  try{
+    await connectDB();
+
+    const categoriesName = await CategoryModel.find().select("name");
+
+    return Response("categories names", 200, true, categoriesName );
+
+  }catch(error){
+    console.error("Error fetching categories", error);
+    throw error;
+  }
+}
