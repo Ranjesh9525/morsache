@@ -113,6 +113,39 @@ export const FetchCategoryData = async (name:string) => {
   }
 };
 
+export const FetchProductsFromFilterData = async (data: { tag: string; values: string[] }[] | []) => {
+  try {
+      await connectDB(); // Assuming connectDB() function is defined to connect to the database
+
+      let query: { [key: string]: any } = {}; // Define an index signature for query
+
+      // Check if data array is empty, return all products
+      if (data?.length === 0) {
+          const allProducts = await ProductsModel.find();
+          return Response("All products",200,true,allProducts)
+
+      }
+
+      // Construct the query dynamically for each tag in data
+      for (const { tag, values } of data) {
+          if (Array.isArray(values) && values.length > 0) {
+              query[tag] = { $in: values };
+          }
+      }
+
+      // Find products that match the query
+      const products = await ProductsModel.find(query);
+
+      return Response("searched products",200,true,products)
+
+  } catch (error) {
+      console.error("Error fetching products based on filter data:", error);
+      throw error;
+  }
+};
+
+
+
 export const FetchSimilarProducts = async (tags:  string[] ) => {
   try {
     await connectDB();

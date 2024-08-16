@@ -8,8 +8,27 @@ import Slider from "@/components/home/slider/Slider";
 import HomeLayout from "@/components/layouts/HomeLayout";
 import Image from "next/image";
 import Protected from "@/_hooks/useProtected";
+// import { getServerSession } from "next-auth";
+// import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+// import { redirect } from "next/navigation";
 
-export default function Home() {
+// import SignInForm from "./SignInForm";
+// import VerificationAlert from "./VerificationAlert";
+
+// async function authenticationPrecheck(): Promise<void> {
+//   const session = await getServerSession(authOptions)
+//   console.log("session from server",session)
+//   if (session?.user) return redirect("/account")
+// }
+
+
+  // type Props = {};
+  
+  // const page = async(props: Props) => {
+  // 
+
+export default async function Home() {
+  // await authenticationPrecheck()
   const category=[
     {
        

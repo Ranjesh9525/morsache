@@ -1,9 +1,16 @@
 "use server"
 import ProductsModel from "../models/Products";
+import UserModel from "../models/User";
+// import CModel from "../models/Products";
 
+import { getServerSession } from "next-auth";
+import {Cart} from "@/@types/cart.d"
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // Import the Offers model with the offersSchema
 import Offers from '@/models/offers'
 import { Response } from "./responseClass";
+import { connectDB } from "@/utilities/DB";
+// import UserModel from "../models/User";
 
 export async function validateOffers(data:any) {
     try {
@@ -97,4 +104,29 @@ export async function validateOffers(data:any) {
 //     }
 // }
 
-// export const createCart = async (data: any) => {
+
+export const createCart = async (data: Cart)=> {
+    try {
+        await connectDB();
+
+
+        const session:any = await getServerSession(authOptions);
+        
+        if (session) {
+            const userId = session?.user?._id;
+            const user = await UserModel.findOne({_id:userId})
+            if(!user){
+                throw new Error('No User found')
+            }
+            user.cart.push(data)
+            user.save()
+        } else {
+            // Handle the case where there is no active session
+            console.log("No active session found. Unable to create cart.");
+        }
+
+    } catch (error) {
+        console.log(`Error creating cart: ${error}`);
+        throw error;
+    }
+};

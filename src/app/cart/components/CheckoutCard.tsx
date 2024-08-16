@@ -39,9 +39,9 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
 };
 
 //get all offers in cart and all products in cart and send it back with the offer results to the offer component
-const offe = [
-  { offerIf: "10%", offerDiscountedPrice: 1900, productId: 323424 },
-];
+// const offe = [
+//   { offerIf: "10%", offerDiscountedPrice: 1900, productId: 323424 },
+// ];
 // data:[{offerId,productId,quantity},
 const CheckoutCard = ({ cart }: Props) => {
   const [code, setCode] = useState<string>("");
@@ -64,6 +64,15 @@ const CheckoutCard = ({ cart }: Props) => {
   } = useMutation({
     mutationFn: validateOffers,
   });
+  // const {
+  //   isPending:uploadCartIsPending,
+  //   isError:uploadCartError,
+    //   isSuccess:uploadCartIsSuccess,
+  //   error:uploadCartError,
+  //   mutate: server_uploadUserCartMutate,
+  // } = useMutation({
+  //   mutationFn: uploadUserCart,
+  // });
   useEffect(() => {
     if (code) {
       setAllOfferData(() =>

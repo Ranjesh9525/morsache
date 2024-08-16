@@ -14,15 +14,79 @@ import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 
 type Props = {
-  category: string;
+  category?: string;
+  currentFilter:    { tag: string; values: string[] }[] | [];
+  setCurrentFilter:React.Dispatch<React.SetStateAction<{ tag: string; values: string[] }[] | []>>
 };
 //make request to fetch the category
-const Filter = ({ category }: Props) => {
-  const [currentFilter, setCurrentFilter] = React.useState<
-    { tag: string; values: string[] }[] | []
-  >([]);
+const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
+  // const [currentFilter, setCurrentFilter] = React.useState<
+  //   { tag: string; values: string[] }[] | []
+  // >([]);
   const router = useRouter();
-  const [categoryData, setCategoryData] = React.useState<category | null>(null);
+  const [categoryData, setCategoryData] = React.useState<category | {name:string,tags:{tag:string,values:string[]}[]}>({
+    name:"",
+    tags:[
+      {
+          tag:"size",
+          values:[
+              "S",
+              "M",
+              "L",
+              "XL",
+              "XXL"
+          ]
+      },
+      {
+          tag:"color",
+          values:[
+              "red",
+              "blue",
+              "green"
+          ]
+      },
+      {
+          tag:"material",
+          values:[
+              "cotton",
+              "polyester"
+          ]
+      },
+      {
+          tag:"gender",
+          values:[
+              "men",
+              "women",
+              "unisex"
+          ]
+      },
+      {
+          tag:"season",
+          values:[
+              "spring",
+              "summer",
+              "autumn",
+              "winter"
+          ]
+      },
+      {
+          tag:"style",
+          values:[
+              "casual",
+              "sport",
+              "formal"
+          ]
+      },
+      {
+          tag:"fit",
+          values:[
+              "slim",
+              "regular",
+              "oversize",
+          ]
+      }
+  ]
+  });
   const handleFilter = (selectedFilter: { tag: string; value: string }) => {
     setCurrentFilter((prevFilter) => {
       const specificTagExist = prevFilter.findIndex(
@@ -108,19 +172,21 @@ const Filter = ({ category }: Props) => {
     mutationFn: FetchCategoryData,
   });
   useEffect(() => {
+    if(category){
     server_FetchCategoryData(category.toString().replaceAll("-", " "));
+    }
   }, []);
   useEffect(() => {
     if (isSuccess) {
       if (response?.data) {
         setCategoryData(response?.data);
       } else {
-        router.push("/500");
+        // router.push("/500");
       }
     }
     if (error) {
       console.log(error);
-      router.push("/500");
+      // router.push("/500");
     }
   }, [error, response]);
   return (
@@ -132,7 +198,7 @@ const Filter = ({ category }: Props) => {
           <>
             {" "}
             <section>
-              {currentFilter.length > 0 && (
+              {currentFilter?.length > 0 && (
                 <>
                   <div className="text-sm font-bold mb-3 inline-flex justify-between">
                     <h1>Filters</h1>{" "}
@@ -145,7 +211,7 @@ const Filter = ({ category }: Props) => {
                   </div>
                   <div className="flex flex-col gap-2 ">
                     {" "}
-                    {currentFilter.map((item, index) => {
+                    {currentFilter?.map((item, index) => {
                       if (item.values.length > 0) {
                         return (
                           <span
@@ -162,13 +228,13 @@ const Filter = ({ category }: Props) => {
                 </>
               )}
             </section>
-            <div id="categories">{categoryData!.name}</div>
+           {categoryData?.name && <div id="categories">{categoryData?.name }</div> }
             <div id="filters">
               <Accordion
                 type="multiple"
-                defaultValue={[...categoryData!.tags.map((i) => i.tag)]}
+                defaultValue={[...categoryData?.tags.map((i) => i.tag)]}
               >
-                {categoryData!.tags.map((tag, index) => {
+                {categoryData?.tags.map((tag, index) => {
                   return (
                     <AccordionItem value={tag.tag} key={index}>
                       <AccordionTrigger className="capitalize hover:no-underline">

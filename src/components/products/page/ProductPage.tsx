@@ -7,48 +7,69 @@ import { Offer, Product } from "@/@types/products.d";
 import { redirect } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { FetchSingleProduct } from "@/serverlessActions/_fetchActions";
+import { ClipLoader } from "react-spinners";
 
 type Props = {
   slug: string;
 };
 
 function generateRandomTitle() {
-  const titles = ["Special Offer", "Discount Deal", "Limited Time Offer", "Big Sale", "Seasonal Discount"];
+  const titles = [
+    "Special Offer",
+    "Discount Deal",
+    "Limited Time Offer",
+    "Big Sale",
+    "Seasonal Discount",
+  ];
   return titles[Math.floor(Math.random() * titles.length)];
 }
 
 function generateRandomDescription() {
-  const descriptions = ["Great discount on selected items", "Buy one get one free", "Exclusive offer for members"];
+  const descriptions = [
+    "Great discount on selected items",
+    "Buy one get one free",
+    "Exclusive offer for members",
+  ];
   return descriptions[Math.floor(Math.random() * descriptions.length)];
 }
 
 function generateRandomImage() {
-  const images = ["https://picsum.photos/200","https://picsum.photos/250","https://picsum.photos/260","https://picsum.photos/270","https://picsum.photos/190","https://picsum.photos/220","https://picsum.photos/240","https://picsum.photos/230"];
+  const images = [
+    "https://picsum.photos/200",
+    "https://picsum.photos/250",
+    "https://picsum.photos/260",
+    "https://picsum.photos/270",
+    "https://picsum.photos/190",
+    "https://picsum.photos/220",
+    "https://picsum.photos/240",
+    "https://picsum.photos/230",
+  ];
   return images[Math.floor(Math.random() * images.length)];
 }
 
-function generateRandomOffer(numberOfOffers:number):Offer[] {
+function generateRandomOffer(numberOfOffers: number): Offer[] {
   function offers() {
     return {
       title: generateRandomTitle(),
-      id:Math.random().toString(36).substring(2, 9),
-        description: generateRandomDescription(),
-        description2: "Additional description here",
-        discount: Math.floor(Math.random() * 51).toString(), // Generate random discount between 0 and 50
-        code:Math.random().toString(36).substring(2, 9),
-        image: generateRandomImage(),
-        quantityEffect: (Math.floor(Math.random() * 10) + 1).toString(), // Generate random quantity effect between 1 and 10
-        effect: ["flat", "percentage", "quantity"][Math.floor(Math.random() * 3)]  as "flat" | "percentage" | "quantity",
-        active: Math.random() > 0.5 // Randomly set active to true or false
-    }
+      id: Math.random().toString(36).substring(2, 9),
+      description: generateRandomDescription(),
+      description2: "Additional description here",
+      discount: Math.floor(Math.random() * 51).toString(), // Generate random discount between 0 and 50
+      code: Math.random().toString(36).substring(2, 9),
+      image: generateRandomImage(),
+      quantityEffect: (Math.floor(Math.random() * 10) + 1).toString(), // Generate random quantity effect between 1 and 10
+      effect: ["flat", "percentage", "quantity"][
+        Math.floor(Math.random() * 3)
+      ] as "flat" | "percentage" | "quantity",
+      active: Math.random() > 0.5, // Randomly set active to true or false
+    };
   }
-  const randomOffers:Offer[] = Array.from({ length: numberOfOffers }, offers)
-  return randomOffers
-} 
+  const randomOffers: Offer[] = Array.from({ length: numberOfOffers }, offers);
+  return randomOffers;
+}
 
 // Generate multiple random offers
- // Define the number of random offers to generate
-
+// Define the number of random offers to generate
 
 // console.log(randomOffers);
 export const sampleProducts: Product[] = [
@@ -57,7 +78,7 @@ export const sampleProducts: Product[] = [
     name: "elementary magenta plain pure linen shirt",
     description: "Description for elementary magenta plain pure linen shirt",
     price: " 20.0",
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -92,7 +113,7 @@ export const sampleProducts: Product[] = [
       },
     ],
     slug: "elementary-magenta-plain-pure-linen-shirt",
-    
+
     stock: "13",
     purchaseQuantity: 10,
     SKU: "PQWONEFK",
@@ -106,10 +127,10 @@ export const sampleProducts: Product[] = [
     id: "14",
     name: "Matteo Grey Checks Shirt",
     price: " 20.0",
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
-    
+
     SKU: "CSBDWONUDF",
     slug: "matteo-grey-checks-shirt",
     description: "Description for Matteo Grey Checks Shirt",
@@ -131,10 +152,10 @@ export const sampleProducts: Product[] = [
     name: "Matteo Light Blue Checks Shirt",
     price: " 35.0",
     sizes: ["S", "M", "L"],
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
-    
+
     SKU: "MCALSKDWPD",
     slug: "matteo-light-blue-checks-shirt",
     description: "Description for Matteo Light Blue Checks Shirt",
@@ -162,10 +183,10 @@ export const sampleProducts: Product[] = [
     name: "brush stroke red shirt",
     price: " 25.0",
     sizes: ["S", "M", "L"],
-     offers: generateRandomOffer(3),
+    offers: generateRandomOffer(3),
     category: ["tshirt", "casual", "unisex"],
     stock: "100",
-    
+
     SKU: "VDJSOWNEAL",
     slug: "brush-stroke-red-shirt",
     description: "Description for Matteo Light Blue Checks Shirt",
@@ -184,7 +205,7 @@ export const sampleProducts: Product[] = [
     id: "17",
     name: "Carmine mauve knitted shirt",
     price: " 30.0",
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -205,7 +226,7 @@ export const sampleProducts: Product[] = [
       { variant: "black", image: "/items/carmine-mauve-knitted-shirt2.webp" },
     ],
     slug: "carmine-mauve-knitted-shirt",
-    
+
     stock: "13",
     purchaseQuantity: 10,
     SKU: "JWENEPWMQ",
@@ -219,7 +240,7 @@ export const sampleProducts: Product[] = [
     id: "27",
     name: "Box Stripe Black Shirt",
     price: " 35.0",
-     offers: generateRandomOffer(4),
+    offers: generateRandomOffer(4),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -238,7 +259,7 @@ export const sampleProducts: Product[] = [
       { variant: "black", image: "/items/Matteo-Grey-Checks-Shirt-1.webp" },
     ],
     slug: "box-stripe-black-shirt",
-    
+
     stock: "13",
     purchaseQuantity: 10,
     SKU: "MQWKEEMFEC",
@@ -257,8 +278,8 @@ export const sampleProducts: Product[] = [
     price: " 40.0",
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
-     offers: generateRandomOffer(5),
-      category: ["tshirt", "plain"],
+    offers: generateRandomOffer(5),
+    category: ["tshirt", "plain"],
     tags: [
       "tshirt",
       "casual",
@@ -276,7 +297,7 @@ export const sampleProducts: Product[] = [
       { variant: "black", image: "/items/carmine-mauve-knitted-shirt2.webp" },
     ],
     slug: "double-cuff-royal-blue-shirt",
-    
+
     stock: "13",
     purchaseQuantity: 10,
     SKU: "KRMNWDD",
@@ -290,7 +311,7 @@ export const sampleProducts: Product[] = [
     id: "29",
     name: "Doric Red Shirt",
     price: " 30.0",
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -325,7 +346,7 @@ export const sampleProducts: Product[] = [
       },
     ],
     slug: "doric-red-shirt",
-    
+
     stock: "13",
     purchaseQuantity: 10,
     SKU: "NMMLECOD",
@@ -341,7 +362,7 @@ export const sampleProducts: Product[] = [
     id: "30",
     name: "Matteo Grey Checks Shirt",
     price: " 45.0",
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
@@ -369,7 +390,7 @@ export const sampleProducts: Product[] = [
       },
     ],
     slug: "matteo-grey-checks-shirt-2",
-    
+
     stock: "13",
     purchaseQuantity: 10,
 
@@ -385,7 +406,7 @@ export const sampleProducts: Product[] = [
     description:
       " Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores necessitatibus temporibus omnis natus exercitationem, animi optio placeat officiis vero illum ut, tempora quis modi atque nisi reprehenderit laborum veritatis recusandae? ",
     price: " 45.0",
-     offers: generateRandomOffer(5),
+    offers: generateRandomOffer(5),
     category: ["tshirt", "plain"],
     tags: [
       "tshirt",
@@ -406,7 +427,7 @@ export const sampleProducts: Product[] = [
     ],
     SKU: "SPMECOD",
     slug: "box-stripe-white-shirt",
-    
+
     stock: "13",
     purchaseQuantity: 10,
 
@@ -448,38 +469,48 @@ export const saveRecentlyViewedProduct = (product: any) => {
   return null;
 };
 const ProductPage = ({ slug }: Props) => {
-  const [product,setProduct] = useState<Product | null>(null)
-
-  const {isPending, isError,isSuccess, data: response, error, mutate: server_fetchProduct} = useMutation({
+  const [product, setProduct] = useState<Product | null>(null);
+// console.log(slug)
+  const {
+    isPending,
+    isError,
+    isSuccess,
+    data: response,
+    error,
+    mutate: server_fetchProduct,
+  } = useMutation({
     mutationFn: FetchSingleProduct,
-  })
+  });
   useEffect(() => {
-    server_fetchProduct(slug)
-  },[])
+    server_fetchProduct(slug);
+  },[]);
 
   useEffect(() => {
     if (response) {
-      setProduct(response.data)
-      console.log(response)
+      setProduct(response.data);
+      // console.log(response);
     }
-    if(isError){
-      console.log(error)
-      redirect("/500")
+    if (isError) {
+      console.log(error);
+      redirect("/500");
     }
-  },[isError,isSuccess])
+  },[isError, isSuccess,response]);
 
-  if (!product) {
+  if (!product && !isPending) {
     redirect("/404");
   }
-
-  saveRecentlyViewedProduct(product);
+  useEffect(() => {
+    if (product) {
+      saveRecentlyViewedProduct(product);
+    }
+  }, [product]);
   return (
     <>
-      <div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5">
+     {isPending ? <ClipLoader/>: product ? <><div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5">
         <ProductGallery product={product!} />
         <ProductInfo product={product!} />
       </div>
-      <Recommendation tags={product.tags!} />
+      <Recommendation tags={product!?.tags!} /></>: <p>Something went wrong</p>}
     </>
   );
 };

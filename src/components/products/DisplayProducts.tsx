@@ -17,27 +17,30 @@ import ProductCard from "../general/ProductCard";
 import { ChevronDown, RectangleVertical } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
-  GetProductsByCategory
+  GetProductsByCategory,
+  FetchProductsFromFilterData,
 } from "@/serverlessActions/_fetchActions";
 import { sampleProducts } from "./page/ProductPage";
 
 type Props = {
-  category: string;
+  category?: string;
+  searchFilterData: any;
 };
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
-const DisplayProducts = ({ category }: Props) => {
+const DisplayProducts = ({ category, searchFilterData }: Props) => {
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [viewAs, setViewAs] = React.useState<number>(4);
+  const [productsData,setProductsData] = React.useState([])
 
   const items = [
     {
       id: "23",
       name: "elementary magenta plain pure linen shirt",
       price: "$20.00",
-      road:84,
+      road: 84,
       sizes: ["S", "M", "L", "XL"],
       images: [
         "/items/elementary-magenta-plain-pure-linen-shirt1.webp",
@@ -149,28 +152,51 @@ const DisplayProducts = ({ category }: Props) => {
   const {
     isPending,
     isError,
-    data:response,
+    data: response,
     error,
     mutate: server_getProductsByCategory,
   } = useMutation({
     mutationFn: GetProductsByCategory,
+  });
+  const {
+    isPending: productsFromFilterIsPending,
+    isError: productsFromFilterIsError,
+    data: productsFromFilterResponse,
+    error: productsFromFilterError,
+    mutate: server_fetchProductsFromFilterData,
+  } = useMutation({
+    mutationFn: FetchProductsFromFilterData,
   });
   //  server_insertSampleProducts()
   //console.log(data);
   //const { isOpen, open, close } = useDropdownMenu({ id: "basic-filter-setting" });
 
   // console.log(data)
-useEffect(() => {
-  server_getProductsByCategory(category)
-},[])
-useEffect(() => {
-  if( !isError && response?.data) {
-    console.log("data", response);
-  }
-  if(error) {
-    console.log("error", error);
-  }
-},[ isError, response, error])
+  useEffect(() => {
+    if (category && category !== "") {
+      server_getProductsByCategory(category);
+    } else if (searchFilterData && searchFilterData.length > 0) {
+      server_fetchProductsFromFilterData(searchFilterData);
+    } else {
+      server_fetchProductsFromFilterData([]);
+    }
+  }, []);
+  useEffect(() => {
+    if (!isError && response?.data) {
+      console.log("data", response);
+      setProductsData(response?.data)
+    }
+    if (error) {
+      console.log("error", error);
+    }
+    if (!productsFromFilterIsError && productsFromFilterResponse?.data) {
+      console.log("data", productsFromFilterResponse);
+      setProductsData(productsFromFilterResponse?.data)
+    }
+    if ( productsFromFilterError) {
+      console.log("error",  productsFromFilterError);
+    }
+  }, [isError, response, error,productsFromFilterIsError,productsFromFilterResponse, productsFromFilterError]);
   return (
     <div>
       <section
@@ -178,7 +204,7 @@ useEffect(() => {
         className="flex items-center justify-between w-full mb-7"
       >
         <section className="text-[14px] flex items-center gap-2">
-          <h1 > View as</h1>
+          <h1> View as</h1>
           <span
             className="flex border p-[0.15rem] cursor-pointer"
             onClick={() => setViewAs(2)}
@@ -244,31 +270,30 @@ useEffect(() => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <span className="w-44 cursor-pointer border p-3 py-[0.65rem] rounded-sm text-[13px] border-gray-300 justify-between gap-6 inline-flex items-center ">
-                For you <ChevronDown size={18} />
+                Sort <ChevronDown size={18} />
               </span>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Filter one</DropdownMenuLabel>
+              <DropdownMenuLabel>Sort</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 checked={showStatusBar}
                 onCheckedChange={setShowStatusBar}
               >
-                filter two
+                Newest
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem
                 checked={showActivityBar}
                 onCheckedChange={setShowActivityBar}
-                disabled
               >
-                filter three
+                Oldest
               </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
+              {/* <DropdownMenuCheckboxItem
                 checked={showPanel}
                 onCheckedChange={setShowPanel}
               >
-                filter four
-              </DropdownMenuCheckboxItem>
+                
+              </DropdownMenuCheckboxItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         </section>
@@ -277,13 +302,13 @@ useEffect(() => {
         id="products"
         className={`grid grid-cols-${viewAs} gap-x-4 gap-y-7`}
       >
-        {response?.data
-          ? response?.data.map((item: Product, index: number) => (
+        {productsData.length > 0
+          ? productsData.map((item: Product, index: number) => (
               <ProductCard
                 item={item}
                 index={index}
                 key={index}
-                isLoading={isPending}
+                isLoading={isPending || productsFromFilterIsPending}
               />
             ))
           : sampleProducts.map((item, index) => (
@@ -291,7 +316,7 @@ useEffect(() => {
                 item={item}
                 index={index}
                 key={index}
-                isLoading={isPending}
+                isLoading={isPending || productsFromFilterIsPending}
               />
             ))}
       </section>

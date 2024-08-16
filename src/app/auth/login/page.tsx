@@ -16,6 +16,7 @@ import SignIn from "../components/SignIn";
 
 async function authenticationPrecheck(): Promise<void> {
   const session = await getServerSession(authOptions)
+  console.log("session from server",session)
   if (session?.user) return redirect("/account")
 }
 

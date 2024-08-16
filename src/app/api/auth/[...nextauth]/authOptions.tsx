@@ -1,6 +1,6 @@
-import NextAuth, { AuthOptions, Theme, User  } from "next-auth";
+import NextAuth, { AuthOptions, Theme, User ,Session } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
-import { Adapter } from "next-auth/adapters";
+import { Adapter, AdapterUser } from "next-auth/adapters";
 import { MongooseAdapter } from "@choutkamartin/mongoose-adapter";
 import { randomInt } from "crypto";
 import { createTransport } from "nodemailer";
@@ -91,7 +91,14 @@ export const authOptions: AuthOptions = {
         throw new Error("Failed to save user to the database");
       }
     },
-   
+   session:async({session,token,user}:{ session: Session; token: JWT; user: AdapterUser; }) =>{
+      // Fetch user data from the database and set it in the session
+      const userData = await UserModel.findOne({ email: user?.email });
+      if (userData) {
+        session.user = userData;
+      }
+      return session;
+    },
   
     jwt: async({token, user}: { token: JWT; user: User}) => {
         const userData: UserDocument = await UserModel.findOne({ email: user.email });
