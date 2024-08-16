@@ -40,12 +40,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
           showIfNotLoggedIn: false,
           exact: true,
         },
-        {
-          name: "T-shirts",
-          path: "/products/category/t-shirts",
-          showIfNotLoggedIn: true,
-          exact: true,
-        },
+
       ],
     },   
     {

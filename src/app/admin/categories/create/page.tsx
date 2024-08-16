@@ -193,9 +193,16 @@ const page = (props: Props) => {
     server_AdminCreateCategory(values as category)
     
   }
+ 
     useEffect(() => {
       if (isSuccess) {
         form.reset()
+        setCategorytags([
+          {
+            tag: "",
+            values: ["", ""],
+          },
+        ])
         toast({
           variant: "success",
           title: "category created ",

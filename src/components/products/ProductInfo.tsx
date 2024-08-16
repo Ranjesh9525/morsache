@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { UserAddToWishList } from "@/serverlessActions/_userActions";
+import { toast } from "../ui/use-toast";
 type Props = {
   product: Product;
 };
@@ -81,7 +82,10 @@ const ProductInfo = ({ product }: Props) => {
     if (selectedProduct) {
       console.log("selectedProduct", selectedProduct);
       dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
-      router.push("/cart");
+      toast({
+        variant:"default",
+        title:"Added to cart"
+      })
     } else {
       console.log("selected product is null");
     }

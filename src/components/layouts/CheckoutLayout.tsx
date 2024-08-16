@@ -123,7 +123,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
     },
     {
       name: "payment",
-      path: `/cart/checkout/checkout/${lastPartPathName}`,
+      path: `/cart/checkout/payment/${lastPartPathName}`,
     },
   ];
 

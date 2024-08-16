@@ -95,8 +95,8 @@ export const AdminUploadProduct = async (data: any) => {
       });
       data.variants = varaintsModified;
     }
-    const SKU = await SKUgenerator(6, data.name);
-    data.SKU = SKU;
+    const SKU = await SKUgenerator(9, data.name);
+    data.SKU = SKU.toUpperCase();
     const product = new ProductsModel(data);
     await product.save();
 
@@ -186,7 +186,12 @@ export const AdminCreateCategory = async (data: category) => {
       });
       data.image = cloudPhoto.secure_url;
     }
-    const category = new CategoryModel(data);
+    const category = new CategoryModel({
+      name: data.name,
+      image: data.image,
+      tags: data.tags
+  });
+    console.log(category)
     await category.save();
     return Response("Category created successfully", 200, true, category);
   } catch (error) {

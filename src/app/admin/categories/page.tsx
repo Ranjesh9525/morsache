@@ -8,6 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   AdminGetAllCategories,
   AdminGetAllUsers,
+  AdminDeleteCategory,
 } from "@/serverlessActions/_adminActions";
 import { category } from "@/@types/categories.d";
 import { tShirtCategory } from "@/@types/categories.d";
@@ -45,16 +46,7 @@ type Props = {};
 const page = (props: Props) => {
   const [categories, setCategories] = useState([]);
   // const data = await getData()
-  // const {
-  //   isPending,
-  //   isError,
-  //   data,
-  //   error,
-  //   mutate: server_getAllUsers,
-  // } = useMutation({
-  //   mutationFn: AdminGetAllUsers,
-  // });
-
+ 
   const {
     isPending,
     isError,
@@ -89,6 +81,7 @@ const page = (props: Props) => {
 
   useEffect(() => {
     if (response?.data) {
+      console.log(response)
       setCategories(response.data);
     }
     if (isError) {
@@ -129,7 +122,7 @@ const page = (props: Props) => {
       />
       <div className="container mx-auto min-h-[70vh] space-y-10 py-10">
         {/* <DataTable columns={columns} data={randomData} /> */}
-        {isPending?<div className="w-full inline-flex items-center justify-center h-full"> <ClipLoader className="" size={30}/> </div>:categories ? (
+        {isPending?<div className="w-full inline-flex items-center justify-center h-full"> <ClipLoader className="" size={30}/> </div>:categories && categories.length>0? (
           categories?.map((item) => {
             return <CategoryCardAdmin category={item} />;
           })
@@ -148,6 +141,36 @@ const page = (props: Props) => {
 export default page;
 
 export const CategoryCardAdmin = ({ category }: { category: category }) => {
+  const {
+    isPending:deleteIsPending,
+    isError:deleteIsError,
+    isSuccess:deleteIsSuccess,
+    error:deleteError,
+    mutate: server_deleteCategory,
+  } = useMutation({
+    mutationFn: AdminDeleteCategory,
+  });
+
+  useEffect(()=>{
+    if(deleteIsError){
+      console.log(deleteError);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `${deleteError}`,
+      });
+    
+    }
+    if(deleteIsSuccess){
+      // console.log(deleteError);
+      toast({
+        variant: "success",
+        title: `Category ${category.name} deleted`,
+      })
+    
+    }
+
+  },[deleteIsError,deleteIsSuccess])
   return (
     <div id="category" className="group">
       <section
@@ -159,7 +182,7 @@ export const CategoryCardAdmin = ({ category }: { category: category }) => {
         </h1>
         <section id="category-action-btns" className="space-x-3">
           <Button variant="outline">Edit</Button>
-          <Button variant="destructive">Delete</Button>
+          <Button variant="destructive" disabled={deleteIsPending} onClick={()=>server_deleteCategory(category._id!)}>{deleteIsPending ? <ClipLoader color="#fff"/>:"Delete"}</Button>
         </section>
       </section>
       <div className="w-full flex">
@@ -182,17 +205,17 @@ export const CategoryCardAdmin = ({ category }: { category: category }) => {
             {category.name}
           </div>
         </div>
-        <div className="flex-[9] border grid grid-cols-4 p-2.5">
-          <section>
+        <div className="flex-[9] border grid grid-cols-4 p-2.5 gap-4">
+          <section className="">
             <h1 className="uppercase font-medium text-lg underline">Id</h1>
-            <span className="text-[14.5px] pr-4 whitespace-break-spaces break-words">
+            <span className="text-[14.5px]  whitespace-break-spaces break-words">
               {category._id}
             </span>
           </section>
           {category.tags &&
             category.tags.length > 0 &&
             category.tags.map((tag, index: number) => (
-              <section key={index}>
+              <section key={index} className="border rounded-md text-center">
                 <h1 className="uppercase font-medium text-lg underline">
                   {tag.tag}
                 </h1>
@@ -200,7 +223,7 @@ export const CategoryCardAdmin = ({ category }: { category: category }) => {
                   {tag.values.map((value, subindex: number) => (
                     <span
                       key={subindex}
-                      className="flex items-center text-[14.5px] gap-2"
+                      className="flex items-center text-center justify-center  w-full text-[14.5px] gap-2"
                     >
                       {/* <Checkbox
                           onCheckedChange={() =>

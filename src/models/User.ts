@@ -1,12 +1,18 @@
 import mongoose from "mongoose";
-import { Document, Schema, model } from 'mongoose';
-
+import { Document, Schema, model } from "mongoose";
 
 export const cartItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
+    ref: "Product",
   },
+  offersData: [
+    {
+      code: String,
+      productId: String,
+      quantity: Number,
+    },
+  ],
   quantity: {
     type: Number,
   },
@@ -20,7 +26,7 @@ export const cartItemSchema = new mongoose.Schema({
     type: Number,
   },
 });
-const cartSchema = new mongoose.Schema({
+export const cartSchema = new mongoose.Schema({
   items: [cartItemSchema],
   totalItems: Number,
   totalAmount: Number,
@@ -33,20 +39,19 @@ const cartSchema = new mongoose.Schema({
     default: Date.now,
   },
   shippingAddress: {
-    street:String,
-    city:  String,
-    
-    state:  String,
-    
-    zipCode:  String,
-    
+    street: String,
+    city: String,
+
+    state: String,
+
+    zipCode: String,
+
     country: String,
-    
   },
   paymentMethod: {
     type: {
       type: String,
-      enum: ['creditCard', 'razorPay', 'stripe', 'payOnDelivery' ],
+      enum: ["creditCard", "razorPay", "stripe", "payOnDelivery"],
     },
     cardNumber: {
       type: String,
@@ -79,15 +84,14 @@ const userSchema = new mongoose.Schema(
     emailVerified: Date,
     image: String,
     address: {
-      street:String,
-      city:  String,
-      
-      state:  String,
-      
-      zipCode:  String,
-      
+      street: String,
+      city: String,
+
+      state: String,
+
+      zipCode: String,
+
       country: String,
-      
     },
     phoneNumber: {
       type: String,

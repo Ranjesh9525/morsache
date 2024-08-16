@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Cart, CartItem } from "@/@types/cart.d";
+import { Cart, CartForServer, CartItem } from "@/@types/cart.d";
 import { Product } from "@/@types/products.d";
 import { Separator } from "@/components/ui/separator";
 import { format } from "@/components/products/ProductInfo";
@@ -46,11 +46,7 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   );
 };
 
-//get all offers in cart and all products in cart and send it back with the offer results to the offer component
-// const offe = [
-//   { offerIf: "10%", offerDiscountedPrice: 1900, productId: 323424 },
-// ];
-// data:[{offerId,productId,quantity},
+
 const CheckoutCard = ({ cart, cartId }: Props) => {
   const [code, setCode] = useState<string>("");
   const [userCartWithDiscount, setUserCartWithDiscount] = useState<Cart | null>(
@@ -79,6 +75,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   const {
     isPending: uploadCartIsPending,
     isError: uploadCartIsError,
+    data: uploadCartData,
     isSuccess: uploadCartIsSuccess,
     error: uploadCartError,
     mutate: server_CreateCartMutate,
@@ -100,6 +97,19 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
       server_findUserCartMutate(cartId);
     }
   }, []);
+
+  function uploadCartSubmit(){
+
+  const modifiedCart:CartForServer = cart!
+  for (const item of modifiedCart.items) {
+    item.productId = item.product.id ? item.product.id : item.product._id;
+    item.offersData = item.product.offers.map((offer:any) => {
+      return { code: offer.code || "", productId: item.productId, quantity: item.quantity };
+    });
+    delete item.product;
+  }
+  server_CreateCartMutate(modifiedCart)
+}
  
   useEffect(() => {
     if (code) {
@@ -138,6 +148,14 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
       //redirect('/cart?error=404')
     }
   }, [findCartIsSuccess, findCartData,findCartIsError]);
+  useEffect(() => {
+    if (uploadCartIsSuccess && uploadCartData.data) {
+      redirect(`/cart/checkout/${uploadCartData?.data}`)
+    }
+    if(uploadCartIsError){
+      console.log(uploadCartError)
+    }
+  }, [uploadCartIsSuccess, uploadCartData,uploadCartIsError]);
 
   useEffect(() => {
     if (offersData && userCartWithDiscount) {
@@ -166,9 +184,9 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   }, [offersData, userCartWithDiscount]);
 
   // console.log("allOfferData", allOfferData);
-  if(!findCartIsPending && userCartWithDiscount===null){
-    redirect('/cart')
-  }
+  // if(!findCartIsPending && userCartWithDiscount===null){
+  //   redirect('/cart')
+  // }
   return (
     <>
       {findCartIsPending ? (
@@ -180,7 +198,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
           <Skeleton className="h-[20px] w-[200px] bg-gray-200 mb-1 rounded-lg" />
           <Skeleton className="h-[20px] w-[100px] bg-gray-200 rounded-lg" />
         </div>
-      ) : (
+      ) : userCartWithDiscount !==null ?(
         <div className="flex flex-col gap-2 w-full">
           <section id="offers" className="">
             <div className="inline-flex items-center w-full">
@@ -257,13 +275,20 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             <>
               {" "}
               <Separator />
-              <Button onClick={() => server_CreateCartMutate(cart)}>
-                Checkout
+              <Button disabled={uploadCartIsPending} onClick={uploadCartSubmit}>
+               {uploadCartIsPending? <ClipLoader size={20}/>: "Checkout"}
               </Button>
             </>
           )}
         </div>
-      )}
+      ): <div className="relative flex flex-col bg-white">
+      <Skeleton className="h-[120px] w-full rounded-lg mb-3" />
+      <Skeleton className="h-[20px] w-[160px] bg-gray-200 mb-1 rounded-lg" />
+      <Skeleton className="h-[20px] w-full bg-gray-200 mb-2 rounded-lg" />
+      <Skeleton className="h-[40px] w-full bg-gray-200 mb-3 rounded-lg" />
+      <Skeleton className="h-[20px] w-[200px] bg-gray-200 mb-1 rounded-lg" />
+      <Skeleton className="h-[20px] w-[100px] bg-gray-200 rounded-lg" />
+    </div>}
     </>
   );
 };

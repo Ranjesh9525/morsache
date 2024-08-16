@@ -496,9 +496,9 @@ const ProductPage = ({ slug }: Props) => {
     }
   },[isError, isSuccess,response]);
 
-  if (!product && !isPending) {
-    redirect("/404");
-  }
+  // if (!product && !isPending) {
+  //   redirect("/404");
+  // }
   useEffect(() => {
     if (product) {
       saveRecentlyViewedProduct(product);
