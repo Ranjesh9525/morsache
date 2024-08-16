@@ -7,14 +7,20 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "@/components/products/ProductInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { validateOffers } from "@/serverlessActions/_cartActions";
+import {
+  createCart,
+  validateOffers,
+  findUserCart,
+} from "@/serverlessActions/_cartActions";
 import { ClipLoader } from "react-spinners";
 import { CiDiscount1 } from "react-icons/ci";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
-  cart: Cart;
+  cart?: Cart;
+  cartId?: string;
 };
 type offerProps = {
   offer: {
@@ -29,7 +35,9 @@ type offerProps = {
 const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   return (
     <div>
-      <h1 className="inline-flex justify-between items-center"><p className="font-medium text-lg">{offer.title}</p> <CiDiscount1/></h1>
+      <h1 className="inline-flex justify-between items-center">
+        <p className="font-medium text-lg">{offer.title}</p> <CiDiscount1 />
+      </h1>
       <div className="flex flex-col w-full ">
         <h1>Affected Products:</h1>
         <p className="text font-italic text-[12.5px]">{product.name}</p>
@@ -43,8 +51,12 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
 //   { offerIf: "10%", offerDiscountedPrice: 1900, productId: 323424 },
 // ];
 // data:[{offerId,productId,quantity},
-const CheckoutCard = ({ cart }: Props) => {
+const CheckoutCard = ({ cart, cartId }: Props) => {
   const [code, setCode] = useState<string>("");
+  const [userCartWithDiscount, setUserCartWithDiscount] = useState<Cart | null>(
+    !cart ? null : cart
+  );
+  const [totalDiscount, setTotalDiscount] = useState<number>(0);
   const [allOfferData, setAllOfferData] = useState<
     | {
         code: string;
@@ -64,19 +76,35 @@ const CheckoutCard = ({ cart }: Props) => {
   } = useMutation({
     mutationFn: validateOffers,
   });
-  // const {
-  //   isPending:uploadCartIsPending,
-  //   isError:uploadCartError,
-    //   isSuccess:uploadCartIsSuccess,
-  //   error:uploadCartError,
-  //   mutate: server_uploadUserCartMutate,
-  // } = useMutation({
-  //   mutationFn: uploadUserCart,
-  // });
+  const {
+    isPending: uploadCartIsPending,
+    isError: uploadCartIsError,
+    isSuccess: uploadCartIsSuccess,
+    error: uploadCartError,
+    mutate: server_CreateCartMutate,
+  } = useMutation({
+    mutationFn: createCart,
+  });
+  const {
+    isPending: findCartIsPending,
+    isError: findCartIsError,
+    isSuccess: findCartIsSuccess,
+    data: findCartData,
+    error: findCartError,
+    mutate: server_findUserCartMutate,
+  } = useMutation({
+    mutationFn: findUserCart,
+  });
+  useEffect(() => {
+    if (cartId) {
+      server_findUserCartMutate(cartId);
+    }
+  }, []);
+ 
   useEffect(() => {
     if (code) {
       setAllOfferData(() =>
-        cart.items.reduce(
+        cart!?.items.reduce(
           (
             acc: { code: string; productId: string; quantity: number }[],
             curr
@@ -101,99 +129,142 @@ const CheckoutCard = ({ cart }: Props) => {
     }
   }, [code]);
 
-const [userCartWithDiscount,setUserCartWithDiscount] = useState<Cart>(cart)
-const [totalDiscount, setTotalDiscount] = useState<number>(0);
-
-useEffect(() => {
-    if (offersData) {
-        let totalDiscountAmount = 0;
-        const updatedCart = { ...userCartWithDiscount };
-        
-        offersData.forEach(({ product, offerDiscountedPrice}:any) => {
-            const cartItemIndex = updatedCart.items.findIndex(item => item.product.id === product.id);
-            if (cartItemIndex !== -1) {
-                const discount = product.salePrice ? (product.salePrice - offerDiscountedPrice) : (product.price - offerDiscountedPrice);
-                totalDiscountAmount += discount;
-                updatedCart.items[cartItemIndex].product.salePrice = offerDiscountedPrice;
-            }
-        });
-
-        setTotalDiscount(prevTotalDiscount => prevTotalDiscount + totalDiscountAmount);
-        setUserCartWithDiscount(updatedCart);
+  useEffect(() => {
+    if (findCartIsSuccess) {
+      setUserCartWithDiscount(findCartData?.data);
     }
-}, [offersData, userCartWithDiscount]);
+    if(findCartIsError){
+      console.log(findCartError)
+      //redirect('/cart?error=404')
+    }
+  }, [findCartIsSuccess, findCartData,findCartIsError]);
 
-  console.log("allOfferData", allOfferData);
+  useEffect(() => {
+    if (offersData && userCartWithDiscount) {
+      let totalDiscountAmount = 0;
+      const updatedCart = { ...userCartWithDiscount };
+
+      offersData.forEach(({ product, offerDiscountedPrice }: any) => {
+        const cartItemIndex = updatedCart!?.items.findIndex(
+          (item) => item.product.id === product.id
+        );
+        if (cartItemIndex !== -1) {
+          const discount = product.salePrice
+            ? product.salePrice - offerDiscountedPrice
+            : product.price - offerDiscountedPrice;
+          totalDiscountAmount += discount;
+          updatedCart.items[cartItemIndex].product.salePrice =
+            offerDiscountedPrice;
+        }
+      });
+
+      setTotalDiscount(
+        (prevTotalDiscount) => prevTotalDiscount + totalDiscountAmount
+      );
+      setUserCartWithDiscount(updatedCart);
+    }
+  }, [offersData, userCartWithDiscount]);
+
+  // console.log("allOfferData", allOfferData);
+  if(!findCartIsPending && userCartWithDiscount===null){
+    redirect('/cart')
+  }
   return (
-    <div className="flex flex-col gap-2 w-full">
-      <section id="offers" className="">
-        <div className="inline-flex items-center w-full">
-          <Input
-            type={"text"}
-            placeholder={"Enter code"}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="w-full  rounded-r-none focus-visible:ring-none focus-visible:ring-0"
-          />
-          <Button
-            type="submit"
-            className="rounded-l-none"
-            onClick={() => validateOffersMutate(allOfferData)}
-          >
-            Apply
-          </Button>
+    <>
+      {findCartIsPending ? (
+        <div className="relative flex flex-col bg-white">
+          <Skeleton className="h-[120px] w-full rounded-lg mb-3" />
+          <Skeleton className="h-[20px] w-[160px] bg-gray-200 mb-1 rounded-lg" />
+          <Skeleton className="h-[20px] w-full bg-gray-200 mb-2 rounded-lg" />
+          <Skeleton className="h-[40px] w-full bg-gray-200 mb-3 rounded-lg" />
+          <Skeleton className="h-[20px] w-[200px] bg-gray-200 mb-1 rounded-lg" />
+          <Skeleton className="h-[20px] w-[100px] bg-gray-200 rounded-lg" />
         </div>
-        {offersData?.data && <h1>Active offers</h1>}
-        <div className="flex flex-col items-center my-2">
-          {isPending ? (
-            <ClipLoader />
-          ) : (
-            offersData?.data &&
-            offersData?.data.map((i: any, ind: number) => (
-              <OfferCard
-                key={ind}
-                offer={i.offer}
-                offerDiscountedPrice={i.offerDiscountedPrice}
-                product={i.optimizedProduct}
+      ) : (
+        <div className="flex flex-col gap-2 w-full">
+          <section id="offers" className="">
+            <div className="inline-flex items-center w-full">
+              <Input
+                type={"text"}
+                placeholder={"Enter code"}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="w-full  rounded-r-none focus-visible:ring-none focus-visible:ring-0"
               />
-            ))
+              <Button
+                type="submit"
+                className="rounded-l-none"
+                onClick={() => validateOffersMutate(allOfferData)}
+              >
+                Apply
+              </Button>
+            </div>
+            {offersData?.data && <h1>Active offers</h1>}
+            <div className="flex flex-col items-center my-2">
+              {isPending ? (
+                <ClipLoader />
+              ) : (
+                offersData?.data &&
+                offersData?.data.map((i: any, ind: number) => (
+                  <OfferCard
+                    key={ind}
+                    offer={i.offer}
+                    offerDiscountedPrice={i.offerDiscountedPrice}
+                    product={i.optimizedProduct}
+                  />
+                ))
+              )}
+            </div>
+          </section>
+          <Separator />
+          <section
+            id="subtotal and shipping"
+            className="flex flex-col gap-2 my-2"
+          >
+            <span className="inline-flex items-center justify-between text-[15px]">
+              <h1 className="font-medium text-gray-800 ">Discounts applied</h1>
+              <h1 className="text-gray-400 ">{format(totalDiscount)}</h1>
+            </span>
+            <span className="inline-flex items-center justify-between text-[15px]">
+              <h1 className="font-medium text-gray-800">Shipping</h1>
+              <span className="text-gray-400 text-[14px]">
+                calculated at checkout
+              </span>
+            </span>
+            <span className="inline-flex items-center justify-between text-[15px]">
+              <h1 className="font-medium text-gray-800">Subtotal</h1>
+              <span className="text-gray-400 ">
+                {" "}
+                {format(userCartWithDiscount!?.totalAmount)}
+              </span>
+            </span>
+          </section>
+          <Separator />
+          <section
+            id="total"
+            className="whitespace items-center-nowrap inline-flex w-full justify-between my-2"
+          >
+            <h1 className="text-lg font-medium text-gray-600">Total</h1>
+            <span className="inline-flex items-center text-sm">
+              INR{" "}
+              <p className="font-semibold text-[1.35rem] ml-1">
+                {format(userCartWithDiscount!?.totalAmount)}
+              </p>
+            </span>
+          </section>
+
+          {cart && (
+            <>
+              {" "}
+              <Separator />
+              <Button onClick={() => server_CreateCartMutate(cart)}>
+                Checkout
+              </Button>
+            </>
           )}
         </div>
-      </section>
-      <Separator />
-      <section id="subtotal and shipping" className="flex flex-col gap-2 my-2">
-        <span className="inline-flex items-center justify-between text-[15px]">
-          <h1 className="font-medium text-gray-800 ">Discounts applied</h1>
-          <h1 className="text-gray-400 ">{ format(totalDiscount) }</h1>
-       
-        </span>
-        <span className="inline-flex items-center justify-between text-[15px]">
-          <h1 className="font-medium text-gray-800">Shipping</h1>
-          <span className="text-gray-400 text-[14px]">
-            calculated at checkout
-          </span>
-        </span>
-        <span className="inline-flex items-center justify-between text-[15px]">
-          <h1 className="font-medium text-gray-800">Subtotal</h1>
-          <span className="text-gray-400 ">  {format(userCartWithDiscount?.totalAmount)}</span>
-        </span>
-      </section>
-      <Separator />
-      <section
-        id="total"
-        className="whitespace items-center-nowrap inline-flex w-full justify-between my-2"
-      >
-        <h1 className="text-lg font-medium text-gray-600">Total</h1>
-        <span className="inline-flex items-center text-sm">
-          INR{" "}
-          <p className="font-semibold text-[1.35rem] ml-1">
-            {format(userCartWithDiscount?.totalAmount)}
-          </p>
-        </span>
-      </section>
-      <Separator />
-      <Button>Checkout</Button>
-    </div>
+      )}
+    </>
   );
 };
 

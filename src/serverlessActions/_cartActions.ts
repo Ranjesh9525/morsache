@@ -130,3 +130,30 @@ export const createCart = async (data: Cart)=> {
         throw error;
     }
 };
+
+export const findUserCart = async (cartId: string) => {
+    try {
+        await connectDB();
+        const session:any = await getServerSession(authOptions);
+        if (session) {
+            const userId = session?.user?._id;
+            const user = await UserModel.findOne({_id:userId})
+            if(!user){
+                throw new Error('No User found')
+            }
+            const cart = user.cart.find((cart: any) => cart._id.toString() === cartId);
+            if (!cart) {
+                throw new Error('Cart not found');
+            }
+            return Response('Cart found', 200, true, cart);
+        } else {
+            // Handle the case where there is no active session
+            console.log("No active session found. Please login.");
+            throw new Error('Please login to continue');
+        }
+    } catch (error) {
+        console.log(`Error finding cart: ${error}`);
+        throw error;
+    }
+    
+}

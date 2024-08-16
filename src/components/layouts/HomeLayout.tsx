@@ -98,8 +98,8 @@ const HomeLayout = ({title,description,keywords,children}: Props) => {
       {" "}
       <Heading
         title={title}
-        description={description || "Create a Paysup account"}
-        keywords={keywords || "online courses,digital skills,marketing,social marketing"}
+        description={description || "Morasache clothing store"}
+        keywords={keywords || "online store,e-commerece,shop,trade,clothing,bodywear,cloths"}
       />
       <div>
         <Sidebar sideNav={sideNav} setSideNav={setSideNav} />
