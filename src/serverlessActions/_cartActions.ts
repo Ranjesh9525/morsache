@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { Cart, CartForServer } from "@/@types/cart.d";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // Import the Offers model with the offersSchema
-import Offers from "@/models/offers";
+import Offers from "@/models/Offers";
 import { Response } from "./responseClass";
 import { connectDB } from "@/utilities/DB";
 import { ObjectId } from "mongodb";
