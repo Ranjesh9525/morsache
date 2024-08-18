@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
 import { getSession } from "next-auth/react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { toast } from "@/components/ui/use-toast"
 import {
   Form,
   FormField,
@@ -19,6 +21,7 @@ import {
   FormDescription,
   FormControl,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 
 const ShippingInformation = () => {
@@ -34,148 +37,68 @@ const ShippingInformation = () => {
   }
 
   // Fetch user data on component mount
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  // useEffect(() => {
+  //   fetchUserCartShippingData();
+  // }, []);
 
   const shippingSchema = z.object({
-      street: z.string(),
-      city: z.string(),
-      state: z.string(),
-      zipCode: z.string(),
-      country: z.string(),
-  });
+    howCustomerGetsIt: z.object({
+        pickUp: z.boolean(),
+        delivery: z.boolean(),
+    })
+});
 
-  const form = useForm<z.infer<typeof shippingSchema>>({
+const form = useForm<z.infer<typeof shippingSchema>>({
     resolver: zodResolver(shippingSchema),
-  });
+});
 
-  function onSubmit(values: z.infer<typeof shippingSchema>) {
+function onSubmit(values: z.infer<typeof shippingSchema>) {
     // Perform any necessary actions with the form values
     console.log(values);
-  }
+}
 
-  return (
-    <div>
-      <section>
-        <h1>Details</h1>
-        {userData ? (
-          <div className="flex gap-2 my-3">
-            {userData.image ? (
-              <Image
-                src={userData.image}
-                alt="profile"
-                width={50}
-                height={50}
-              />
-            ) : (<AiOutlineUser className="bg-gray-200 p-[0.35rem] h-[30px] w-[30px] rounded-[50%]" />)
-            }
-            <h1 className="">
-              {userData.firstName && userData.lastName ? (
-                <>
-                  {userData.firstName} {userData.lastName}
-                </>
-              ) : (
-                ""
-              )}
-            </h1>
-            <h1 className=" font-medium">{userData.email}</h1>
-            {userData.shippingAddress && (
-              <p>Shipping Address: {userData.shippingAddress}</p>
-            )}
-          </div>
-        ) : (
-          <p className="">
-            <ClipLoader />
-          </p>
-        )}
-      </section>
-      <section className=" my-8">
-      <h1 className="mb-3">Shipping address</h1>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full space-y-12"
-          >
-            <div className="w-full grid grid-cols-2 gap-3 items-start">
-              <FormField
+return (
+    <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+            <FormField
                 control={form.control}
-                name="street"
+                name="howCustomerGetsIt"
                 render={({ field }) => (
-                  <FormItem className="items-start flex w-full flex-col justify-start">
-                    <h1 className="capitalize font-medium tracking-tight text-xl">
-                      Street
-                    </h1>
-                    <FormControl>
-                      <Input placeholder="Enter street address" {...field} />
-                    </FormControl>
-                  </FormItem>
+                    <FormItem className="space-y-3">
+                        <FormLabel>How would you like to receive it?</FormLabel>
+                        <FormControl>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                // defaultValue={field!.value!}
+                                className="flex flex-col space-y-1"
+                            >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="pickUp" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        Pick Up
+                                    </FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="delivery" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        Delivery
+                                    </FormLabel>
+                                </FormItem>
+                            </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )}
-              />
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem className="items-start flex w-full flex-col justify-start">
-                    <h1 className="capitalize font-medium tracking-tight text-xl">
-                      City
-                    </h1>
-                    <FormControl>
-                      <Input placeholder="Enter city" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="state"
-                render={({ field }) => (
-                  <FormItem className="items-start flex w-full flex-col justify-start">
-                    <h1 className="capitalize font-medium tracking-tight text-xl">
-                      State
-                    </h1>
-                    <FormControl>
-                      <Input placeholder="Enter state" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="zipCode"
-                render={({ field }) => (
-                  <FormItem className="items-start flex w-full flex-col justify-start">
-                    <h1 className="capitalize font-medium tracking-tight text-xl">
-                      Zip Code
-                    </h1>
-                    <FormControl>
-                      <Input placeholder="Enter zip code" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem className="items-start flex w-full flex-col justify-start">
-                    <h1 className="capitalize font-medium tracking-tight text-xl">
-                      Country
-                    </h1>
-                    <FormControl>
-                      <Input placeholder="Enter zip code" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-          </form>
-        </Form>
-      </section>
-    </div>
-  );
-};
-
+            />
+            <Button type="submit">Submit</Button>
+        </form>
+    </Form>
+);
+                }
 export default ShippingInformation;
 
 // const {

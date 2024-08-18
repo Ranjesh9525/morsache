@@ -38,16 +38,17 @@ export const cartSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  shippingAddress: {
+  shippingAddress: [{
     street: String,
     city: String,
-
     state: String,
-
     zipCode: String,
-
     country: String,
-  },
+    defaultAddress:{
+      type: Boolean,
+      default: true
+    }
+  }],
   paymentMethod: {
     type: {
       type: String,

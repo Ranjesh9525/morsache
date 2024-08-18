@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 import { useMutation } from "@tanstack/react-query";
 import CheckoutCard from "@/app/cart/components/CheckoutCard";
+import ShippingInformation from "@/app/cart/components/ShippingInformation";
 
 type Props = {
     params:{
@@ -25,7 +26,7 @@ const page = (props: Props) => {
     <CheckoutLayout title="Checkout - Morsache Clothing">
       <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-4">
         <div className="col-span-6">
-
+        <ShippingInformation/>
         </div>
         <div className="col-span-3">
             <div className="sticky top-[10px]">

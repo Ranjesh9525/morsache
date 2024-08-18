@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
 import { Response } from "./responseClass";
+import { getSession } from "next-auth/react";
 
 // Import the Product model
 
@@ -174,3 +175,4 @@ export const FetchCategoriesNamesOnly = async()=>{
     throw error;
   }
 }
+

@@ -1,5 +1,6 @@
 "use server";
 import ProductsModel from "../models/Products";
+import ShippingModel from "../models/Shipping";
 import UserModel, { cartSchema } from "../models/User";
 // import CModel from "../models/Products";
 
@@ -11,7 +12,14 @@ import Offers from "@/models/Offers";
 import { Response } from "./responseClass";
 import { connectDB } from "@/utilities/DB";
 import { ObjectId } from "mongodb";
+import { Document } from "mongoose";
 // import UserModel from "../models/User";
+
+interface Shipping extends Document {
+  locationBy: "street" | "city" | "state" | "postalCode" | "country";
+  name: string;
+  price: number;
+}
 
 export async function validateOffers(data: any) {
   try {
@@ -181,7 +189,6 @@ export const createCart = async (data: CartForServer) => {
 
     await connectDB();
 
-   
     const session: any = await getServerSession(authOptions);
 
     if (session) {
@@ -193,23 +200,23 @@ export const createCart = async (data: CartForServer) => {
       //save cart to user.cart array, but clear out any cart saved there first
       // Clear out any existing cart saved in user.cart array
       user.carts = [];
-    //   const newArray = [{ _id: cartId ,data}]
-    //   // Save new cart data into user.cart array
-    //   user.cart = newArray
+      //   const newArray = [{ _id: cartId ,data}]
+      //   // Save new cart data into user.cart array
+      //   user.cart = newArray
       // Generate a random _id for the cart
       const cartId = new ObjectId();
-      data._id = cartId 
+      data._id = cartId;
       console.log(data);
       // Save new cart data into user.cart array
       user.carts.push(data);
 
       await user.save();
-      
+
       const cartIdFromCart = user.carts[0]._id;
       if (!cartIdFromCart) {
         throw new Error("no cart id");
       }
-      console.log(user)
+      console.log(user);
       return Response("Cart initialized", 200, true, cartIdFromCart);
     } else {
       // Handle the case where there is no active session
@@ -245,6 +252,54 @@ export const findUserCart = async (cartId: string) => {
     }
   } catch (error) {
     console.log(`Error finding cart: ${error}`);
+    throw error;
+  }
+};
+
+export const FetchUserCartShippingData = async () => {
+  try {
+    await connectDB();
+    const session: any = await getServerSession(authOptions);
+    const userId = session!?.user!?._id;
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      return null;
+    }
+    const cart = user.carts[0];
+    if (!cart) {
+      return null;
+    }
+    const userShippingAddress = user.shippingAddress.find(
+      (address: any) => address.default === true
+    );
+    if (!userShippingAddress) {
+      return null;
+    }
+    const TotalShippingAddressData: Shipping[] = [];
+
+    for (const key in userShippingAddress) {
+      const value = userShippingAddress[key];
+      const morsacheShippingData: any = ShippingModel.findOne({ name: value });
+      if (morsacheShippingData) {
+        TotalShippingAddressData.push(morsacheShippingData);
+      }
+    }
+
+    //shipping logic: send back the 
+    const shippingData = TotalShippingAddressData.reduce((acc: any, curr) => {
+      if (!acc) {
+        acc.price < curr.price ? (acc = curr) : null;
+      }
+    }, 0);
+
+    if(!shippingData || shippingData.length < 1){ 
+      const DefaultShippingData  = ShippingModel.findOne({ name: "default" });
+      return Response("shipping data", 200, true, DefaultShippingData);
+    }
+
+    return Response("shipping data", 200, true, shippingData);
+  } catch (error) {
+    console.error("Error fetching shipping data", error);
     throw error;
   }
 };
