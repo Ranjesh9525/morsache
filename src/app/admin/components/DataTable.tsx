@@ -21,11 +21,13 @@ import { useRouter } from "next/navigation";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  route:string
 }
 //id,firstname,totalorders,datejoined,role,email
 export function DataTable<TData, TValue>({
   columns,
   data,
+  route
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const table = useReactTable({
@@ -64,7 +66,7 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   onClick={() =>
                     router.push(
-                      "/admin/products/" +
+                      `/admin/${route}/` +
                         row
                           .getVisibleCells()
                           .find((cell) => cell.column.id === "id")

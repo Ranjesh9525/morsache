@@ -276,7 +276,7 @@ const page = (props: Props) => {
         </DialogContent>
       </Dialog>
       <div className="container mx-auto min-h-[70vh] py-10">
-      { isPending ? "" : fetchedData ? <DataTable columns={columns} data={fetchedData} /> : <p className="text-center text-gray-500 mt-16" >No data to show, either fetch error or theres no shipping data, check logs for details</p>}
+      { isPending ? "" : fetchedData ? <DataTable route={"teams"} columns={columns} data={fetchedData} /> : <p className="text-center text-gray-500 mt-16" >No data to show, either fetch error or theres no shipping data, check logs for details</p>}
       </div>
     </>
   );

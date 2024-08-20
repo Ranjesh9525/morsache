@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import CheckoutCard from "@/app/cart/components/CheckoutCard";
 import PrevAndNextBtn from "@/app/cart/components/PrevAndNextBtn";
+import Image from "next/image";
+import { IoCardOutline } from "react-icons/io5";
+import { InitializeOrder } from "@/serverlessActions/_cartActions";
 
 type Props = {
   params: {
@@ -14,6 +17,9 @@ type Props = {
 const Page = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
+const {isPending,isSuccess,data,error,isError,mutate:server_InitializeOrder}=useMutation({
+  mutationFn: InitializeOrder
+})
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -25,6 +31,7 @@ const Page = (props: Props) => {
   };
 
   const handlePayment = async () => {
+    server_InitializeOrder()
     setIsLoading(true);
     const res = await loadRazorpayScript();
 
@@ -55,7 +62,7 @@ const Page = (props: Props) => {
       currency: order_currency,
       name: "Morsache Clothing",
       description: "Order Payment",
-      image: "/your_logo.png",
+      image: "/morsache-clothing-logo.png",
       order_id,
       handler: async (response: any) => {
         alert(
@@ -72,7 +79,7 @@ const Page = (props: Props) => {
         address: "Morsache Clothing HQ",
       },
       theme: {
-        color: "#61dafb",
+        color: "#545454",
       },
     };
 
@@ -83,15 +90,22 @@ const Page = (props: Props) => {
 
   return (
     <CheckoutLayout title="Payment - Morsache Clothing">
-      <div style={{ backgroundColor: "red", width: "100px" }}>
-        <button onClick={handlePayment} disabled={isLoading}>
-          {isLoading ? "Processing..." : "Go to payment page"}
-        </button>
-      </div>
+     
       <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-9">
       <div className="col-span-6 flex flex-col h-full">
-      <div className="flex-1">
-          {/* <ShippingInformation /> */}</div>
+      <div className="flex-1 flex flex-col items-start gap-4">
+   
+        <button className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer">
+         <IoCardOutline/> <p className="font-medium">Pay on delivery</p>
+        </button>
+        <button className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer" onClick={handlePayment} disabled={isLoading}>
+         <Image src="/razorpay.png" alt="razorPay" width={100} height={50}/> <p className="font-medium">{isLoading ? "Processing..." : "Pay With Razor Pay"}</p>
+        </button>
+        <button className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer" disabled={true}>
+         <Image src="/stripe.png" alt="razorPay" width={80} height={50}/> <p className="font-medium">Pay with stripe</p>
+        </button>
+   
+      </div>
         <div className="mt-auto">
 
           <PrevAndNextBtn

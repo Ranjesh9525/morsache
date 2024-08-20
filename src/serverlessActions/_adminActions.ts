@@ -239,9 +239,22 @@ export const AdminAddTeam=async(email:string)=>{
   try{
     await connectDB();
     const user = await UserModel.findOneAndUpdate({email:email},{
-      
+
     })
   }catch(error){
     console.error("Error adding teammate ")
   }
 }
+
+export const AdminGetAllShippingData=async()=>{
+  try{
+    await connectDB();
+    const ShippingData = await ShippingModel.find({})
+    return Response("Shipping data fetched",200,true,ShippingData)
+ 
+  }catch(error){
+    console.error("Error adding teammate ")
+  }
+}
+
+

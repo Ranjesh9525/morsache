@@ -31,25 +31,27 @@ const CartCard = ({ product }: Props) => {
   return (
     <>
       {response?.data ? (
-        <div className="flex gap-2 cursor-pointer">
+        <div className="flex gap-2 mb-2 cursor-pointer">
           <section>
             <Image
               src={response?.data?.images[0] || ""}
               alt={response?.data?.name}
-              width={75}
-              height={75}
+              width={65}
+              height={65}
             />
           </section>
           <section>
-            <h1>{response?.data?.name}</h1>
+            <h1 className="font-medium">{response?.data?.name}</h1>
 
+           
+
+            <span className="grid grid-cols-2 gap-1 text-[14px] ">
             <p className="text-[14px] text-grey-500">
               SKU:{response?.data?.SKU}
             </p>
-
-            <span className="flex flex-col gap-1 text-sm mt-2">
-              {product?.variant && <p>Variant: {product?.variant}</p>}
-
+              {product?.variant && <p>variant: {product?.variant}</p>}
+              {product?.size && <p>size: {product?.size}</p>}
+                <p>quantity:{product?.quantity}</p>
               {/* <Link
                   href={`/products/${?.slug}`}
                   className="text-[#545454] cursor-pointer hover:text-[#545454]/80"

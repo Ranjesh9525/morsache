@@ -27,6 +27,7 @@ export interface Cart {
   totalAmount: number;
   createdAt: Date;
   updatedAt: Date;
+  shippingPrice?: string; 
   shippingAddress: ShippingAddress[];
   paymentMethod?: PaymentMethod;
   recieveBy?:"pickup"|"delivery";
@@ -66,7 +67,7 @@ export interface CartForServer  {
   totalAmount: number;
   shippingAddress?: ShippingAddress[];
   paymentMethod?: PaymentMethod;
-  shippingPrice?: number; 
+  shippingPrice?: string; 
   recieveBy?:"pickup"|"delivery"
   isPaid: boolean;
   createdAt: Date;

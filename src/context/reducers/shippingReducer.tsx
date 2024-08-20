@@ -4,7 +4,7 @@ export const shippingReducer = (
 ) => {
   switch (action.type) {
     case "SET_SHIPPING_CHOICE":
-        console.log("choice", action.payload);
+        // console.log("choice", action.payload);
       return {
         choice: action.payload,
       };

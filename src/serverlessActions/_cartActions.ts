@@ -1,6 +1,7 @@
 "use server";
 import ProductsModel from "../models/Products";
 import ShippingModel from "../models/Shipping";
+import OrdersModel from "../models/Orders";
 import UserModel, { cartSchema } from "../models/User";
 // import CModel from "../models/Products";
 
@@ -259,7 +260,6 @@ export const findUserCart = async (cartId: string) => {
 export const FetchUserCartShippingData = async () => {
   try {
     await connectDB();
-    console.log("starting")
     const session: any = await getServerSession(authOptions);
     const userId = session!?.user!?._id;
     const user = await UserModel.findOne({ _id: userId });
@@ -268,11 +268,12 @@ export const FetchUserCartShippingData = async () => {
     }
     const cart = user.carts[0];
     if (!cart) {
-    throw new Error("Cart not found");
+      throw new Error("Cart not found");
     }
-    const userShippingAddress = user.address.find(
-      (address: any) => address.defaultAddress === true
-    );
+    const userShippingAddress = user
+      .toObject()
+      .address.find((address: any) => address.defaultAddress === true);
+ 
     if (!userShippingAddress) {
       throw new Error("No shipping address found");
     }
@@ -280,49 +281,156 @@ export const FetchUserCartShippingData = async () => {
 
     for (const key in userShippingAddress) {
       const value = userShippingAddress[key];
-      const morsacheShippingData: any = ShippingModel.findOne({ name: value });
+      const morsacheShippingData: any = await ShippingModel.findOne({
+        name: value,
+      }).lean();
       if (morsacheShippingData) {
         TotalShippingAddressData.push(morsacheShippingData);
       }
     }
-
+    // console.log(TotalShippingAddressData);
     //shipping logic: send back the ShuppingObject with the highest price
     const shippingData = TotalShippingAddressData.reduce((acc: any, curr) => {
-      if (acc) {
-         curr.price > acc.price? (acc = curr) : null;
+      if (!acc || curr.price > acc.price) {
+          return curr; 
+      } else {
+          return acc; 
       }
-    }, 0);
-    console.log(shippingData)
+  }, null);
+    // console.log(shippingData);
     user.carts[0].shippingAddress = userShippingAddress;
-
-    if(shippingData){
+    user.carts[0].recieveBy = "delivery"
+    if (shippingData) {
       user.carts[0].shippingPrice = shippingData?.price;
       await user.save();
-      return {message:"shipping data"};
-      // return Response("shipping data", 200, true, shippingData);
+       return Response("shipping data", 200, true, shippingData);
     }
 
-    if(!shippingData || shippingData.length < 1){ 
-      const DefaultShippingData:any  = ShippingModel.find({ name: "default" });
-      console.log(DefaultShippingData)
-      if(!DefaultShippingData){
+    if (!shippingData || shippingData?.length < 1) {
+      const DefaultShippingData: any = await ShippingModel.findOne({
+        name: "default",
+      });
+      if (!DefaultShippingData) {
         throw new Error("No default shipping data found");
-      }else{
-      user.carts[0].shippingPrice = DefaultShippingData?.price;
-      await user.save();
-      // return Response("shipping data", 200, true, DefaultShippingData);
-    }}
-
+      } else {
+        console.log(DefaultShippingData);
+        user.carts[0].shippingPrice = DefaultShippingData?.price;
+        await user.save();
+        return Response("shipping data", 200, true, DefaultShippingData);
+      }
+    }
   } catch (error) {
     console.error("Error fetching shipping data", error);
     throw error;
   }
 };
 
-// const sampleObject = {
-//   locationBy: "city",
-//   name: "Sample Product",
-//   price: 29.99,
-//   createdAt: new Date("2022-01-15T10:30:00"),
-//   updatedAt: new Date("2022-01-15T15:45:00"),
-// };
+export const InitializeOrder = async()=>{
+  try{
+    await connectDB()
+    const session: any = await getServerSession(authOptions);
+    const userId = session!?.user!?._id;
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      throw new Error("No User found");
+    }
+    const cart = user.carts[0];
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+    console.log(cart)
+    // {
+    //   shippingAddress: {
+    //     street: 'test strest',
+    //     city: 'test city',
+    //     state: 'test state',
+    //     postalCode: '2389284',
+    //     country: '323',
+    //     defaultAddress: true
+    //   },
+    //   items: [
+    //     {
+    //       productId: new ObjectId("66bcef9b7946202bb052b85b"),
+    //       offersData: [Array],
+    //       quantity: 1,
+    //       size: 'xxl',
+    //       variant: 'blue',
+    //       totalPrice: 2339,
+    //       _id: new ObjectId("66c4f35bb9d301eeead6379a")
+    //     },
+    //     {
+    //       productId: new ObjectId("66bcef9b7946202bb052b85b"),
+    //       offersData: [Array],
+    //       quantity: 2,
+    //       size: 'm',
+    //       variant: 'brown',
+    //       totalPrice: 4678,
+    //       _id: new ObjectId("66c4f35bb9d301eeead6379d")
+    //     }
+    //   ],
+    //   totalItems: 3,
+    //   totalAmount: 7017,
+    //   isPaid: false,
+    //   _id: new ObjectId("66c4f35bc0efb1002bcebed9"),
+    //   updatedAt: 2024-08-20T20:42:14.781Z,
+    //   createdAt: 2024-08-20T16:58:52.231Z,
+    //   recieveBy: 'delivery',
+    //   shippingPrice: 2893
+    // }
+    // const order = new OrdersModel({
+
+    // })
+    // {
+    //   orderNumber: {
+    //     type: String,
+    //     required: true,
+    //   },
+    //   customer: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     required: true,
+    //   },
+    //   items: [cartItemSchema],
+    //   totalItems: Number,
+    //   totalAmount: {
+    //     type: Number,
+    //     required: true,
+    //   },
+    //   status: {
+    //     type: String,
+    //     enum: ["pending", "confirmed", "shipped", "delivered"],
+    //     default: "pending",
+    //   },
+    //   shippingAddress: {
+    //     street: String,
+    //     city: String,
+    //     state: String,
+    //     postalCode: String,
+    //     country: String,
+    //   },
+    //   paymentMethod: {
+    //     type: {
+    //       type: String,
+    //       enum: ["creditCard", "razorPay", "stripe", "payOnDelivery"],
+    //     },
+    //     cardNumber: {
+    //       type: String,
+    //     },
+    //     cardExpiry: {
+    //       type: String,
+    //     },
+    //     cardCVV: {
+    //       type: String,
+    //     },
+    //   },
+    //   paymentStatus: {
+    //     type: String,
+    //     enum: ["pending", "paid"],
+    //     default: "pending",
+    //   },
+    // },
+  }catch(error){
+console.error("Error creating order",error)
+throw error
+  }
+}

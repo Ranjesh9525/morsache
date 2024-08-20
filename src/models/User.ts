@@ -31,7 +31,7 @@ export const cartSchema = new mongoose.Schema(
     items: [cartItemSchema],
     totalItems: Number,
     totalAmount: Number,
-    shippingAddress: [
+    shippingAddress: 
       {
         street: String,
         city: String,
@@ -42,7 +42,6 @@ export const cartSchema = new mongoose.Schema(
           type: Boolean,
         },
       },
-    ],
     paymentMethod: {
       type: {
         type: String,

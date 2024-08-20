@@ -113,7 +113,7 @@ useEffect(()=>{
         description="A list of all users on the morsache store"
       />
       <div className="container mx-auto min-h-[70vh] py-10">
-        <DataTable columns={columns} data={randomData} />
+        <DataTable columns={columns} route={"users"} data={randomData} />
       </div>
     </>
   );

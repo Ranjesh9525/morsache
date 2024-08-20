@@ -168,7 +168,7 @@ const page = (props: Props) => {
             <ClipLoader />
           </section>
         ) : (
-          <DataTable columns={columns} data={data.data} />
+          <DataTable route={"products"} columns={columns} data={data.data} />
         )}
       </div>
     </>

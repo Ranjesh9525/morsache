@@ -33,10 +33,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { format } from "@/components/products/ProductInfo";
-import { AdminAddShippingData } from "@/serverlessActions/_adminActions";
+import { AdminAddShippingData, AdminGetAllShippingData } from "@/serverlessActions/_adminActions";
 
 
 type Props = {};
@@ -78,7 +78,7 @@ export const columns: ColumnDef<ShippingData>[] = [
   },
   {
     accessorKey: "price",
-    header: "Price",
+    header: "Price(INR)",
   },
 ];
 const page = (props: Props) => {
@@ -110,25 +110,39 @@ const page = (props: Props) => {
   });
   function onSubmit(values:z.infer<typeof shippingSchema>) {
    server_AdminAddShippingData(values)
-    console.log(values);
+    // console.log(values);
   }
-// useEffect(()=>{
-//   if(isSuccess){
-//     toast({
-//       variant: "success",
-//       title: "shipping data added ",
-//       description: "shipping data has been added successfully",
-//     })
-//   }
-//   if(error){
-//     toast({
-//       variant: "destructive",
-//       title: "Error:shipping creation failed",
-//       description:<p>{error?.message}</p> ,
-//     })
-//   }
+
+  const {isSuccess:ShippingDataIsSuccess,data:ShippingResponse,isError:ShippingDataIsError,error:ShippingDataError,isPending:ShippingDataIsFetching,refetch:refetchShippingData}=useQuery({
+   queryKey:["admin_shipping_data"],
+    queryFn:()=>AdminGetAllShippingData()
+  })
+useEffect(()=>{
+  console.log(ShippingResponse)
+  if(ShippingResponse?.data){
+    setFetchedData(ShippingResponse?.data)
+  }
+
+},[ShippingDataIsSuccess,ShippingResponse])
+
+useEffect(()=>{
+  if(isSuccess){
+    refetchShippingData()
+    toast({
+      variant: "success",
+      title: "shipping data added ",
+      description: "shipping data has been added successfully",
+    })
+  }
+  if(error){
+    toast({
+      variant: "destructive",
+      title: "Error:shipping creation failed",
+      description:<p>{error?.message}</p> ,
+    })
+  }
   
-// },[isSuccess,error])
+},[isSuccess,error])
 
   return (
     <>
@@ -246,28 +260,27 @@ const page = (props: Props) => {
                       )}
                     />
                 </div>{" "}
-                <div className="space-y-2 mx-auto w-fit">
+                <div className="space-y-2  w-fit flex flex-col items-center justify-center">
                   <Button
-                    // disabled={
-                    //   form.formState.isValidating ||
-                    //   form.formState.isSubmitting ||
-                    //   !form.formState.isValid
-                    // }
+                    disabled={
+                      form.formState.isValidating ||
+                      form.formState.isSubmitting ||
+                      !form.formState.isValid
+                    }
                     //   onClick={() =>
                     //  console.log(form.getValues(), form.formState)
                     //   }
                     type="submit"
                     className="w-full max-w-[400px] text-center py-5 h-none"
                   >
-                    {form.formState.isSubmitting ? (
+                    {form.formState.isSubmitting || isPending ? (
                       <ClipLoader size={22} color="white" />
                     ) : (
                       "Add Shipping Details"
                     )}
                   </Button>
                   <p className="text-[12.5px] capitalize text-center">
-                    This offer will only be activated for products you add it to
-                    their offer list
+                    You can set for differnt location types, the hierachy of prices goes from street to country so setting for a country will act as default price for that country
                   </p>
                 </div>
               </form>
@@ -276,7 +289,7 @@ const page = (props: Props) => {
         </DialogContent>
       </Dialog>
       <div className="container mx-auto min-h-[70vh] py-10">
-      { isPending ? "" : fetchedData ? <DataTable columns={columns} data={fetchedData} /> : <p className="text-center text-gray-500 mt-16" >No data to show, either fetch error or theres no shipping data, check logs for details</p>}
+      { ShippingDataIsFetching ? <span className="flex items-center justify-center mt-12"><ClipLoader size={30}/></span> : fetchedData ? <DataTable route={"shipping"} columns={columns} data={fetchedData} /> : <p className="text-center text-gray-500 mt-16" >No data to show, either fetch error or theres no shipping data, check logs for details</p>}
       </div>
     </>
   );

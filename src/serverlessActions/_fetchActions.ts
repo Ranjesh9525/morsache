@@ -5,6 +5,7 @@ import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
 import { Response } from "./responseClass";
 import { getSession } from "next-auth/react";
+import { Product } from "@/@types/products";
 
 // Import the Product model
 
@@ -170,12 +171,31 @@ export const FetchProductsFromFilterData = async (data: { tag: string; values: s
 export const FetchSimilarProducts = async (tags:  string[] ) => {
   try {
     await connectDB();
+    console.log("tags",tags)
+  //tags [ 'casual', 'graphic', 'long sleeve', 'collared' ]
+    // const similarProducts = await ProductsModel.find({ tags: { $in: tags } })
+    //     .sort({ tags: { $size: -1 } })
+    //     .limit(12);
+    // const similarProducts = await ProductsModel.find({ tags: { $in: tags } })
+    // .sort({ $where: `this.tags.filter(value => ${tags}.includes(value)).length` })
+    // .exec();
+    const allProducts: Product[] = await ProductsModel.find({}).exec();
 
-    const similarProducts = await ProductsModel.find({ tags: { $in: tags } })
-        .sort({ tags: { $size: -1 } }) //here we sort by the number of matching tags in descending order
-        .limit(12);//im sendiog back only 12 items
+    const filteredProducts = allProducts.filter(product =>
+      product!.tags!.some(tag => tags.includes(tag))
+  );
 
-    return Response("similar products", 200, true, similarProducts );
+  // Sort filtered products based on the number of common tags with the target tags array
+  filteredProducts.sort((productA, productB) => {
+      const commonTagsA = productA.tags!.filter(tag => tags.includes(tag)).length;
+      const commonTagsB = productB.tags!.filter(tag => tags.includes(tag)).length;
+      return commonTagsB - commonTagsA; // Sort in descending order
+  });
+
+  return Response("similar products", 200, true, filteredProducts);
+
+
+    // return Response("similar products", 200, true, similarProducts );
   } catch (error) {
     console.error("Error fetching similar products:", error);
     throw error;

@@ -148,6 +148,9 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   useEffect(() => {
     if (findCartIsSuccess) {
       setUserCartWithDiscount(findCartData?.data);
+      if(findCartData?.data?.recieveBy){
+        dispatch({type:"SET_SHIPPING_CHOICE",payload:findCartData?.data?.recieveBy})
+      }
       console.log(findCartData?.data);
     }
     if (findCartIsError) {
@@ -161,6 +164,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     }
     if (uploadCartIsError) {
       console.log(uploadCartError);
+      redirect('/cart?error=401')
     }
   }, [uploadCartIsSuccess, uploadCartData, uploadCartIsError]);
 
@@ -197,7 +201,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   const {
     error: shippingDataError,
     data: shippingDataResponse,
-    isPending: shippingDataIsPending,
+    isFetching: shippingDataIsPending,
     isError: shippingDataIsError,
     refetch,
   } = useQuery({
@@ -215,7 +219,8 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
       console.log(shippingDataError);
     }
     if (shippingDataResponse) {
-      console.log(shippingDataResponse);
+      
+      console.log(shippingDataResponse,userCartWithDiscount);
     }
   }, [shippingDataIsError, shippingDataResponse]);
   return (
@@ -231,12 +236,15 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
         </div>
       ) : userCartWithDiscount !== null ? (
         <div className="flex flex-col gap-2 w-full">
-          <section>
             {!cart &&
+          <section className="h-[200px] overflow-y-auto">
+{
               userCartWithDiscount.items.map((product: any, ind: number) => {
                 return <CartCard key={ind} product={product} />;
-              })}
-          </section>
+              })
+}
+</section>
+}
           <Separator />
           <section id="offers" className="">
             <div className="inline-flex items-center w-full">
@@ -285,7 +293,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             <span className="inline-flex items-center justify-between text-[15px]">
               <h1 className="font-medium text-gray-800">Shipping</h1>
               <span className="text-gray-400 text-[14px]">
-                {Shipping.choice ? "Calculating..." : "calculated at checkout"}
+                {shippingDataIsPending ? <p>Calulating... <ClipLoader size={17} /></p>: Shipping.choice ?  format(shippingDataResponse?.data?.price) : "calculated at checkout"}
               </span>
             </span>
             <span className="inline-flex items-center justify-between text-[15px]">
@@ -305,7 +313,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             <span className="inline-flex items-center text-sm">
               INR{" "}
               <p className="font-semibold text-[1.35rem] ml-1">
-                {format(userCartWithDiscount!?.totalAmount)}
+                {format((userCartWithDiscount.totalAmount + (shippingDataResponse?.data?.price ? shippingDataResponse?.data?.price: 0)))}
               </p>
             </span>
           </section>

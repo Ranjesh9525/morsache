@@ -59,13 +59,11 @@ const {Shipping,dispatch}=React.useContext<any>(ShippingContext)!;
                         dispatch({type:"SET_SHIPPING_CHOICE",payload:"pickUp"})
                      
                     }}
-                    className={`flex flex-col items-center space-x-3 rounded-xl border cursor-pointer w-full p-4 border-primary space-y-0 ${
-                      Shipping.choice === "pickUp" ? "bg-primary text-white" : ""
-                    }`}
+                    className={`flex flex-col items-start space-x-3 rounded-xl border cursor-pointer w-full p-4 border-primary space-y-0 `}
                   >
-                    <div className="w-full flex">
+                                       <div className="flex gap-2">
                       <Input
-                        className="w-4 h-4"
+                        className="w-4 h-4 checked:text-primary"
                         type="radio"
                         onChange={()=>dispatch({type:"SET_SHIPPING_CHOICE",payload:"pickUp"})}
                         value="pickUp"
@@ -75,17 +73,14 @@ const {Shipping,dispatch}=React.useContext<any>(ShippingContext)!;
                     </div>
                     <p
                       className={`text-[12.5px] ml-2 ${
-                        Shipping.choice === "pickUp"
-                          ? "text-white"
-                          : " text-gray-500"
+                      
+                           " text-gray-500"
                       }`}
                     >
                       Lorem ipsum dolor sit, amet consectetur adipisicing elit.
                       Rerum repellat consequuntur nesciunt ratione vel, numquam
                       provident assumenda hic, quae obcaecati cupiditate
-                      voluptatem eum molestias! Tenetur tempore provident aliio
-                      ea voluptates a quasi id, distinctio nobis delectus
-                      quaerat minima. Fuga?
+                      
                     </p>
                   </div>
                   <div
@@ -93,13 +88,11 @@ const {Shipping,dispatch}=React.useContext<any>(ShippingContext)!;
                      dispatch({type:"SET_SHIPPING_CHOICE",payload: "delivery"});
                      
                     }}
-                    className={`flex flex-col gap-2 items-start space-x-3  rounded-xl border cursor-pointer w-full p-4 border-primary ${
-                      Shipping.choice === "delivery" ? "bg-primary !text-white" : ""
-                    }`}
+                    className={`flex flex-col gap-2 items-start space-x-3  rounded-xl border cursor-pointer w-full p-4 border-primary`}
                   >
                     <div className="flex gap-2">
                       <Input
-                        className="w-4 h-4"
+                        className="w-4 h-4 checked:!bg-primary"
                         type="radio"
                         onChange={()=>{
                      dispatch({type:"SET_SHIPPING_CHOICE",payload: "delivery"});
@@ -112,9 +105,8 @@ const {Shipping,dispatch}=React.useContext<any>(ShippingContext)!;
                     </div>
                     <p
                       className={`text-[12.5px] ml-2 ${
-                        Shipping.choice === "delivery"
-                          ? "text-white"
-                          : " text-gray-500"
+                     
+                          " text-gray-500"
                       }`}
                     >
                       Lorem ipsum dolor sit, amet consectetur adipisicing elit.

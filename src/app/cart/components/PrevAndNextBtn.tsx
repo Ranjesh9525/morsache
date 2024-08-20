@@ -23,13 +23,12 @@ const PrevAndNextBtn = ({ showBack, showNext, nextLink, prevLink }: props) => {
         <span></span>
       )}
       {showNext ? (
-        // <Link
+        <Link
                     
-        //   className="text-sm text-white hover:bg-[#c6c5c5] bg-[#ababab] rounded-md px-4 py-2"
-        //   href={nextLink || ""}
-        // >
-         <button type="submit" >Next</button>
-        // </Link>
+          className="text-sm text-white hover:bg-[#c6c5c5] bg-[#ababab] rounded-md px-4 py-2"
+          href={nextLink || ""}
+        >
+      Next</Link>
       ) : (
         <span></span>
       )}

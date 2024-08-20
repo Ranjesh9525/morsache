@@ -66,7 +66,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
                 width={40}
                 height={40}
               />
-              <h1 className="font-medium text-[#474747] text-2xl">
+              <h1 className="font-medium whitespace-nowrap text-[#474747] text-2xl">
                 orsache - Admin
               </h1>
             </Link> : <Link
