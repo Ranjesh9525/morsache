@@ -1,6 +1,18 @@
 import { ObjectId } from "mongodb";
 import { Product } from "./products";
+interface PaymentMethod {
+  type: 'razorPay' | 'stripe' | 'payOnDelivery';
+}
 
+
+interface ShippingAddress {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  defaultAddress?: boolean;
+}
 // Cart item type
 export interface CartItem {
   product: Product;
@@ -15,8 +27,8 @@ export interface Cart {
   totalAmount: number;
   createdAt: Date;
   updatedAt: Date;
-  shippingAddress: string;
-  paymentMethod: string;
+  shippingAddress: ShippingAddress[];
+  paymentMethod: PaymentMethod;
   isPaid: boolean;
 }
 export interface CartItemForServer {
@@ -29,21 +41,34 @@ export interface CartItemForServer {
   }[];
   quantity: number;
   size: string;
+  
   variant: string;
   totalPrice: number;
 }
 
+
+
+// interface CartSchema  {
+//   items: CartItem[];
+//   totalItems: number;
+//   totalAmount: number;
+
+//   isPaid: boolean;
+// }
+
+
 // Cart type
-export interface CartForServer {
+export interface CartForServer  {
   _id?:ObjectId;
   items: CartItemForServerm[];
   totalItems: number;
   totalAmount: number;
+  shippingAddress?: ShippingAddress[];
+  paymentMethod?: PaymentMethod;
+  shippingPrice?: number;
+  isPaid: boolean;
   createdAt: Date;
   updatedAt: Date;
-  shippingAddress: string;
-  paymentMethod: string;
-  isPaid: boolean;
 }
 
 export type CartAction =

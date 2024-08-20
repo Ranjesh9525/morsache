@@ -316,7 +316,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
                 item={item}
                 index={index}
                 key={index}
-                isLoading={isPending || productsFromFilterIsPending}
+                isLoading={true}
               />
             ))}
       </section>

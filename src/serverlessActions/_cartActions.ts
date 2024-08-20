@@ -285,15 +285,24 @@ export const FetchUserCartShippingData = async () => {
       }
     }
 
-    //shipping logic: send back the 
+    //shipping logic: send back the ShuppingObject with the highest price
     const shippingData = TotalShippingAddressData.reduce((acc: any, curr) => {
-      if (!acc) {
-        acc.price < curr.price ? (acc = curr) : null;
+      if (acc) {
+         curr.price > acc.price? (acc = curr) : null;
       }
     }, 0);
+    console.log(shippingData)
+    user.carts[0].shippingAddress = userShippingAddress;
+
+    if(shippingData){
+      user.carts[0].shippingPrice = shippingData?.price;
+      await user.save();
+    }
 
     if(!shippingData || shippingData.length < 1){ 
-      const DefaultShippingData  = ShippingModel.findOne({ name: "default" });
+      const DefaultShippingData:any  = ShippingModel.findOne({ name: "default" });
+      user.carts[0].shippingPrice = DefaultShippingData?.price;
+      await user.save();
       return Response("shipping data", 200, true, DefaultShippingData);
     }
 

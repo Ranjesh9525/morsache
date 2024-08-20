@@ -30,14 +30,6 @@ export const cartSchema = new mongoose.Schema({
   items: [cartItemSchema],
   totalItems: Number,
   totalAmount: Number,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
   shippingAddress: [{
     street: String,
     city: String,
@@ -46,32 +38,35 @@ export const cartSchema = new mongoose.Schema({
     country: String,
     defaultAddress:{
       type: Boolean,
-      default: true
     }
   }],
   paymentMethod: {
     type: {
       type: String,
-      enum: ["creditCard", "razorPay", "stripe", "payOnDelivery"],
+      enum: [ "razorPay", "stripe", "payOnDelivery"],
     },
-    cardNumber: {
-      type: String,
-    },
-    cardExpiry: {
-      type: String,
-    },
-    cardCVV: {
-      type: String,
-    },
+    // cardNumber: {
+    //   type: String,
+    // },
+    // cardExpiry: {
+    //   type: String,
+    // },
+    // cardCVV: {
+    //   type: String,
+    // },
     // paypalEmail: {
     //   type: String,
     // },
+  },
+  shippingPrice: {
+    type: Number,
   },
   isPaid: {
     type: Boolean,
     default: false,
   },
-});
+},{
+  timestamps: true});
 
 const userSchema = new mongoose.Schema(
   {
@@ -93,6 +88,10 @@ const userSchema = new mongoose.Schema(
       zipCode: String,
 
       country: String,
+      defaultAddress:{
+        type: Boolean,
+        default: false
+      }
     },
     phoneNumber: {
       type: String,

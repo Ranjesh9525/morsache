@@ -5,6 +5,7 @@ import { v2 as cloudinary } from "cloudinary";
 import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
+import ShippingModel from "../models/Shipping";
 import OffersModel from "../models/Offers";
 import { Response } from "./responseClass";
 import { Offer, Product } from "@/@types/products";
@@ -170,15 +171,14 @@ export const AdminGetAllOffers = async () => {
   }
 };
 
-
 export const AdminCreateCategory = async (data: category) => {
   try {
     await connectDB();
-    console.log(data)
-    if(!data.tags || data.tags.length < 1){
+    // console.log(data)
+    if (!data.tags || data.tags.length < 1) {
       throw new Error("Tags cannot be empty");
     }
-    if(data.image){
+    if (data.image) {
       const cloudPhoto = await cloudinary.uploader.upload(data.image, {
         folder: "categories",
         public_id: data.name,
@@ -189,16 +189,16 @@ export const AdminCreateCategory = async (data: category) => {
     const category = new CategoryModel({
       name: data.name,
       image: data.image,
-      tags: data.tags
-  });
-    console.log(category)
+      tags: data.tags,
+    });
+    // console.log(category)
     await category.save();
     return Response("Category created successfully", 200, true, category);
   } catch (error) {
     console.error("Error creating category:", error);
     throw error;
   }
-}
+};
 
 export const AdminGetAllCategories = async () => {
   try {
@@ -209,16 +209,39 @@ export const AdminGetAllCategories = async () => {
     console.error("Error fetching categories:", error);
     throw error;
   }
-}
+};
 
-export const AdminDeleteCategory = async(id:string)=>{
-  try{
-await connectDB();
-const category = await CategoryModel.findByIdAndDelete(id);
-return null
-
-  }catch (error) {
+export const AdminDeleteCategory = async (id: string) => {
+  try {
+    await connectDB();
+    const category = await CategoryModel.findByIdAndDelete(id);
+    return null;
+  } catch (error) {
     console.error("Error creating category:", error);
     throw error;
+  }
+};
+
+export const AdminAddShippingData = async (data:{locationBy:string,name:string,price:string | number}) => {
+  try {
+    await connectDB();
+    data.price  = parseInt(data?.price as string);
+    const Shipping = new ShippingModel(data);
+    console.log(Shipping);
+    await Shipping.save();
+  } catch (error) {
+    console.error("Error adding shipping data:", error);
+    throw error;
+  }
+};
+
+export const AdminAddTeam=async(email:string)=>{
+  try{
+    await connectDB();
+    const user = await UserModel.findOneAndUpdate({email:email},{
+      
+    })
+  }catch(error){
+    console.error("Error adding teammate ")
   }
 }

@@ -3,6 +3,7 @@ import CheckoutLayout from "@/components/layouts/CheckoutLayout";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import CheckoutCard from "@/app/cart/components/CheckoutCard";
+import PrevAndNextBtn from "@/app/cart/components/PrevAndNextBtn";
 
 type Props = {
   params: {
@@ -42,11 +43,14 @@ const Page = (props: Props) => {
       body: JSON.stringify({ amount: 500, currency: "INR" }),
     });
 
-    const { id: order_id, currency: order_currency, amount: order_amount } =
-      await result.json();
+    const {
+      id: order_id,
+      currency: order_currency,
+      amount: order_amount,
+    } = await result.json();
 
     const options = {
-      key: process.env.RAZORPAY_KEY_ID, 
+      key: process.env.RAZORPAY_KEY_ID,
       amount: order_amount.toString(),
       currency: order_currency,
       name: "Morsache Clothing",
@@ -54,7 +58,9 @@ const Page = (props: Props) => {
       image: "/your_logo.png",
       order_id,
       handler: async (response: any) => {
-        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+        alert(
+          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+        );
         //bro add post payment logic
       },
       prefill: {
@@ -85,6 +91,11 @@ const Page = (props: Props) => {
       <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-4">
         <div className="col-span-6">
           {/* <ShippingInformation /> */}
+          <PrevAndNextBtn
+            showNext={false}
+            showBack={true}
+            prevLink={`/cart/checkout/shipping/${props.params.cartId.toString()}`}
+          />
         </div>
         <div className="col-span-3">
           <div className="sticky top-[34px]">

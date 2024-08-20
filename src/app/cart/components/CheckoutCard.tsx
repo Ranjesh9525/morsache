@@ -276,7 +276,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
               {" "}
               <Separator />
               <Button disabled={uploadCartIsPending} onClick={uploadCartSubmit}>
-               {uploadCartIsPending? <ClipLoader size={20}/>: "Checkout"}
+               {uploadCartIsPending? <ClipLoader size={20} color="white"/>: "Checkout"}
               </Button>
             </>
           )}

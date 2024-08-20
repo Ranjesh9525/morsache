@@ -196,17 +196,16 @@ useEffect(()=>{
       {/**/}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogTrigger>
-          <section className="w-full px-9 ">
+        <section className="w-full px-9 ">
             {" "}
-            <Button className="my-2">Create New Offer</Button>{" "}
+           <span className=" rounded-md bg-[#545454] py-3 text-white px-5"> Create New Offer</span>
           </section>
         </DialogTrigger>
         <DialogContent className=" max-w-4xl">
           <DialogHeader>
             <DialogTitle>Create a new offer</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
+              This action is to create a new offer that will give users discount if they apply the code, beware of the benefits you are setting
             </DialogDescription>
           </DialogHeader>
           <div className="w-full space-y-4">
@@ -431,8 +430,7 @@ useEffect(()=>{
                     )}
                   </Button>
                   <p className="text-[12.5px] capitalize text-center">
-                    This offer will only be activated for products you add it to
-                    their offer list
+                    You can edit this later but already made orders wont be affected
                   </p>
                 </div>
               </form>
