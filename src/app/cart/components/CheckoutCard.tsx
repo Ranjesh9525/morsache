@@ -8,15 +8,18 @@ import { format } from "@/components/products/ProductInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { redirect, useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createCart,
   validateOffers,
   findUserCart,
+  FetchUserCartShippingData,
 } from "@/serverlessActions/_cartActions";
 import { ClipLoader } from "react-spinners";
 import { CiDiscount1 } from "react-icons/ci";
 import { Skeleton } from "@/components/ui/skeleton";
+import CartCard from "./CartCard";
+import { ShippingContext } from "@/context/shippingContext";
 
 type Props = {
   cart?: Cart;
@@ -46,12 +49,12 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   );
 };
 
-
 const CheckoutCard = ({ cart, cartId }: Props) => {
   const [code, setCode] = useState<string>("");
   const [userCartWithDiscount, setUserCartWithDiscount] = useState<Cart | null>(
     !cart ? null : cart
   );
+  const { Shipping, dispatch } = React.useContext<any>(ShippingContext)!;
   const [totalDiscount, setTotalDiscount] = useState<number>(0);
   const [allOfferData, setAllOfferData] = useState<
     | {
@@ -98,19 +101,22 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     }
   }, []);
 
-  function uploadCartSubmit(){
-
-  const modifiedCart:CartForServer = cart!
-  for (const item of modifiedCart.items) {
-    item.productId = item.product.id ? item.product.id : item.product._id;
-    item.offersData = item.product.offers.map((offer:any) => {
-      return { code: offer.code || "", productId: item.productId, quantity: item.quantity };
-    });
-    delete item.product;
+  function uploadCartSubmit() {
+    const modifiedCart: CartForServer = cart!;
+    for (const item of modifiedCart.items) {
+      item.productId = item.product.id ? item.product.id : item.product._id;
+      item.offersData = item.product.offers.map((offer: any) => {
+        return {
+          code: offer.code || "",
+          productId: item.productId,
+          quantity: item.quantity,
+        };
+      });
+      delete item.product;
+    }
+    server_CreateCartMutate(modifiedCart);
   }
-  server_CreateCartMutate(modifiedCart)
-}
- 
+
   useEffect(() => {
     if (code) {
       setAllOfferData(() =>
@@ -142,20 +148,21 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   useEffect(() => {
     if (findCartIsSuccess) {
       setUserCartWithDiscount(findCartData?.data);
+      console.log(findCartData?.data);
     }
-    if(findCartIsError){
-      console.log(findCartError)
-      //redirect('/cart?error=404')
+    if (findCartIsError) {
+      console.log(findCartError);
+      redirect("/cart?error=404");
     }
-  }, [findCartIsSuccess, findCartData,findCartIsError]);
+  }, [findCartIsSuccess, findCartData, findCartIsError]);
   useEffect(() => {
     if (uploadCartIsSuccess && uploadCartData.data) {
-      redirect(`/cart/checkout/${uploadCartData?.data}`)
+      redirect(`/cart/checkout/${uploadCartData?.data}`);
     }
-    if(uploadCartIsError){
-      console.log(uploadCartError)
+    if (uploadCartIsError) {
+      console.log(uploadCartError);
     }
-  }, [uploadCartIsSuccess, uploadCartData,uploadCartIsError]);
+  }, [uploadCartIsSuccess, uploadCartData, uploadCartIsError]);
 
   useEffect(() => {
     if (offersData && userCartWithDiscount) {
@@ -187,6 +194,30 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   // if(!findCartIsPending && userCartWithDiscount===null){
   //   redirect('/cart')
   // }
+  const {
+    error: shippingDataError,
+    data: shippingDataResponse,
+    isPending: shippingDataIsPending,
+    isError: shippingDataIsError,
+    refetch,
+  } = useQuery({
+    queryKey: ["shipping"],
+    queryFn: () => FetchUserCartShippingData(),
+    enabled: false,
+  });
+  useEffect(() => {
+    if(Shipping.choice){
+    refetch()
+  }
+  }, [Shipping]);
+  useEffect(() => {
+    if (shippingDataIsError) {
+      console.log(shippingDataError);
+    }
+    if (shippingDataResponse) {
+      console.log(shippingDataResponse);
+    }
+  }, [shippingDataIsError, shippingDataResponse]);
   return (
     <>
       {findCartIsPending ? (
@@ -198,8 +229,15 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
           <Skeleton className="h-[20px] w-[200px] bg-gray-200 mb-1 rounded-lg" />
           <Skeleton className="h-[20px] w-[100px] bg-gray-200 rounded-lg" />
         </div>
-      ) : userCartWithDiscount !==null ?(
+      ) : userCartWithDiscount !== null ? (
         <div className="flex flex-col gap-2 w-full">
+          <section>
+            {!cart &&
+              userCartWithDiscount.items.map((product: any, ind: number) => {
+                return <CartCard key={ind} product={product} />;
+              })}
+          </section>
+          <Separator />
           <section id="offers" className="">
             <div className="inline-flex items-center w-full">
               <Input
@@ -234,6 +272,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
               )}
             </div>
           </section>
+
           <Separator />
           <section
             id="subtotal and shipping"
@@ -246,7 +285,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             <span className="inline-flex items-center justify-between text-[15px]">
               <h1 className="font-medium text-gray-800">Shipping</h1>
               <span className="text-gray-400 text-[14px]">
-                calculated at checkout
+                {Shipping.choice ? "Calculating..." : "calculated at checkout"}
               </span>
             </span>
             <span className="inline-flex items-center justify-between text-[15px]">
@@ -276,19 +315,25 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
               {" "}
               <Separator />
               <Button disabled={uploadCartIsPending} onClick={uploadCartSubmit}>
-               {uploadCartIsPending? <ClipLoader size={20} color="white"/>: "Checkout"}
+                {uploadCartIsPending ? (
+                  <ClipLoader size={20} color="white" />
+                ) : (
+                  "Checkout"
+                )}
               </Button>
             </>
           )}
         </div>
-      ): <div className="relative flex flex-col bg-white">
-      <Skeleton className="h-[120px] w-full rounded-lg mb-3" />
-      <Skeleton className="h-[20px] w-[160px] bg-gray-200 mb-1 rounded-lg" />
-      <Skeleton className="h-[20px] w-full bg-gray-200 mb-2 rounded-lg" />
-      <Skeleton className="h-[40px] w-full bg-gray-200 mb-3 rounded-lg" />
-      <Skeleton className="h-[20px] w-[200px] bg-gray-200 mb-1 rounded-lg" />
-      <Skeleton className="h-[20px] w-[100px] bg-gray-200 rounded-lg" />
-    </div>}
+      ) : (
+        <div className="relative flex flex-col bg-white">
+          <Skeleton className="h-[120px] w-full rounded-lg mb-3" />
+          <Skeleton className="h-[20px] w-[160px] bg-gray-200 mb-1 rounded-lg" />
+          <Skeleton className="h-[20px] w-full bg-gray-200 mb-2 rounded-lg" />
+          <Skeleton className="h-[40px] w-full bg-gray-200 mb-3 rounded-lg" />
+          <Skeleton className="h-[20px] w-[200px] bg-gray-200 mb-1 rounded-lg" />
+          <Skeleton className="h-[20px] w-[100px] bg-gray-200 rounded-lg" />
+        </div>
+      )}
     </>
   );
 };

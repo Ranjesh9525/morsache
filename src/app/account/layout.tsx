@@ -23,14 +23,14 @@ const sidebarNavItems = [
     title: "Wishlist",
     href: "/account/wishlist",
   },
-  {
-    title: "Notifications",
-    href: "/account/notifications",
-  },
-  {
-    title: "Display",
-    href: "/account/display",
-  },
+  // {
+  //   title: "Notifications",
+  //   href: "/account/notifications",
+  // },
+  // {
+  //   title: "Display",
+  //   href: "/account/display",
+  // },
 ]
 
 interface SettingsLayoutProps {

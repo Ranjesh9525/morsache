@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { FetchSingleProduct } from "@/serverlessActions/_fetchActions";
 import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   slug: string;
@@ -470,7 +471,7 @@ export const saveRecentlyViewedProduct = (product: any) => {
 };
 const ProductPage = ({ slug }: Props) => {
   const [product, setProduct] = useState<Product | null>(null);
-// console.log(slug)
+  // console.log(slug)
   const {
     isPending,
     isError,
@@ -483,7 +484,7 @@ const ProductPage = ({ slug }: Props) => {
   });
   useEffect(() => {
     server_fetchProduct(slug);
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (response) {
@@ -492,9 +493,9 @@ const ProductPage = ({ slug }: Props) => {
     }
     if (isError) {
       console.log(error);
-      redirect("/500");
+      redirect("/404");
     }
-  },[isError, isSuccess,response]);
+  }, [isError, isSuccess, response]);
 
   // if (!product && !isPending) {
   //   redirect("/404");
@@ -506,11 +507,36 @@ const ProductPage = ({ slug }: Props) => {
   }, [product]);
   return (
     <>
-     {isPending ? <ClipLoader/>: product ? <><div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5">
-        <ProductGallery product={product!} />
-        <ProductInfo product={product!} />
-      </div>
-      <Recommendation tags={product!?.tags!} /></>: <p>Something went wrong</p>}
+      {product ? (
+        <>
+          <div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5">
+            <ProductGallery product={product!} />
+            <ProductInfo product={product!} />
+          </div>
+          <Recommendation tags={product!?.tags!} />
+        </>
+      ) : (
+        <div className="grid grid-cols-2 p-9 min-h-screen gap-x-16 !mt-5 bg-white">
+          <div className="relative flex gap-3">
+            <div className="flex flex-col gap-4 flex-[3]">
+              <Skeleton className="h-[160px] w-[100%]  rounded-lg" />
+              <Skeleton className="h-[160px] w-[100%] rounded-lg" />{" "}
+            </div>
+            <Skeleton className="h-[450px] w-full rounded-lg flex-[9]" />
+          </div>
+          <div className="relative flex flex-col">
+            <Skeleton className="h-[50px] w-full rounded-lg" />
+            <Skeleton className="h-[30px] w-[160px] my-3 rounded-lg" />
+            <Skeleton className="h-[30px] w-full my-3 rounded-lg" />
+            <Skeleton className="h-[60px] mt-6 w-[40%] rounded-lg" />
+            <Skeleton className="h-[60px] mt-2 w-[40%] rounded-lg" />
+            <Skeleton className="h-[60px] mt-2 w-[40%] rounded-lg" />
+            <Skeleton className="h-[60px] mb-6 mt-2 w-[40%] rounded-lg" />
+            <Skeleton className="h-[41px] w-full rounded-lg" />
+            <Skeleton className="h-[41px] mt-3 w-full rounded-lg" />
+          </div>
+        </div>
+      )}
     </>
   );
 };

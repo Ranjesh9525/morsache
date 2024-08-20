@@ -98,6 +98,26 @@ export const FetchSingleProduct = async(slug:string) => {
     throw error;
   }
 }
+export const FetchSingleProductByIdOptimized = async(id:string) => {
+  try{
+    await connectDB();
+    const product = await ProductsModel.findById(id)
+    if (!product) {
+      return null;
+    }
+    const optimizedProduct = {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      images: product.images,
+      SKU: product.SKU,
+      salePrice: product.salePrice || null}
+    return Response("product", 200, true, optimizedProduct );
+  }catch(error){  
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+}
 
 export const FetchCategoryData = async (name:string) => {
   try {

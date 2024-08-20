@@ -59,7 +59,17 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
               onClick={() => setSideNav({ open: true })}
             />
           </span>
-          <Link
+        { session?.user?.role ==="admin" ?   <Link href="/admin" className="inline-flex items-end uppercase">
+              <Image
+                src="/morsache-clothing-logo-small.png"
+                alt="logo"
+                width={40}
+                height={40}
+              />
+              <h1 className="font-medium text-[#474747] text-2xl">
+                orsache - Admin
+              </h1>
+            </Link> : <Link
             scroll={true}
             href="/"
             className="text-4xl font-medium inline-flex uppercase  items-end tracking-wider cursor-pointer text-[#474747]"
@@ -73,7 +83,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
               alt="logo"
             />
             orsache
-          </Link>
+          </Link>}
           <span
             id="icons"
             className="flex items-center justify-end gap-4 w-full"

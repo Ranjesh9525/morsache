@@ -88,14 +88,18 @@ const Page = (props: Props) => {
           {isLoading ? "Processing..." : "Go to payment page"}
         </button>
       </div>
-      <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-4">
-        <div className="col-span-6">
-          {/* <ShippingInformation /> */}
+      <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-9">
+      <div className="col-span-6 flex flex-col h-full">
+      <div className="flex-1">
+          {/* <ShippingInformation /> */}</div>
+        <div className="mt-auto">
+
           <PrevAndNextBtn
             showNext={false}
             showBack={true}
             prevLink={`/cart/checkout/shipping/${props.params.cartId.toString()}`}
           />
+        </div>
         </div>
         <div className="col-span-3">
           <div className="sticky top-[34px]">

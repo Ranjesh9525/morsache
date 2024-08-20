@@ -26,47 +26,57 @@ export const cartItemSchema = new mongoose.Schema({
     type: Number,
   },
 });
-export const cartSchema = new mongoose.Schema({
-  items: [cartItemSchema],
-  totalItems: Number,
-  totalAmount: Number,
-  shippingAddress: [{
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String,
-    defaultAddress:{
-      type: Boolean,
-    }
-  }],
-  paymentMethod: {
-    type: {
-      type: String,
-      enum: [ "razorPay", "stripe", "payOnDelivery"],
+export const cartSchema = new mongoose.Schema(
+  {
+    items: [cartItemSchema],
+    totalItems: Number,
+    totalAmount: Number,
+    shippingAddress: [
+      {
+        street: String,
+        city: String,
+        state: String,
+        postalCode: String,
+        country: String,
+        defaultAddress: {
+          type: Boolean,
+        },
+      },
+    ],
+    paymentMethod: {
+      type: {
+        type: String,
+        enum: ["razorPay", "stripe", "payOnDelivery"],
+      },
+      // cardNumber: {
+      //   type: String,
+      // },
+      // cardExpiry: {
+      //   type: String,
+      // },
+      // cardCVV: {
+      //   type: String,
+      // },
+      // paypalEmail: {
+      //   type: String,
+      // },
     },
-    // cardNumber: {
-    //   type: String,
-    // },
-    // cardExpiry: {
-    //   type: String,
-    // },
-    // cardCVV: {
-    //   type: String,
-    // },
-    // paypalEmail: {
-    //   type: String,
-    // },
+    recieveBy: {
+      type: String,
+      enum: ["delivery", "pickup"],
+    },
+    shippingPrice: {
+      type: Number,
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
   },
-  shippingPrice: {
-    type: Number,
-  },
-  isPaid: {
-    type: Boolean,
-    default: false,
-  },
-},{
-  timestamps: true});
+  {
+    timestamps: true,
+  }
+);
 
 const userSchema = new mongoose.Schema(
   {
@@ -79,20 +89,22 @@ const userSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     emailVerified: Date,
     image: String,
-    address: {
-      street: String,
-      city: String,
+    address: [
+      {
+        street: String,
+        city: String,
 
-      state: String,
+        state: String,
 
-      zipCode: String,
+        postalCode: String,
 
-      country: String,
-      defaultAddress:{
-        type: Boolean,
-        default: false
-      }
-    },
+        country: String,
+        defaultAddress: {
+          type: Boolean,
+          default: false,
+        },
+      },
+    ],
     phoneNumber: {
       type: String,
     },

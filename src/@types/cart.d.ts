@@ -9,7 +9,7 @@ interface ShippingAddress {
   street: string;
   city: string;
   state: string;
-  zipCode: string;
+  postalCode: string;
   country: string;
   defaultAddress?: boolean;
 }
@@ -28,7 +28,8 @@ export interface Cart {
   createdAt: Date;
   updatedAt: Date;
   shippingAddress: ShippingAddress[];
-  paymentMethod: PaymentMethod;
+  paymentMethod?: PaymentMethod;
+  recieveBy?:"pickup"|"delivery";
   isPaid: boolean;
 }
 export interface CartItemForServer {
@@ -65,7 +66,8 @@ export interface CartForServer  {
   totalAmount: number;
   shippingAddress?: ShippingAddress[];
   paymentMethod?: PaymentMethod;
-  shippingPrice?: number;
+  shippingPrice?: number; 
+  recieveBy?:"pickup"|"delivery"
   isPaid: boolean;
   createdAt: Date;
   updatedAt: Date;

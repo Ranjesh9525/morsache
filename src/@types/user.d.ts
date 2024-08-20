@@ -14,7 +14,7 @@ export interface UserDocument extends Document {
     state: string;
     postalCode: string;
     country: string;
-  };
+  }[];
   phoneNumber?: string;
   role?: "customer" | "admin";
   orders?: {

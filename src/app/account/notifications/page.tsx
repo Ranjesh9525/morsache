@@ -11,7 +11,7 @@ export default function SettingsNotificationsPage() {
         </p>
       </div>
       <Separator />
-      <NotificationsForm />
+      {/* <NotificationsForm /> */}
     </div>
   )
 }

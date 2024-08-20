@@ -98,13 +98,28 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
   })
   useEffect(() => {
     if(response?.data){
-      console.log(response)
+       console.log(response)
       response.data.forEach((item: any) => {
-        userNavItems[response.data.length > 1 ? 1 : 0].section.push({ name: item.name, path: `/products/category/${item.name.replaceAll(" ", "-")}`, showIfNotLoggedIn: true, exact: true })
+        userNavItems[1].section.push({ name: item.name, path: `/products/category/${item.name.replaceAll(" ", "-")}`, showIfNotLoggedIn: true, exact: true })
       })
       setNavItems(userNavItems);
     }
   },[response])
+  useEffect(()=>{
+if(session?.user?.role === "admin"){
+  userNavItems.push({
+    sectionName: "",
+    section: [
+      {
+        name: "Dashboard",
+        path: "/admin",
+        showIfNotLoggedIn: true,
+        exact: true,
+      },
+    ],
+  })
+}
+  },[session])
   useEffect(() => {
     if(isError){
       console.log(error)

@@ -8,11 +8,11 @@ export default function SettingsAccountPage() {
         <h3 className="text-lg font-medium">Account</h3>
         <p className="text-sm text-muted-foreground">
           Update your account settings. Set your preferred language and
-          timezone.
+          timezone.shipping address etc
         </p>
       </div>
       <Separator />
-      <AccountForm />
+      {/* <AccountForm /> */}
     </div>
   )
 }

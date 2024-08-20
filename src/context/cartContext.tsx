@@ -40,8 +40,7 @@ const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     totalAmount: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
-    shippingAddress: "",
-    paymentMethod: "",
+    shippingAddress:[],
     isPaid: false,
   });
   // useEffect(() => {

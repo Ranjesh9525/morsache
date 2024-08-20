@@ -259,21 +259,22 @@ export const findUserCart = async (cartId: string) => {
 export const FetchUserCartShippingData = async () => {
   try {
     await connectDB();
+    console.log("starting")
     const session: any = await getServerSession(authOptions);
     const userId = session!?.user!?._id;
     const user = await UserModel.findOne({ _id: userId });
     if (!user) {
-      return null;
+      throw new Error("No User found");
     }
     const cart = user.carts[0];
     if (!cart) {
-      return null;
+    throw new Error("Cart not found");
     }
-    const userShippingAddress = user.shippingAddress.find(
-      (address: any) => address.default === true
+    const userShippingAddress = user.address.find(
+      (address: any) => address.defaultAddress === true
     );
     if (!userShippingAddress) {
-      return null;
+      throw new Error("No shipping address found");
     }
     const TotalShippingAddressData: Shipping[] = [];
 
@@ -297,18 +298,31 @@ export const FetchUserCartShippingData = async () => {
     if(shippingData){
       user.carts[0].shippingPrice = shippingData?.price;
       await user.save();
+      return {message:"shipping data"};
+      // return Response("shipping data", 200, true, shippingData);
     }
 
     if(!shippingData || shippingData.length < 1){ 
-      const DefaultShippingData:any  = ShippingModel.findOne({ name: "default" });
+      const DefaultShippingData:any  = ShippingModel.find({ name: "default" });
+      console.log(DefaultShippingData)
+      if(!DefaultShippingData){
+        throw new Error("No default shipping data found");
+      }else{
       user.carts[0].shippingPrice = DefaultShippingData?.price;
       await user.save();
-      return Response("shipping data", 200, true, DefaultShippingData);
-    }
+      // return Response("shipping data", 200, true, DefaultShippingData);
+    }}
 
-    return Response("shipping data", 200, true, shippingData);
   } catch (error) {
     console.error("Error fetching shipping data", error);
     throw error;
   }
 };
+
+// const sampleObject = {
+//   locationBy: "city",
+//   name: "Sample Product",
+//   price: 29.99,
+//   createdAt: new Date("2022-01-15T10:30:00"),
+//   updatedAt: new Date("2022-01-15T15:45:00"),
+// };

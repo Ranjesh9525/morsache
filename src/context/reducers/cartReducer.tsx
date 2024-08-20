@@ -70,7 +70,7 @@ export const cartReducer = (state: Cart, action: CartAction) => {
     case "REMOVE_FROM_CART":
         const { product: productId, size: payloadSize, variant: payloadVariant } = action.payload;
         
-        const updatedItems = savedCart.items.filter((item: any) => item.product.id !== productId && item.size !== payloadSize && item.variant !== payloadVariant);
+        const updatedItems = savedCart.items.filter((item: any) => item?.product?.id !== productId && item?.size !== payloadSize && item.variant !== payloadVariant);
       
         const totalItems = updatedItems.reduce((total, item) => total + item.quantity, 0);
         const totalAmount = updatedItems.reduce((total, item) => total + item.quantity * parseFloat(item.product.price), 0);
