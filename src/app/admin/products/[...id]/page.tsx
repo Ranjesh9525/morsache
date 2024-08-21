@@ -42,7 +42,7 @@ type Props = {
   params: { id: string };
 };
 
-const page = ({ params }: Props) => {
+const Page = ({ params }: Props) => {
   const [dragging, setDragging] = React.useState(false);
   const [imageDimensions, setImageDimensions] = React.useState<any[]>([]);
   const { toast } = useToast();
@@ -321,4 +321,4 @@ const page = ({ params }: Props) => {
   );
 };
 
-export default page;
+export default Page;

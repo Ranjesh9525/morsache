@@ -66,7 +66,7 @@ function increaseQuantity (){
                 {inStock ? (
                   <p>{"In Stock"}</p>
                 ) : (
-                  <p className="text-red-500">"Out Of Stock"</p>
+                  <p className="text-red-500">Out Of Stock</p>
                 )}
                 <Link
                   href={`/products/${cartItem?.product?.slug}`}

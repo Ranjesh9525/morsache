@@ -305,7 +305,7 @@ const ProductsForm = ({data}: Props) => {
                         Category
                       </h1>
                       <FormDescription className="text-[12px]">
-                        Please fill in a category, use a comma "," to insert
+                        Please fill in a category, use a comma &quot;,&quot; to insert
                         more than one or select from below
                       </FormDescription>
                       <FormControl>
@@ -347,7 +347,7 @@ const ProductsForm = ({data}: Props) => {
                         sizes
                       </h1>
                       <FormDescription className="text-[12px]">
-                        Please fill in a size, use a comma "," to insert more
+                        Please fill in a size, use a comma &quot;,&quot; to insert more
                         than one or select from below
                       </FormDescription>
                       <FormControl>
@@ -718,7 +718,7 @@ const ProductsForm = ({data}: Props) => {
                         tags
                       </h1>
                       <FormDescription className="text-[12px]">
-                        Please fill in a Tag, use a comma "," to insert more
+                        Please fill in a Tag, use a comma &quot;,&quot; to insert more
                         than one or select from below
                       </FormDescription>
                       <FormControl>

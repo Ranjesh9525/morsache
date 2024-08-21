@@ -45,37 +45,7 @@ import { AdminCreateOffer } from "@/serverlessActions/_adminActions";
 type Props = {};
 
 
-// Generate 5 random offers
-export const columns: ColumnDef<Offer>[] = [
-  {
-    accessorKey: "title",
-    header: "Title",
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    accessorKey: "discount",
-    header: "Discount (%)",
-  },
-  {
-    accessorKey: "code",
-    header: "Offer Code",
-  },
-  {
-    accessorKey: "quantityEffect",
-    header: "Quantity Effect",
-  },
-  {
-    accessorKey: "effect",
-    header: "Effect Type",
-  },
-  {
-    accessorKey: "active",
-    header: "Active",
-  },
-];
+
 const offersData: Offer[] = [
   {
     title: "Special Summer Sale",
@@ -132,7 +102,7 @@ const offersData: Offer[] = [
     active: true,
   },
 ];
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const offerSchema = z.object({
     title: z.string(),
@@ -446,4 +416,4 @@ useEffect(()=>{
   );
 };
 
-export default page;
+export default Page;

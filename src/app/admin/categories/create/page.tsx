@@ -49,92 +49,92 @@ import Image from "next/image";
 type Props = {};
 
 // Generate 5 random offers
-export const columns: ColumnDef<Offer>[] = [
-  {
-    accessorKey: "title",
-    header: "Title",
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    accessorKey: "discount",
-    header: "Discount (%)",
-  },
-  {
-    accessorKey: "code",
-    header: "Offer Code",
-  },
-  {
-    accessorKey: "quantityEffect",
-    header: "Quantity Effect",
-  },
-  {
-    accessorKey: "effect",
-    header: "Effect Type",
-  },
-  {
-    accessorKey: "active",
-    header: "Active",
-  },
-];
-const offersData: Offer[] = [
-  {
-    title: "Special Summer Sale",
-    description: "Get ready for summer with our exclusive discount offers.",
-    description2: "Buy 10 items and get 20% off.",
-    discount: "20",
-    code: "SUMMER20",
-    quantityEffect: "10",
-    effect: "quantity",
-    active: true,
-  },
-  {
-    title: "Back to School Promotion",
-    description:
-      "Start the new school year with great savings on school supplies.",
-    description2:
-      "15% Discounts when you buy over 5 of any backpacks, stationery, and more.",
-    discount: "15",
-    code: "SCHOOL15",
-    quantityEffect: "5",
-    effect: "quantity",
-    active: true,
-  },
-  {
-    title: "30%!! off Winter Clearance Sale",
-    description:
-      "Warm up your winter with hot deals on winter clothing and accessories.",
-    description2: "Huge 30% discounts on jackets, scarves, and gloves.",
-    discount: "30",
-    code: "WINTER30",
-    quantityEffect: "8",
-    effect: "percentage",
-    active: true,
-  },
-  {
-    title: "Fitness Challenge Offer 250INR off",
-    description: "Get fit and save big with our fitness challenge discount.",
-    description2: "Special 250INR discount for any gym wears ",
-    discount: "250",
-    code: "FITNESS25",
-    quantityEffect: "6",
-    effect: "flat",
-    active: true,
-  },
-  {
-    title: "Tech Upgrade Bonanza",
-    description:
-      "Upgrade your tech gadgets with our exclusive tech deals. Get 10% off",
-    description2: "Discounts on smartphones, laptops, and accessories.",
-    discount: "10",
-    code: "TECH10",
-    quantityEffect: "7",
-    effect: "percentage",
-    active: true,
-  },
-];
+// export const columns = [
+//   {
+//     accessorKey: "title",
+//     header: "Title",
+//   },
+//   {
+//     accessorKey: "description",
+//     header: "Description",
+//   },
+//   {
+//     accessorKey: "discount",
+//     header: "Discount",
+//   },
+//   {
+//     accessorKey: "code",
+//     header: "Offer Code",
+//   },
+//   {
+//     accessorKey: "quantityEffect",
+//     header: "Quantity Effect",
+//   },
+//   {
+//     accessorKey: "effect",
+//     header: "Effect Type",
+//   },
+//   {
+//     accessorKey: "active",
+//     header: "Active",
+//   },
+// ] as never
+// const offersData: Offer[] = [
+//   {
+//     title: "Special Summer Sale",
+//     description: "Get ready for summer with our exclusive discount offers.",
+//     description2: "Buy 10 items and get 20% off.",
+//     discount: "20",
+//     code: "SUMMER20",
+//     quantityEffect: "10",
+//     effect: "quantity",
+//     active: true,
+//   },
+//   {
+//     title: "Back to School Promotion",
+//     description:
+//       "Start the new school year with great savings on school supplies.",
+//     description2:
+//       "15% Discounts when you buy over 5 of any backpacks, stationery, and more.",
+//     discount: "15",
+//     code: "SCHOOL15",
+//     quantityEffect: "5",
+//     effect: "quantity",
+//     active: true,
+//   },
+//   {
+//     title: "30%!! off Winter Clearance Sale",
+//     description:
+//       "Warm up your winter with hot deals on winter clothing and accessories.",
+//     description2: "Huge 30% discounts on jackets, scarves, and gloves.",
+//     discount: "30",
+//     code: "WINTER30",
+//     quantityEffect: "8",
+//     effect: "percentage",
+//     active: true,
+//   },
+//   {
+//     title: "Fitness Challenge Offer 250INR off",
+//     description: "Get fit and save big with our fitness challenge discount.",
+//     description2: "Special 250INR discount for any gym wears ",
+//     discount: "250",
+//     code: "FITNESS25",
+//     quantityEffect: "6",
+//     effect: "flat",
+//     active: true,
+//   },
+//   {
+//     title: "Tech Upgrade Bonanza",
+//     description:
+//       "Upgrade your tech gadgets with our exclusive tech deals. Get 10% off",
+//     description2: "Discounts on smartphones, laptops, and accessories.",
+//     discount: "10",
+//     code: "TECH10",
+//     quantityEffect: "7",
+//     effect: "percentage",
+//     active: true,
+//   },
+// ];
 // id?:string;
 // name:string;
 // image:string;
@@ -142,7 +142,7 @@ const offersData: Offer[] = [
 //     tag:string,
 //     values:string[]
 // }[]
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [categoryTags, setCategorytags] = React.useState<
   {
     values:string[];
@@ -501,4 +501,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;

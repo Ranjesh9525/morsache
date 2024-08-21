@@ -77,7 +77,7 @@ export const columns: ColumnDef<Offer>[] = [
   },
 ];
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
 
 
@@ -129,4 +129,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { DataTable } from "../components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import PageHeadingText from "../components/PageHeadingText";
 import { DataTableColumnHeader } from "../components/DataTableColumnHeader";
@@ -27,23 +26,23 @@ export type Users = {
 };
 
 // Generate 5 random users
-export const columns: ColumnDef<category>[] = [
-  {
-    accessorKey: "id",
-    header: "id",
-  },
-  {
-    accessorKey: "id",
-    header: "id",
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-];
+// export const columns: ColumnDef<category>[] = [
+//   {
+//     accessorKey: "id",
+//     header: "id",
+//   },
+//   {
+//     accessorKey: "id",
+//     header: "id",
+//   },
+//   {
+//     accessorKey: "name",
+//     header: "Name",
+//   },
+// ];
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [categories, setCategories] = useState([]);
   // const data = await getData()
  
@@ -123,8 +122,8 @@ const page = (props: Props) => {
       <div className="container mx-auto min-h-[70vh] space-y-10 py-10">
         {/* <DataTable columns={columns} data={randomData} /> */}
         {isPending?<div className="w-full inline-flex items-center justify-center h-full"> <ClipLoader className="" size={30}/> </div>:categories && categories.length>0? (
-          categories?.map((item) => {
-            return <CategoryCardAdmin category={item} />;
+          categories?.map((item:any,index:number) => {
+            return <CategoryCardAdmin key={index} cat={item} />;
           })
         ) : (
           <span >
@@ -138,9 +137,9 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
 
-export const CategoryCardAdmin = ({ category }: { category: category }) => {
+export const CategoryCardAdmin = ({ cat }: { cat: category }) => {
   const {
     isPending:deleteIsPending,
     isError:deleteIsError,
@@ -165,7 +164,7 @@ export const CategoryCardAdmin = ({ category }: { category: category }) => {
       // console.log(deleteError);
       toast({
         variant: "success",
-        title: `Category ${category.name} deleted`,
+        title: `Category ${cat.name} deleted`,
       })
     
     }
@@ -178,18 +177,18 @@ export const CategoryCardAdmin = ({ category }: { category: category }) => {
         className="w-full hidden my-2 group-hover:flex justify-between items-center transition-all duration-200"
       >
         <h1 className="text-xl font-semibold">
-          Category Name : {category.name}
+          Category Name : {cat.name}
         </h1>
         <section id="category-action-btns" className="space-x-3">
           <Button variant="outline">Edit</Button>
-          <Button variant="destructive" disabled={deleteIsPending} onClick={()=>server_deleteCategory(category._id!)}>{deleteIsPending ? <ClipLoader color="#fff"/>:"Delete"}</Button>
+          <Button variant="destructive" disabled={deleteIsPending} onClick={()=>server_deleteCategory(cat._id!)}>{deleteIsPending ? <ClipLoader color="#fff"/>:"Delete"}</Button>
         </section>
       </section>
       <div className="w-full flex">
         <div className="flex-[3] relative cursor-pointer">
           <div id="category-image " className="h-[450px]  relative  ">
             <Image
-              src={category.image}
+              src={cat.image}
               alt=""
               width={280}
               height={280}
@@ -202,19 +201,19 @@ export const CategoryCardAdmin = ({ category }: { category: category }) => {
             className="absolute text-xl font-medium uppercase bottom-[20px] tracking-wider left-[10px] text-white"
           >
             {" "}
-            {category.name}
+            {cat.name}
           </div>
         </div>
         <div className="flex-[9] border grid grid-cols-4 p-2.5 gap-4">
           <section className="">
             <h1 className="uppercase font-medium text-lg underline">Id</h1>
             <span className="text-[14.5px]  whitespace-break-spaces break-words">
-              {category._id}
+              {cat._id}
             </span>
           </section>
-          {category.tags &&
-            category.tags.length > 0 &&
-            category.tags.map((tag, index: number) => (
+          {cat.tags &&
+            cat.tags.length > 0 &&
+            cat.tags.map((tag, index: number) => (
               <section key={index} className="border rounded-md text-center">
                 <h1 className="uppercase font-medium text-lg underline">
                   {tag.tag}

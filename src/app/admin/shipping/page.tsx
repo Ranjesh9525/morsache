@@ -81,7 +81,7 @@ export const columns: ColumnDef<ShippingData>[] = [
     header: "Price(INR)",
   },
 ];
-const page = (props: Props) => {
+const Page = (props: Props) => {
   // const randomData = randomShippingData(9);
   // console.log(randomData)
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -295,4 +295,4 @@ useEffect(()=>{
   );
 };
 
-export default page;
+export default Page;

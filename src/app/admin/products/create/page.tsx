@@ -37,7 +37,7 @@ import { Switch } from "@/components/ui/switch";
 
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [dragging, setDragging] = React.useState(false);
   const [imageDimensions, setImageDimensions] = React.useState<any[]>([]);
 
@@ -336,7 +336,7 @@ for(let i= 0;i < amount; i++){
                       Category
                     </h1>
                     <FormDescription className="text-[12px]">
-                      Please fill in a category, use a comma "," to insert more
+                      Please fill in a category, use a comma &quot;,&quot; to insert more
                       than one or select from below
                     </FormDescription>
                     <FormControl>
@@ -378,7 +378,7 @@ for(let i= 0;i < amount; i++){
                       sizes
                     </h1>
                     <FormDescription className="text-[12px]">
-                      Please fill in a size, use a comma "," to insert more than
+                      Please fill in a size, use a comma &quot;,&quot; to insert more than
                       one or select from below
                     </FormDescription>
                     <FormControl>
@@ -743,7 +743,7 @@ for(let i= 0;i < amount; i++){
                       tags
                     </h1>
                     <FormDescription className="text-[12px]">
-                      Please fill in a Tag, use a comma "," to insert more than
+                      Please fill in a Tag, use a comma &quot;,&quot; to insert more than
                       one or select from below
                     </FormDescription>
                     <FormControl>
@@ -898,4 +898,4 @@ for(let i= 0;i < amount; i++){
   );
 };
 
-export default page;
+export default Page;

@@ -105,7 +105,7 @@ export const columns: ColumnDef<Product>[] = [
 ];
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   // const data = await getData()
   // const {
   //   isPending,
@@ -175,4 +175,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;
