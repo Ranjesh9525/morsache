@@ -1,4 +1,4 @@
-export const shippingReducer = (
+ const shippingReducer = (
   state: { choice: "pickup" | "delivery" |"" },
   action: { type: "SET_SHIPPING_CHOICE"; payload: "pickup" | "delivery" }
 ) => {
@@ -12,3 +12,4 @@ export const shippingReducer = (
       return state;
   }
 };
+export default shippingReducer

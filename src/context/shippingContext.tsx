@@ -2,7 +2,7 @@
 // import { Shipping, ShippingAction } from "@/@types/Shipping";
 import React, { useEffect, useReducer } from "react";
 import { createContext, useState } from "react";
-import { shippingReducer } from "./reducers/ShippingReducer";
+import  shippingReducer  from "./reducers/shippingReducer";
 
 // const ShippingInitialState: Shipping =
   
