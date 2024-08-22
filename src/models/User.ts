@@ -86,6 +86,7 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     email: { type: String, unique: true },
+    password: String,
     emailVerified: Date,
     image: String,
     address: [

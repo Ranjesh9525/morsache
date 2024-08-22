@@ -2,8 +2,10 @@
 import { ShippingAddress } from "@/@types/cart";
 import { connectDB } from "@/utilities/DB";
 import { Schema } from "mongoose";
+import { getServerSession } from "next-auth";
 import ProductsModel from "../models/Products";
 import UsersModel from "../models/User";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
 import { Response } from "./responseClass";
 
@@ -88,3 +90,52 @@ export const UserUpdateShippingAddress = async ({
 // } = useMutation({
 //   mutationFn: UserUpdateShippingAddress,
 // });
+
+export const UserIsNewUser = async () => {
+  try {
+    await connectDB();
+    const session: any = await getServerSession(authOptions);
+    const userId = session!?.user!?._id;
+    const user = await UsersModel.findOne({ _id: userId });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    if (user.firstName && user.lastName && user.password && user.phoneNumber) {
+      return Response("User is not new", 200, true, {
+        isNewUser: false,
+      });
+    }
+    return Response("User is new", 200, true, { isNewUser: true });
+  } catch (error) {
+    console.error("Error checking if user is new:", error);
+    throw new Error("Error checking if user is new");
+  }
+};
+
+export const UserUpdateProfile = async ({
+  userId,
+  firstName,
+  lastName,
+  phoneNumber,
+}: {
+  userId: Schema.Types.ObjectId;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+}) => {
+  try {
+    await connectDB();
+    const user = await UsersModel.findOne({ _id: userId });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.phoneNumber = phoneNumber;
+    await user.save();
+    return { message: "Profile updated successfully", success: true };
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw new Error("Error updating profile");
+  }
+};

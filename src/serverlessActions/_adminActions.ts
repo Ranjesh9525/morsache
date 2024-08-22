@@ -7,9 +7,12 @@ import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
 import ShippingModel from "../models/Shipping";
 import OffersModel from "../models/Offers";
+import OrdersModel from "../models/Orders";
 import { Response } from "./responseClass";
 import { Offer, Product } from "@/@types/products";
 import { category } from "@/@types/categories";
+import { Order } from "@/@types/order";
+
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -235,12 +238,33 @@ export const AdminAddShippingData = async (data:{locationBy:string,name:string,p
   }
 };
 
-export const AdminAddTeam=async(email:string)=>{
+export const AdminAddTeam = async ({ email }: { email: string }) => {
+  try {
+      await connectDB();
+      const user = await UserModel.findOne({ email });
+
+      if (!user) {
+          throw new Error('User not found');
+      }
+
+      await UserModel.findOneAndUpdate({ email: email }, {
+          $set: {
+              role: "admin"
+          }
+      });
+
+      return Response("Teammate added successfully", 200, true);
+  } catch (error) {
+      console.error("Error adding teammate:", error);
+      throw new Error("Error adding teammate");
+  }
+}
+
+export const AdminGetAllTeam=async()=>{
   try{
     await connectDB();
-    const user = await UserModel.findOneAndUpdate({email:email},{
-
-    })
+    const Team = await UserModel.find({role:"admin"})
+    return Response("Team fetched successfully",200,true,Team)
   }catch(error){
     console.error("Error adding teammate ")
   }
@@ -258,3 +282,27 @@ export const AdminGetAllShippingData=async()=>{
 }
 
 
+export const AdminGetAllOrders = async () => {
+  try {
+    await connectDB();
+    const orders: Order[] = await OrdersModel.find();
+    return Response("Orders fetched successfully", 200, true, orders);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    throw error;
+  }
+}
+export const AdminUpdateOrder = async (orderNo:string) => {
+  try {
+    await connectDB();
+    const order = await OrdersModel.findOne({ orderNumber: orderNo });
+    if (!order) {
+      throw new Error("Order not found");
+    }
+    order.orderStatus = "confirmed";
+    await order.save();
+    return Response("Order confirmed", 200, true);
+  } catch (error) {
+    console.error("Error confirming order", error);
+    throw error;
+  }}

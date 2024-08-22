@@ -142,6 +142,17 @@ export const cartReducer = (state: Cart, action: CartAction) => {
           };
         }
       return savedCart;
+        case "CLEAR_CART":
+          localStorage.removeItem("cart");
+          return{
+            items: [],
+            totalItems: 0,
+            totalAmount: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            shippingAddress:[],
+            isPaid: false,
+          };
 
     default:
       return savedCart;

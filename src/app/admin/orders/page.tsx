@@ -38,80 +38,60 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Offer } from "@/@types/products";
-import { AdminCreateOffer } from "@/serverlessActions/_adminActions";
+import {
+  AdminCreateOffer,
+  AdminGetAllOrders,
+} from "@/serverlessActions/_adminActions";
+import { Order } from "@/@types/order";
 
 type Props = {};
 
-
-// Generate 5 random offers
-export const columns: ColumnDef<Offer>[] = [
-  {
-    accessorKey: "title",
-    header: "Title",
-  },
-  {
-    accessorKey: "description",
-    header: "Description",
-  },
-  {
-    accessorKey: "discount",
-    header: "Discount (%)",
-  },
-  {
-    accessorKey: "code",
-    header: "Offer Code",
-  },
-  {
-    accessorKey: "quantityEffect",
-    header: "Quantity Effect",
-  },
-  {
-    accessorKey: "effect",
-    header: "Effect Type",
-  },
-  {
-    accessorKey: "active",
-    header: "Active",
-  },
+const orderColumns: ColumnDef<Order>[] = [
+  { accessorKey: "_id", header: "Order Id" },
+  { accessorKey: "orderNumber", header: "Order Number" },
+  { accessorKey: "customer", header: "Customer Id" },
+  { accessorKey: "totalItems", header: "Total Items" },
+  { accessorKey: "totalAmount", header: "Total Amount" },
+  { accessorKey: "orderStatus", header: "Order Status" },
+  { accessorKey: "shippingAddress", header: "Shipping Address" },
+  { accessorKey: "shippingPrice", header: "Shipping Price" },
+  { accessorKey: "paymentMethod.type", header: "Payment Method" },
+  { accessorKey: "paymentStatus", header: "Payment Status" },
 ];
-
 const Page = (props: Props) => {
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [orders, setOrders] = React.useState<Order[] | null>(null);
 
+  // const {
+  //   isPending,
+  //   isError,
+  //   data: offersData,
+  //   isSuccess,
+  //   error,
+  //   mutate: server_AdminCreateOffer,
+  // } = useMutation({
+  //   mutationFn: AdminCreateOffer,
+  // });
+  const { data, isPending, isSuccess, error, isError } = useQuery({
+    queryKey: ["orders"],
+    queryFn: () => AdminGetAllOrders(),
+  });
+  useEffect(() => {
+    if (isSuccess) {
+      setOrders(data?.data);
+    }
+  }, [isSuccess, data]);
 
-//   const {
-//     isPending,
-//     isError,
-//     data: offersData,
-//     isSuccess,
-//     error,
-//     mutate: server_AdminCreateOffer,
-//   } = useMutation({
-//     mutationFn: AdminCreateOffer,
-//   });
-//   function onSubmit(values: Offer) {
-//     server_AdminCreateOffer(values)
-//     console.log(values);
-//   }
-// useEffect(()=>{
-//   if(isSuccess){
-//     toast({
-//       variant: "success",
-//       title: "Offer created ",
-//       description: "Offer has been created successfully",
-//     })
-//   }
-//   if(error){
-//     toast({
-//       variant: "destructive",
-//       title: "Error:offer creation failed",
-//       description:<p>{error?.message}</p> ,
-//     })
-//   }
-  
-// },[isSuccess,error])
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error:offer creation failed",
+        description: <p>{error?.message}</p>,
+      });
+    }
+  }, [isError, error]);
   return (
     <>
       <PageHeadingText
@@ -120,10 +100,15 @@ const Page = (props: Props) => {
       />
 
       {/**/}
-  
 
       <div className="container mx-auto min-h-[70vh] py-10">
-        {/* <DataTable columns={columns} route={"orders"} data={offersData} /> */}
+        {isPending ? (
+          <p className="text-center">
+            <ClipLoader size={50} />
+          </p>
+        ) : orders && orders?.length > 0 ? (
+          <DataTable columns={orderColumns} route={"orders"} data={orders!} />
+        ):<p>No orders found</p>}
       </div>
     </>
   );

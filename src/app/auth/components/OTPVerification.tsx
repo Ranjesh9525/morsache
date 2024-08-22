@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation'
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   email: string;
@@ -14,11 +16,18 @@ type Props = {
 };
 
 const OTPVerification = ({ email, setEmail }: Props) => {
+  const {data:session}:any = useSession();
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-
+const {data,refetch}= useQuery({
+  queryKey: ['checkUser'],
+  queryFn: () => {
+    return fetch('/api/auth/otp').then(res => res.json())
+  },
+  enabled:false
+})
   async function handleOTPVerification(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSubmitting(true);
@@ -28,15 +37,22 @@ const OTPVerification = ({ email, setEmail }: Props) => {
     const formattedCallback = encodeURIComponent("/account");
     const otpRequestURL = `/api/auth/callback/email?email=${formattedEmail}&token=${formattedCode}&callbackUrl=${formattedCallback}`;
     const response = await fetch(otpRequestURL);
-
+    const handleRedirect = (url:string) => {
+      router.push(url);
+    };
     if (response) {
+      // if(!session?.user?.firstName  || !session?.user?.lastName ){
+      //   handleRedirect(`/auth/register?callbackUrl=${encodeURIComponent('/auth/login')}`)
+        
+      // }
       if (response.url.includes("/account")) {
         toast({
           variant: "default",
           title: `You're now authenticated`,
           description: "Lets get back to shopping!",
         });
-        router.push(response.url);
+        handleRedirect(response.url)
+        router.refresh();
       } else {
         toast({
           variant: "destructive",

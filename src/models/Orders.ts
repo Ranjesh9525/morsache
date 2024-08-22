@@ -18,7 +18,7 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    status: {
+    orderStatus: {
       type: String,
       enum: ["pending", "confirmed", "shipped", "delivered"],
       default: "pending",
@@ -29,6 +29,9 @@ const orderSchema = new mongoose.Schema(
       state: String,
       postalCode: String,
       country: String,
+    },
+    shippingPrice: {
+      type: Number,
     },
     paymentMethod: {
       type: {
@@ -54,4 +57,4 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Orders = mongoose.model("Order", orderSchema);
+export default mongoose.models.Order  || mongoose.model("Order", orderSchema);

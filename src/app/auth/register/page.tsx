@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,138 +18,14 @@ import {
 import { Input } from "@/components/ui/input";
 import HomeLayout from "@/components/layouts/HomeLayout";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/use-toast";
+import { signIn } from "next-auth/react";
 
-
-// value
-// :
-// [{id: 44784764453026, properties: {}, quantity: 1, variant_id: 44784764453026,…}]
-// 0
-// :
-// {id: 44784764453026, properties: {}, quantity: 1, variant_id: 44784764453026,…}
-// discounted_price
-// :
-// 119900
-// discounts
-// :
-// []
-// featured_image
-// :
-// {aspect_ratio: 0.667, alt: "HoodiniShirt Grey Hoodie", height: 1200,…}
-// final_line_price
-// :
-// 119900
-// final_price
-// :
-// 119900
-// gift_card
-// :
-// false
-// grams
-// :
-// 0
-// handle
-// :
-// "hoodinishirt-green-solid-hoodie"
-// has_components
-// :
-// false
-// id
-// :
-// 44784764453026
-// image
-// :
-// "https://cdn.shopify.com/s/files/1/0420/7073/7058/files/4908bf38cb529d5f2645713041ec664d.jpg?v=1715598821"
-// key
-// :
-// "44784764453026:dc868910e8fa6c65dca9888dc341737f"
-// line_level_discount_allocations
-// :
-// []
-// line_level_total_discount
-// :
-// 0
-// line_price
-// :
-// 119900
-// options_with_values
-// :
-// [{name: "Color", value: "Green"}, {name: "Size", value: "L"}]
-// 0
-// :
-// {name: "Color", value: "Green"}
-// 1
-// :
-// {name: "Size", value: "L"}
-// original_line_price
-// :
-// 119900
-// original_price
-// :
-// 119900
-// presentment_price
-// :
-// 1199
-// price
-// :
-// 119900
-// product_description
-// :
-// "\nGive your everyday wardrobe an effortless appeal with this classy sage 100% polyester shirt. Designed in a Relaxed fit fit, this shirt is known for its endless versatility. A look that bridges dressy and casual, with half sleeve and hooded, it is perfect to wear alone or as an outer layer.\n\nSize & Fit\nFit - Relaxed fit\n  Size -  Model is wearing M size\n\nWash Care\nmachine wash\n\nSpecifications\n\nelevated\nplain\nhooded\n100% polyester\nhalf sleeve\n\nNote : The actual colour of the product may vary slightly due to photographic lighting sources or your device.\n\nSKU:4mswh9890-06\n"
-// product_has_only_default_variant
-// :
-// false
-// product_id
-// :
-// 8316966699170
-// product_title
-// :
-// "HoodiniShirt Grey Hoodie"
-// product_type
-// :
-// "Hoodies"
-// properties
-// :
-// {}
-// quantity
-// :
-// 1
-// quantity_rule
-// :
-// {min: 1, max: null, increment: 1}
-// requires_shipping
-// :
-// true
-// sku
-// :
-// "4MSWH9890-06-L"
-// taxable
-// :
-// true
-// title
-// :
-// "HoodiniShirt Grey Hoodie - Green / L"
-// total_discount
-// :
-// 0
-// url
-// :
-// "/products/hoodinishirt-green-solid-hoodie?variant=44784764453026"
-// variant_id
-// :
-// 44784764453026
-// variant_options
-// :
-// ["Green", "L"]
-// variant_title
-// :
-// "Green / L"
-// vendor
-// :
-// "SNITCH"
 type Props = {};
 
 const Page = (props: Props) => {
-  const router = useRouter()
+  const router = useRouter();
+  const callbackUrl = useSearchParams().get("callbackUrl");
   const formSchema = z.object({
     firstName: z.string().min(2, {
       message: "first name must be at least 2 characters.",
@@ -180,12 +56,45 @@ const Page = (props: Props) => {
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    let email = values.email;
+    const response = await signIn("email", {
+      email,
+      data: values,
+      redirect: false,
+      registered: true,
+    });
+     console.log(response)
+
+    if (response?.url === `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`) {
+      router.push("/auth/register"); //  // Redirect to the register page
+    } else {
+      if (response?.error) {
+        toast({
+          variant: "destructive",
+          title: `${response.error} error`,
+          description: "Check your details and try again",
+        });
+        if (response?.url) {
+          router.push(response.url);
+        } else {
+          router.replace(
+            `/auth/login?error=${encodeURIComponent(response.error)}`
+          );
+        }
+      } else {
+        toast({
+          variant: "default",
+          title: `OTP sent to ${values.email}`,
+          description: "Check your email for your 6-digit OTP",
+        });
+        // setEmail(values.email);
+      }
+    }
+  }
+  if (!callbackUrl) {
     router.push("/auth/login");
   }
-
   return (
     <HomeLayout title="Create an account - Morsache Clothing">
       <div
@@ -193,7 +102,7 @@ const Page = (props: Props) => {
         className="flex flex-col min-h-screen  items-center lg:p-12 sm:p-6"
       >
         <h1 className="text-2xl uppercase font-semibold text-center mt-4 mb-12">
-          Create your <br /> morsache account
+          Create your account
         </h1>
         <DropdownMenuSeparator />
         <Form {...form}>
@@ -213,7 +122,7 @@ const Page = (props: Props) => {
                     Please fill in your first name
                   </FormDescription>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -231,7 +140,7 @@ const Page = (props: Props) => {
                     Please fill in your last name
                   </FormDescription>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input placeholder="" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -267,7 +176,7 @@ const Page = (props: Props) => {
                     Please fill in your password to continue
                   </FormDescription>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input type={'password'} placeholder="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -275,9 +184,11 @@ const Page = (props: Props) => {
             />
             <div className="space-y-2">
               <Button type="submit" className="w-full text-center">
-                Register
+                Save
               </Button>
-              <p className="text-[12.5px] capitalize text-center"> </p>
+              <p className="text-[12.5px] capitalize text-center">
+                {" "}
+              </p>
             </div>
           </form>
         </Form>

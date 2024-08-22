@@ -4,7 +4,7 @@ import ShippingModel from "../models/Shipping";
 import OrdersModel from "../models/Orders";
 import UserModel, { cartSchema } from "../models/User";
 // import CModel from "../models/Products";
-
+import crypto from "crypto";
 import { getServerSession } from "next-auth";
 import { Cart, CartForServer } from "@/@types/cart.d";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
@@ -14,6 +14,7 @@ import { Response } from "./responseClass";
 import { connectDB } from "@/utilities/DB";
 import { ObjectId } from "mongodb";
 import { Document } from "mongoose";
+import { sendOrderConfirmationEmail } from "./sendMail";
 // import UserModel from "../models/User";
 
 interface Shipping extends Document {
@@ -245,6 +246,9 @@ export const findUserCart = async (cartId: string) => {
       if (!cart) {
         throw new Error("Cart not found");
       }
+      if(cart.isPaid){
+        throw new Error("Cart closed");
+      }
       return Response("Cart found", 200, true, cart);
     } else {
       // Handle the case where there is no active session
@@ -273,7 +277,7 @@ export const FetchUserCartShippingData = async () => {
     const userShippingAddress = user
       .toObject()
       .address.find((address: any) => address.defaultAddress === true);
- 
+
     if (!userShippingAddress) {
       throw new Error("No shipping address found");
     }
@@ -292,18 +296,18 @@ export const FetchUserCartShippingData = async () => {
     //shipping logic: send back the ShuppingObject with the highest price
     const shippingData = TotalShippingAddressData.reduce((acc: any, curr) => {
       if (!acc || curr.price > acc.price) {
-          return curr; 
+        return curr;
       } else {
-          return acc; 
+        return acc;
       }
-  }, null);
+    }, null);
     // console.log(shippingData);
     user.carts[0].shippingAddress = userShippingAddress;
-    user.carts[0].recieveBy = "delivery"
+    user.carts[0].recieveBy = "delivery";
     if (shippingData) {
       user.carts[0].shippingPrice = shippingData?.price;
       await user.save();
-       return Response("shipping data", 200, true, shippingData);
+      return Response("shipping data", 200, true, shippingData);
     }
 
     if (!shippingData || shippingData?.length < 1) {
@@ -325,9 +329,18 @@ export const FetchUserCartShippingData = async () => {
   }
 };
 
-export const InitializeOrder = async()=>{
-  try{
-    await connectDB()
+const generateRandomOrderNumber = () => {
+  const randomValue = crypto.randomBytes(12).toString("hex");
+  const hash = crypto.createHash("sha256").update(randomValue).digest("hex");
+
+  const orderNumber = hash.substring(0, 24);
+
+  return orderNumber;
+};
+
+export const InitializeOrder = async (paymentMethod: string) => {
+  try {
+    await connectDB();
     const session: any = await getServerSession(authOptions);
     const userId = session!?.user!?._id;
     const user = await UserModel.findOne({ _id: userId });
@@ -338,99 +351,33 @@ export const InitializeOrder = async()=>{
     if (!cart) {
       throw new Error("Cart not found");
     }
-    console.log(cart)
-    // {
-    //   shippingAddress: {
-    //     street: 'test strest',
-    //     city: 'test city',
-    //     state: 'test state',
-    //     postalCode: '2389284',
-    //     country: '323',
-    //     defaultAddress: true
-    //   },
-    //   items: [
-    //     {
-    //       productId: new ObjectId("66bcef9b7946202bb052b85b"),
-    //       offersData: [Array],
-    //       quantity: 1,
-    //       size: 'xxl',
-    //       variant: 'blue',
-    //       totalPrice: 2339,
-    //       _id: new ObjectId("66c4f35bb9d301eeead6379a")
-    //     },
-    //     {
-    //       productId: new ObjectId("66bcef9b7946202bb052b85b"),
-    //       offersData: [Array],
-    //       quantity: 2,
-    //       size: 'm',
-    //       variant: 'brown',
-    //       totalPrice: 4678,
-    //       _id: new ObjectId("66c4f35bb9d301eeead6379d")
-    //     }
-    //   ],
-    //   totalItems: 3,
-    //   totalAmount: 7017,
-    //   isPaid: false,
-    //   _id: new ObjectId("66c4f35bc0efb1002bcebed9"),
-    //   updatedAt: 2024-08-20T20:42:14.781Z,
-    //   createdAt: 2024-08-20T16:58:52.231Z,
-    //   recieveBy: 'delivery',
-    //   shippingPrice: 2893
-    // }
-    // const order = new OrdersModel({
+ 
+    const order = new OrdersModel({
+      orderNumber:  generateRandomOrderNumber(),
+      customer: userId,
+      items: cart.items,
+      totalItems: cart.totalItems,
+      totalAmount: cart.totalAmount + cart.shippingPrice,
+      shippingPrice:cart.shippingPrice,
+      orderStatus: "pending",
+      shippingAddress: cart.shippingAddress,
+      paymentMethod: {
+        type: paymentMethod,
+      },
+      paymentStatus: "pending",
+    });
+    console.log("order",order);
+    await order.save();
+    user.carts[0].paymentMethod = {type:paymentMethod}
+    user.carts[0].isPaid = true;
+    await user.save();
 
-    // })
-    // {
-    //   orderNumber: {
-    //     type: String,
-    //     required: true,
-    //   },
-    //   customer: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User",
-    //     required: true,
-    //   },
-    //   items: [cartItemSchema],
-    //   totalItems: Number,
-    //   totalAmount: {
-    //     type: Number,
-    //     required: true,
-    //   },
-    //   status: {
-    //     type: String,
-    //     enum: ["pending", "confirmed", "shipped", "delivered"],
-    //     default: "pending",
-    //   },
-    //   shippingAddress: {
-    //     street: String,
-    //     city: String,
-    //     state: String,
-    //     postalCode: String,
-    //     country: String,
-    //   },
-    //   paymentMethod: {
-    //     type: {
-    //       type: String,
-    //       enum: ["creditCard", "razorPay", "stripe", "payOnDelivery"],
-    //     },
-    //     cardNumber: {
-    //       type: String,
-    //     },
-    //     cardExpiry: {
-    //       type: String,
-    //     },
-    //     cardCVV: {
-    //       type: String,
-    //     },
-    //   },
-    //   paymentStatus: {
-    //     type: String,
-    //     enum: ["pending", "paid"],
-    //     default: "pending",
-    //   },
-    // },
-  }catch(error){
-console.error("Error creating order",error)
-throw error
+    sendOrderConfirmationEmail(order,user.email,"Order Confirmation");
+    //if payment on delivery send email for order initiated
+    return Response("Order created", 200, true);
+  } catch (error) {
+    console.error("Error creating order", error);
+    throw error;
   }
-}
+};
+

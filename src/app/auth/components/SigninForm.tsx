@@ -41,31 +41,41 @@ const SigninForm = ({ setEmail }: Props) => {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     let email = values.email;
-    const response = await signIn("email", { email, redirect: false });
+    const response = await signIn("email", {
+      email,
+      redirect: false,
+      registered: false,
+    });
+    // console.log(response)
 
-    if (response?.error) {
-      toast({
-        variant: "destructive",
-        title: `${response.error} error`,
-        description: "Check you details and try again",
-      });
-      if (response?.url) {
-        router.push(response.url);
-      } else {
-        router.replace(
-          `/auth/login?error=${encodeURIComponent(response.error)}`
-        );
-      }
+    if (response?.url === `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`) {
+      
+    
+      router.push(`/auth/register?callbackUrl=${encodeURIComponent('/auth/login')}`); //  // Redirect to the register page
     } else {
-      toast({
-        variant: "default",
-        title: `OTP sent to ${values.email}`,
-        description: "Check your email for your 6-digit OTP",
-      });
-      setEmail(values.email);
+      if (response?.error) {
+        toast({
+          variant: "destructive",
+          title: `${response.error} error`,
+          description: "Check your details and try again",
+        });
+        if (response?.url) {
+          router.push(response.url);
+        } else {
+          router.replace(
+            `/auth/login?error=${encodeURIComponent(response.error)}`
+          );
+        }
+      } else {
+        toast({
+          variant: "default",
+          title: `OTP sent to ${values.email}`,
+          description: "Check your email for your 6-digit OTP",
+        });
+        setEmail(values.email);
+      }
     }
   }
-
   return (
     <div
       id="auth-container"
@@ -104,11 +114,14 @@ const SigninForm = ({ setEmail }: Props) => {
               type="submit"
               className="w-full text-center py-3 h-none"
             >
-              {form.formState.isSubmitting ? <ClipLoader size={22} color="white" /> : "Request OTP"}
+              {form.formState.isSubmitting ? (
+                <ClipLoader size={22} color="white" />
+              ) : (
+                "Request Otp"
+              )}
             </Button>
             <p className="text-[12.5px] capitalize text-center">
-              {" "}
-              a 6-digit login code would be sent to your email{" "}
+           {"a 6-digit code would be sent to your email"}
             </p>
           </div>
         </form>

@@ -1,4 +1,4 @@
-import NextAuth, { AuthOptions, Theme, User ,Session } from "next-auth";
+import NextAuth, { AuthOptions, Theme,Account,Profile, User ,Session ,CallbacksOptions } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import { Adapter, AdapterUser } from "next-auth/adapters";
 import { MongooseAdapter } from "@choutkamartin/mongoose-adapter";
@@ -8,7 +8,23 @@ import { JWT } from "next-auth/jwt";
 import UserModel  from "@/models/User";
 import { connectDB, disconnectDB } from "@/utilities/DB";
 import { UserDocument } from "@/@types/user";
+import { NextApiRequest } from "next";
+import bcrypt from "bcryptjs";
 
+interface CustomSignIn {
+  user: User | AdapterUser;
+  account: Account | null;
+  profile?: Profile | undefined;
+  email?: { verificationRequest?: boolean | undefined } | undefined;
+  credentials?: Record<string, any> | undefined;
+  registered?:boolean
+  data?:{
+    password?:string
+    firstName?:string
+    lastName?:string
+    email?:string
+  }
+}
 //   adapter: PrismaAdapter(prisma as PrismaClient) as Adapter,
 const senderName = process.env.SMTP_FROM_NAME;
 const senderEmail = process.env.SMTP_FROM;
@@ -61,36 +77,48 @@ export const authOptions: AuthOptions = {
     signOut:"/"
   },
   callbacks: {
-    async signIn({ user,email }) {
+    async signIn({ user,data,registered}: CustomSignIn) {
       try {
         await connectDB()
         // Check if the user already exists in the database
-        console.log(user,email)
         const existingUser = await UserModel.findOne({ email: user.email });
-    
         if (existingUser) {
           console.log("User already exists in the database");
-          //  disconnectDB()
+                await disconnectDB()
           return existingUser;
         }
-    
-        // If the user does not exist, create a new user
-        const newUser = new UserModel({
-          email: user.email,
-          // Add other user data here
-        });
-    
-        // Save the new user to the database
-        await newUser.save();
-    
-        console.log("New user created and saved to the database");
-        // disconnectDB()
-        return newUser;
+        // if(!registered){
+          
+        //   return `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`
+        // }else{
+      
+            console.log("New user - Redirecting to register page");
+            const newUser = new UserModel({
+              email: user.email,
+            });
+            // const hashedPassword = await bcrypt.hash(data!.password!, 12);
+            //  const newUser = new UserModel({
+            // email: user.email,
+            // firstName: data.firstName,
+            // lastName: data.lastName,
+            // password: hashedPassword,
+            // emailVerified: new Date(),
+            //  });
+          await newUser.save();
+          console.log("New user created and saved ");
+          return newUser;
+        
+          
       } catch (error:any) {
-        console.error("Error saving user to the database:", error.message);
-        throw new Error("Failed to save user to the database");
+        console.error("Error saving user :", error.message);
+        throw new Error("Failed to save user ");
       }
     },
+    // emailVerification: async({ user, url }) => {
+    //   const { host } = new URL(url);
+
+    // },
+
    session:async({session,token,user}:{ session: Session; token: JWT; user: AdapterUser; }) =>{
       // Fetch user data from the database and set it in the session
       const userData = await UserModel.findOne({ email: user?.email });

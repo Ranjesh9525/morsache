@@ -161,7 +161,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
             </Link>
             <Breadcrumb>
               <BreadcrumbList>
-                {PagesNames.map((page, index) => {
+                {  PathName === "/cart/checkout/review" ? null : PagesNames.map((page, index) => {
                   return (
                     <div key={index} className="flex items-center gap-2">
                       <BreadcrumbItem

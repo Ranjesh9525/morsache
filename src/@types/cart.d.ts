@@ -78,4 +78,5 @@ export type CartAction =
   | { type: "ADD_TO_CART"; payload: CartItem }
   | { type: "REMOVE_FROM_CART"; payload: CartItem }
   | { type: "INCREASE"; payload: CartItem }
-  | { type: "DECREASE"; payload: CartItem };
+  | { type: "DECREASE"; payload: CartItem }
+  |{type:"CLEAR_CART";}

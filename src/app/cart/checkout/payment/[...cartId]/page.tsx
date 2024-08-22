@@ -1,12 +1,15 @@
 "use client";
 import CheckoutLayout from "@/components/layouts/CheckoutLayout";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import CheckoutCard from "@/app/cart/components/CheckoutCard";
 import PrevAndNextBtn from "@/app/cart/components/PrevAndNextBtn";
 import Image from "next/image";
 import { IoCardOutline } from "react-icons/io5";
 import { InitializeOrder } from "@/serverlessActions/_cartActions";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { CartContext } from "@/context/cartContext";
 
 type Props = {
   params: {
@@ -15,11 +18,19 @@ type Props = {
 };
 
 const Page = (props: Props) => {
+  const {cart,dispatch}= useContext(CartContext)!
   const [isLoading, setIsLoading] = useState(false);
-
-const {isPending,isSuccess,data,error,isError,mutate:server_InitializeOrder}=useMutation({
-  mutationFn: InitializeOrder
-})
+  const router = useRouter();
+  const {
+    isPending,
+    isSuccess,
+    data,
+    error,
+    isError,
+    mutate: server_InitializeOrder,
+  } = useMutation({
+    mutationFn: InitializeOrder,
+  });
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -30,8 +41,8 @@ const {isPending,isSuccess,data,error,isError,mutate:server_InitializeOrder}=use
     });
   };
 
-  const handlePayment = async () => {
-    server_InitializeOrder()
+  const handleRazorPay = async () => {
+    server_InitializeOrder("razorPay");
     setIsLoading(true);
     const res = await loadRazorpayScript();
 
@@ -68,7 +79,7 @@ const {isPending,isSuccess,data,error,isError,mutate:server_InitializeOrder}=use
         alert(
           `Payment successful! Payment ID: ${response.razorpay_payment_id}`
         );
-        //bro add post payment logic
+        // add post payment logic
       },
       prefill: {
         name: "John Doe",
@@ -88,32 +99,72 @@ const {isPending,isSuccess,data,error,isError,mutate:server_InitializeOrder}=use
     setIsLoading(false);
   };
 
+  const handlePayOnDelivery = () => {
+    // add pay on delivery logic
+    server_InitializeOrder("payOnDelivery");
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      setIsLoading(false);
+      toast({
+        variant: "default",
+        title: "order placed",
+        description: "Thanks for shopping with us!",
+      });
+      dispatch({type:"CLEAR_CART"})
+      router.push("/cart/checkout/review");
+    }
+    if (isError) {
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: error.message,
+      });
+    }
+  }, [isSuccess, isLoading, isError]);
+
   return (
     <CheckoutLayout title="Payment - Morsache Clothing">
-     
       <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-9">
-      <div className="col-span-6 flex flex-col h-full">
-      <div className="flex-1 flex flex-col items-start gap-4">
-   
-        <button className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer">
-         <IoCardOutline/> <p className="font-medium">Pay on delivery</p>
-        </button>
-        <button className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer" onClick={handlePayment} disabled={isLoading}>
-         <Image src="/razorpay.png" alt="razorPay" width={100} height={50}/> <p className="font-medium">{isLoading ? "Processing..." : "Pay With Razor Pay"}</p>
-        </button>
-        <button className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer" disabled={true}>
-         <Image src="/stripe.png" alt="razorPay" width={80} height={50}/> <p className="font-medium">Pay with stripe</p>
-        </button>
-   
-      </div>
-        <div className="mt-auto">
-
-          <PrevAndNextBtn
-            showNext={false}
-            showBack={true}
-            prevLink={`/cart/checkout/shipping/${props.params.cartId.toString()}`}
-          />
-        </div>
+        <div className="col-span-6 flex flex-col h-full">
+          <div className="flex-1 flex flex-col items-start gap-4">
+            <button
+              className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+              onClick={handlePayOnDelivery}
+            >
+              <IoCardOutline /> <p className="font-medium">Pay on delivery</p>
+            </button>
+            <button
+              className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+              onClick={handleRazorPay}
+              disabled={isLoading}
+            >
+              <Image
+                src="/razorpay.png"
+                alt="razorPay"
+                width={100}
+                height={50}
+              />{" "}
+              <p className="font-medium">
+                {isLoading ? "Processing..." : "Pay With Razor Pay"}
+              </p>
+            </button>
+            <button
+              className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+              disabled={true}
+            >
+              <Image src="/stripe.png" alt="razorPay" width={80} height={50} />{" "}
+              <p className="font-medium">Pay with stripe</p>
+            </button>
+          </div>
+          <div className="mt-auto">
+            <PrevAndNextBtn
+              showNext={false}
+              showBack={true}
+              prevLink={`/cart/checkout/shipping/${props.params.cartId.toString()}`}
+            />
+          </div>
         </div>
         <div className="col-span-3">
           <div className="sticky top-[34px]">
