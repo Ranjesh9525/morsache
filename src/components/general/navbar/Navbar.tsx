@@ -42,7 +42,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
   const { data: session }: any = useSession();
   const { cart, dispatch } = useContext(CartContext)!;
   // console.log(session);
-  console.log("session from client",session)
+  // console.log("session from client",session)
   return (
     <div className="min-h-[36px]">
       <motion.div

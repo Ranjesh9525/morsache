@@ -374,7 +374,7 @@ export const InitializeOrder = async (paymentMethod: string) => {
 
     sendOrderConfirmationEmail(order,user.email,"Order Confirmation");
     //if payment on delivery send email for order initiated
-    return Response("Order created", 200, true);
+    return Response("Order created", 200, true,order?._id);
   } catch (error) {
     console.error("Error creating order", error);
     throw error;

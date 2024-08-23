@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
+import { UserIsNewUser } from "@/serverlessActions/_userActions";
+import { ClipLoader } from "react-spinners";
 
 type Props = {
   email: string;
@@ -16,18 +22,19 @@ type Props = {
 };
 
 const OTPVerification = ({ email, setEmail }: Props) => {
-  const {data:session}:any = useSession();
+  const [isNewUser, setIsNewUser] = useState(false);
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-const {data,refetch}= useQuery({
-  queryKey: ['checkUser'],
-  queryFn: () => {
-    return fetch('/api/auth/otp').then(res => res.json())
-  },
-  enabled:false
-})
+  const { data, refetch, isFetching } = useQuery({
+    queryKey: ["checkUser"],
+    queryFn: () => UserIsNewUser(),
+    enabled: false,
+  });
+  const handleRedirect = (url: string) => {
+    router.push(url);
+  };
   async function handleOTPVerification(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSubmitting(true);
@@ -37,22 +44,30 @@ const {data,refetch}= useQuery({
     const formattedCallback = encodeURIComponent("/account");
     const otpRequestURL = `/api/auth/callback/email?email=${formattedEmail}&token=${formattedCode}&callbackUrl=${formattedCallback}`;
     const response = await fetch(otpRequestURL);
-    const handleRedirect = (url:string) => {
-      router.push(url);
-    };
+
     if (response) {
-      // if(!session?.user?.firstName  || !session?.user?.lastName ){
-      //   handleRedirect(`/auth/register?callbackUrl=${encodeURIComponent('/auth/login')}`)
-        
-      // }
       if (response.url.includes("/account")) {
-        toast({
-          variant: "default",
-          title: `You're now authenticated`,
-          description: "Lets get back to shopping!",
+        await refetch().then((dat) => {
+          // console.log("check", dat);
+          setIsNewUser(dat.data?.data?.isNewUser);
         });
-        handleRedirect(response.url)
-        router.refresh();
+         console.log("data", data, isNewUser);
+         if(isNewUser){
+          toast({
+            variant: "default",
+            title:"You're now authenticated",
+            description:"Update your account details"
+         })}
+        if (!isFetching && !isNewUser && !data?.data?.isNewUser) {
+          console.log("triggering",)
+          toast({
+            variant: "default",
+            title: `You're now authenticated`,
+            description: "Lets get back to shopping!",
+          });
+          handleRedirect(response.url);
+          router.refresh();
+        }
       } else {
         toast({
           variant: "destructive",
@@ -65,57 +80,69 @@ const {data,refetch}= useQuery({
 
     setIsSubmitting(false);
   }
+  useEffect(() => {
+    if (isNewUser) {
+      handleRedirect(
+        `/auth/register?callbackUrl=${encodeURIComponent("/auth/login")}`
+      );
+    }
+  }, [isNewUser]);
+
   return (
     <div
       id="otp-form-container"
       className="min-h-screen items-start justify-center flex  lg:p-12 sm:p-6"
     >
-      <form
-        onSubmit={handleOTPVerification}
-        className="flex flex-col w-full  justify-center items-center max-w-[400px] space-y-4"
-      >
-        <h1 className="uppercase  text-center tracking-tight font-semibold text-3xl">
-          Enter otp
-        </h1>
-        <p className="text-[12px] text-center text-gray-500 mb-2">
-          Please fill in OTP sent to your email to continue
-        </p>
-        <InputOTP
-          maxLength={6}
-          value={code}
-          onChange={(value) => setCode(value)}
-          className=""
+      {isFetching ? (
+        <ClipLoader size={40} />
+      ) : (
+        <form
+          onSubmit={handleOTPVerification}
+          className="flex flex-col w-full  justify-center items-center max-w-[400px] space-y-4"
         >
-          <InputOTPGroup>
-            <InputOTPSlot index={0} />
-            <InputOTPSlot index={1} />
-            <InputOTPSlot index={2} />
-            <InputOTPSlot index={3} />
-            <InputOTPSlot index={4} />
-            <InputOTPSlot index={5} />
-          </InputOTPGroup>
-        </InputOTP>
-
-        <span>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !code || code.length !== 6}
-            className="w-full text-center mt-4"
-          >
-            {isSubmitting ? "Verifying..." : "Verify"}
-          </Button>
-          <p className="text-[12.5px] mt-3 w-full capitalize text-center">
-            Code sent to your email becomes invalid after{" "}
-            <strong>3 minutes</strong>
+          <h1 className="uppercase  text-center tracking-tight font-semibold text-3xl">
+            Enter otp
+          </h1>
+          <p className="text-[12px] text-center text-gray-500 mb-2">
+            Please fill in OTP sent to your email to continue
           </p>
-        </span>
-        <p
-          className="text-[13px] underline  hover:text-gray-700 cursor-pointer"
-          onClick={() => setEmail("")}
-        >
-          Change email?
-        </p>
-      </form>
+          <InputOTP
+            maxLength={6}
+            value={code}
+            onChange={(value) => setCode(value)}
+            className=""
+          >
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
+            </InputOTPGroup>
+          </InputOTP>
+
+          <span>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !code || code.length !== 6}
+              className="w-full text-center mt-4"
+            >
+              {isSubmitting ? "Verifying..." : "Verify"}
+            </Button>
+            <p className="text-[12.5px] mt-3 w-full capitalize text-center">
+              Code sent to your email becomes invalid after{" "}
+              <strong>3 minutes</strong>
+            </p>
+          </span>
+          <p
+            className="text-[13px] underline  hover:text-gray-700 cursor-pointer"
+            onClick={() => setEmail("")}
+          >
+            Change email?
+          </p>
+        </form>
+      )}
     </div>
   );
 };

@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import {
   Cloud,
@@ -219,7 +219,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     height={35}
                     className="rounded-full"
                   />
-                  <h1>{Session?.user?.firstName || "Harivansh"}</h1>{" "}
+                  <h1>{Session?.user?.firstName || Session?.user?.email}</h1>{" "}
                 </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
@@ -228,7 +228,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
-                    <span>Edit Profile</span>
+                    <Link href="/account/">Edit Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
@@ -237,7 +237,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span onClick={() => signOut({redirect:false,callbackUrl:"/"})}>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -398,6 +398,16 @@ const storeComponents: { title: string; href: string; description: string }[] =
       title: "Edit Slider",
       href: "/admin/store/slider",
       description: "Edit the home page slide carousel, add or remove images",
+    },
+    {
+      title: "Featured Categories",
+      href: "/admin/store/featured",
+      description: "Style the homepage featured categories",
+    },
+    {
+      title: "Footer",
+      href: "/admin/store/footer",
+      description: "Edit the footer, change details shown in the footer",
     },
     {
       title: "Edit offer image",

@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import ProductsModel from "../models/Products";
 import UsersModel from "../models/User";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-
+import bcrypt from "bcryptjs"
 import { Response } from "./responseClass";
 
 export const UserAddToWishList = async (userId: string, productId: string) => {
@@ -113,26 +113,41 @@ export const UserIsNewUser = async () => {
 };
 
 export const UserUpdateProfile = async ({
-  userId,
   firstName,
   lastName,
   phoneNumber,
+  password
 }: {
-  userId: Schema.Types.ObjectId;
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  password:string
 }) => {
   try {
     await connectDB();
+    const session: any = await getServerSession(authOptions);
+    const userId= session!?.user!?._id;
     const user = await UsersModel.findOne({ _id: userId });
+    const hashedPassword = await bcrypt.hash(password, 12)
+    console.log("here", userId,
+    firstName,
+    lastName,
+    hashedPassword,
+    phoneNumber,)
+    // if (userId?.toString() !== userIdFromServer?.toString()) {
+    //   console.log("unauthorized")
+    //   throw new Error("Unauthorized");
+    // }
     if (!user) {
+      console.log("user not found")
       throw new Error("User not found");
     }
     user.firstName = firstName;
     user.lastName = lastName;
     user.phoneNumber = phoneNumber;
+    user.password = hashedPassword
     await user.save();
+    console.log("profile updated")
     return { message: "Profile updated successfully", success: true };
   } catch (error) {
     console.error("Error updating profile:", error);

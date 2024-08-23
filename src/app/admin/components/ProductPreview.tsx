@@ -14,9 +14,9 @@ type Props = {
 const ProductPreview = ({setPreview,preview}: Props) => {
   const router = useRouter();
   const [values, setValues] = React.useState<Product>();
-  // useEffect(()=>{
-
-  // },[preview])
+   useEffect(()=>{
+router.refresh()
+   },[preview])
 
   useEffect(() => {
     const productDraft = localStorage.getItem("product-draft");

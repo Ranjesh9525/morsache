@@ -19,7 +19,10 @@ import { Input } from "@/components/ui/input";
 import HomeLayout from "@/components/layouts/HomeLayout";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { UserUpdateProfile } from "@/serverlessActions/_userActions";
+import { useMutation } from "@tanstack/react-query";
+import { ClipLoader } from "react-spinners";
 
 type Props = {};
 
@@ -31,9 +34,13 @@ const Page = (props: Props) => {
       message: "first name must be at least 2 characters.",
     }),
     lastName: z.string().min(2, {
-      message: "Username must be at least 2 characters.",
+      message: "last name must be at least 2 characters.",
     }),
-    email: z.string().email("Email is invalid"),
+    phoneNumber: z.string().min(9, {
+      message: "phone number must be at least 9 characters.",
+    }).max(14, {
+      message: "phone number must not be longer than 14 characters.",
+    }),
     password: z
       .string()
       .min(8, {
@@ -55,42 +62,32 @@ const Page = (props: Props) => {
       lastName: "",
     },
   });
+  const {data,isError,isPending,error,isSuccess,mutate:server_updateUserDetails}=useMutation({
+    mutationFn:UserUpdateProfile,
+    onSuccess:(data)=>{
+
+      toast({
+        variant:"default",
+        title:"Account updated successfully",
+      })
+      router.push("/auth/login")
+    },
+    onError:(error)=>{
+      toast({
+        variant:"destructive",
+        title:"Error",
+        description:error.message
+      })
+      router.push('/serverError')
+    }
+
+  })
+
+  
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    let email = values.email;
-    const response = await signIn("email", {
-      email,
-      data: values,
-      redirect: false,
-      registered: true,
-    });
-     console.log(response)
-
-    if (response?.url === `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`) {
-      router.push("/auth/register"); //  // Redirect to the register page
-    } else {
-      if (response?.error) {
-        toast({
-          variant: "destructive",
-          title: `${response.error} error`,
-          description: "Check your details and try again",
-        });
-        if (response?.url) {
-          router.push(response.url);
-        } else {
-          router.replace(
-            `/auth/login?error=${encodeURIComponent(response.error)}`
-          );
-        }
-      } else {
-        toast({
-          variant: "default",
-          title: `OTP sent to ${values.email}`,
-          description: "Check your email for your 6-digit OTP",
-        });
-        // setEmail(values.email);
-      }
-    }
+    
+   server_updateUserDetails({password:values.password,firstName:values.firstName,lastName:values.lastName,phoneNumber:values.phoneNumber})
   }
   if (!callbackUrl) {
     router.push("/auth/login");
@@ -148,17 +145,17 @@ const Page = (props: Props) => {
             />
             <FormField
               control={form.control}
-              name={"email" as never}
+              name={"phoneNumber" as never}
               render={({ field }) => (
                 <FormItem className="items-start flex w-full flex-col ">
                   <FormLabel className="capitalize tracking-tight text-xl">
-                    Email
+                    Phone Number
                   </FormLabel>
                   <FormDescription className="text-[12px]">
-                    Please fill in your email
+                    Please fill in your Phone Number
                   </FormDescription>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input placeholder="Phone" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -183,11 +180,12 @@ const Page = (props: Props) => {
               )}
             />
             <div className="space-y-2">
-              <Button type="submit" className="w-full text-center">
-                Save
+              <Button 
+              disabled={isPending}
+              type="submit" className="w-full text-center">
+                { isPending ? <ClipLoader color="#fff" size={21}/> : "Save"}
               </Button>
               <p className="text-[12.5px] capitalize text-center">
-                {" "}
               </p>
             </div>
           </form>

@@ -24,7 +24,7 @@ const Footer = (props: Props) => {
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
-                <Link href="#">Find Stores Near Me</Link>
+                <Link href="#">Visit Our Store</Link>
               </li>
             </ul>
           </span>
@@ -34,7 +34,7 @@ const Footer = (props: Props) => {
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
-                <Link href="#">Contact Us</Link>
+                <Link href="/support">Contact Us</Link>
               </li>
               <li className="mb-2">
                 <Link href="#">FAQ&#39;s</Link>
@@ -43,7 +43,7 @@ const Footer = (props: Props) => {
                 <Link href="#"></Link>
               </li>
               <li className="mb-2">
-                <Link href="#">Terms {"&"}Conditions</Link>
+                <Link href="/policy">Terms {"&"}Conditions</Link>
               </li>
             </ul>
           </span>
@@ -53,13 +53,13 @@ const Footer = (props: Props) => {
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
-                <Link href="#"> TRACK ORDER</Link>
+                <Link href="/account/trackOrder"> TRACK ORDER</Link>
               </li>
               <li className="mb-2">
                 <Link href="#"> PLACE RETURN/EXCHANGE REQUEST</Link>
               </li>
               <li className="mb-2">
-                <Link href="#"> RETURNS/EXCHANGE POLICY</Link>
+                <Link href="/policy"> RETURNS/EXCHANGE POLICY</Link>
               </li>
             </ul>
           </span>

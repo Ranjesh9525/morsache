@@ -2,6 +2,7 @@
 import { connectDB } from "@/utilities/DB";
 import mongoose from "mongoose";
 import ProductsModel from "../models/Products";
+import StoreModel from "../models/Store";
 import CategoryModel from "../models/Category";
 import { Response } from "./responseClass";
 import { getSession } from "next-auth/react";
@@ -48,12 +49,11 @@ const sampleProducts = [
   // Add more sample products as needed
 ];
 
-
 // Function to insert sample products into the database
 export const insertSampleProducts = async () => {
   try {
     console.log("starting");
-   await connectDB();
+    await connectDB();
     await ProductsModel.insertMany(sampleProducts);
     console.log("Sample products inserted successfully");
     const products = await ProductsModel.find();
@@ -67,7 +67,7 @@ export const insertSampleProducts = async () => {
 
 export const getProducts = async () => {
   try {
-   await connectDB();
+    await connectDB();
     const products = await ProductsModel.find();
     return JSON.parse(JSON.stringify(products));
   } catch (error) {
@@ -75,34 +75,33 @@ export const getProducts = async () => {
   }
 };
 
-
 export const GetProductsByCategory = async (category: string) => {
   try {
     await connectDB();
     const products = await ProductsModel.find({ category: category });
-    return Response("products", 200, true, products );
+    return Response("products", 200, true, products);
   } catch (error) {
     console.error("Error fetching products:", error);
   }
-}
+};
 
-export const FetchSingleProduct = async(slug:string) => {
-  try{
+export const FetchSingleProduct = async (slug: string) => {
+  try {
     await connectDB();
-    const product = await ProductsModel.findOne({slug:slug})
+    const product = await ProductsModel.findOne({ slug: slug });
     if (!product) {
       return null;
     }
-    return Response("product", 200, true, product );
-  }catch(error){  
+    return Response("product", 200, true, product);
+  } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
   }
-}
-export const FetchSingleProductByIdOptimized = async(id:string) => {
-  try{
+};
+export const FetchSingleProductByIdOptimized = async (id: string) => {
+  try {
     await connectDB();
-    const product = await ProductsModel.findById(id)
+    const product = await ProductsModel.findById(id);
     if (!product) {
       return null;
     }
@@ -112,67 +111,66 @@ export const FetchSingleProductByIdOptimized = async(id:string) => {
       price: product.price,
       images: product.images,
       SKU: product.SKU,
-      salePrice: product.salePrice || null}
-    return Response("product", 200, true, optimizedProduct );
-  }catch(error){  
+      salePrice: product.salePrice || null,
+    };
+    return Response("product", 200, true, optimizedProduct);
+  } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
   }
-}
+};
 
-export const FetchCategoryData = async (name:string) => {
+export const FetchCategoryData = async (name: string) => {
   try {
     await connectDB();
-    const category = await CategoryModel.findOne({name:name})
+    const category = await CategoryModel.findOne({ name: name });
     if (!category) {
       return null;
     }
     // console.log(category);
-    return Response("category", 200, true, category );
+    return Response("category", 200, true, category);
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;
   }
 };
 
-export const FetchProductsFromFilterData = async (data: { tag: string; values: string[] }[] | []) => {
+export const FetchProductsFromFilterData = async (
+  data: { tag: string; values: string[] }[] | []
+) => {
   try {
-      await connectDB(); // Assuming connectDB() function is defined to connect to the database
+    await connectDB(); // Assuming connectDB() function is defined to connect to the database
 
-      let query: { [key: string]: any } = {}; // Define an index signature for query
+    let query: { [key: string]: any } = {}; // Define an index signature for query
 
-      // Check if data array is empty, return all products
-      if (data?.length === 0) {
-          const allProducts = await ProductsModel.find();
-          return Response("All products",200,true,allProducts)
+    // Check if data array is empty, return all products
+    if (data?.length === 0) {
+      const allProducts = await ProductsModel.find();
+      return Response("All products", 200, true, allProducts);
+    }
 
+    // Construct the query dynamically for each tag in data
+    for (const { tag, values } of data) {
+      if (Array.isArray(values) && values.length > 0) {
+        query[tag] = { $in: values };
       }
+    }
 
-      // Construct the query dynamically for each tag in data
-      for (const { tag, values } of data) {
-          if (Array.isArray(values) && values.length > 0) {
-              query[tag] = { $in: values };
-          }
-      }
+    // Find products that match the query
+    const products = await ProductsModel.find(query);
 
-      // Find products that match the query
-      const products = await ProductsModel.find(query);
-
-      return Response("searched products",200,true,products)
-
+    return Response("searched products", 200, true, products);
   } catch (error) {
-      console.error("Error fetching products based on filter data:", error);
-      throw error;
+    console.error("Error fetching products based on filter data:", error);
+    throw error;
   }
 };
 
-
-
-export const FetchSimilarProducts = async (tags:  string[] ) => {
+export const FetchSimilarProducts = async (tags: string[]) => {
   try {
     await connectDB();
-    console.log("tags",tags)
-  //tags [ 'casual', 'graphic', 'long sleeve', 'collared' ]
+    console.log("tags", tags);
+    //tags [ 'casual', 'graphic', 'long sleeve', 'collared' ]
     // const similarProducts = await ProductsModel.find({ tags: { $in: tags } })
     //     .sort({ tags: { $size: -1 } })
     //     .limit(12);
@@ -181,19 +179,22 @@ export const FetchSimilarProducts = async (tags:  string[] ) => {
     // .exec();
     const allProducts: Product[] = await ProductsModel.find({}).exec();
 
-    const filteredProducts = allProducts.filter(product =>
-      product!.tags!.some(tag => tags.includes(tag))
-  );
+    const filteredProducts = allProducts.filter((product) =>
+      product!.tags!.some((tag) => tags.includes(tag))
+    );
 
-  // Sort filtered products based on the number of common tags with the target tags array
-  filteredProducts.sort((productA, productB) => {
-      const commonTagsA = productA.tags!.filter(tag => tags.includes(tag)).length;
-      const commonTagsB = productB.tags!.filter(tag => tags.includes(tag)).length;
+    // Sort filtered products based on the number of common tags with the target tags array
+    filteredProducts.sort((productA, productB) => {
+      const commonTagsA = productA.tags!.filter((tag) =>
+        tags.includes(tag)
+      ).length;
+      const commonTagsB = productB.tags!.filter((tag) =>
+        tags.includes(tag)
+      ).length;
       return commonTagsB - commonTagsA; // Sort in descending order
-  });
+    });
 
-  return Response("similar products", 200, true, filteredProducts);
-
+    return Response("similar products", 200, true, filteredProducts);
 
     // return Response("similar products", 200, true, similarProducts );
   } catch (error) {
@@ -202,17 +203,64 @@ export const FetchSimilarProducts = async (tags:  string[] ) => {
   }
 };
 
-export const FetchCategoriesNamesOnly = async()=>{
-  try{
+export const FetchCategoriesNamesOnly = async () => {
+  try {
     await connectDB();
 
     const categoriesName = await CategoryModel.find().select("name");
 
-    return Response("categories names", 200, true, categoriesName );
-
-  }catch(error){
+    return Response("categories names", 200, true, categoriesName);
+  } catch (error) {
     console.error("Error fetching categories", error);
     throw error;
   }
-}
+};
 
+export const FetchStoreData = async () => {
+  try {
+    await connectDB();
+    const store = await StoreModel.findOne();
+    if (!store) {
+      throw new Error("store not found");
+    }
+    return Response("store", 200, true, store);
+  } catch (error) {
+    console.error("Error fetching store", error);
+    throw error;
+  }
+};
+
+export const FetchCategoriesById = async ({
+  type,
+  id,
+}: {
+  type: string;
+  id: string;
+}) => {
+  try {
+    await connectDB();
+    if (type === "category") {
+      const category = await CategoryModel.findById(id);
+      if (!category) {
+        return Response("category not found", 404, false, null);
+      }
+      const products = await ProductsModel.find({
+        categories: { $elemMatch: { $eq: category.name } },
+      });
+      const data = { name: category?.name, products };
+      return Response("category", 200, true, data);
+    }
+    if (type === "section") {
+      const category = await CategoryModel.findById(id)
+        .select("name")
+        .select("image");
+      if (!category) {
+        return Response("category not found", 404, false, null);
+      }
+      return Response("category", 200, true, category);
+    }
+  } catch (error) {
+    console.error("Error fetching category", error);
+    throw error;
+  }
+};

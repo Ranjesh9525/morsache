@@ -6,12 +6,14 @@ import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
 import ShippingModel from "../models/Shipping";
+import StoreModel from "../models/Store";
 import OffersModel from "../models/Offers";
 import OrdersModel from "../models/Orders";
 import { Response } from "./responseClass";
 import { Offer, Product } from "@/@types/products";
 import { category } from "@/@types/categories";
 import { Order } from "@/@types/order";
+import { Store } from "@/@types/store";
 
 
 cloudinary.config({
@@ -306,3 +308,47 @@ export const AdminUpdateOrder = async (orderNo:string) => {
     console.error("Error confirming order", error);
     throw error;
   }}
+
+  export const AdminUpdateStoreData = async(data:any)=>{
+    try{
+      await connectDB();
+      const fetchedData:Store[] = await StoreModel.find({})
+      const storeData = fetchedData[0]
+      // if(!storeData){
+      //  const newStoreData = new StoreModel(data)
+      //  await newStoreData.save()
+      // return Response("Store data updated successfully",200,true)
+
+      // }
+      if(!storeData){
+        throw new Error("Store data not found")
+      }
+      const {
+        carouselImages,
+        featuredCategories,
+        offerImage,
+        slidingOffers,
+        footerData
+      }=data
+      if(carouselImages){
+        const NewImages: string[] =[]
+        carouselImages.forEach(async(image:any)=>{
+          if(!image.includes("cloudinary")){
+            const cloudPhoto = await cloudinary.uploader.upload(image, {
+              folder: "store/sliderImages",
+              public_id: image,
+            });
+            NewImages.push(cloudPhoto.secure_url);
+          }else{
+            NewImages.push(image)
+          }
+        })
+        storeData.carouselImages = NewImages
+      
+      }
+      return Response("Store data updated successfully",200,true)
+    }catch(error){
+      console.error("Error updating store data",error);
+      throw error
+    }
+  }

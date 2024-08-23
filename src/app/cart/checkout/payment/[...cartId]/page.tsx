@@ -113,7 +113,7 @@ const Page = (props: Props) => {
         description: "Thanks for shopping with us!",
       });
       dispatch({type:"CLEAR_CART"})
-      router.push("/cart/checkout/review");
+      router.push(`/cart/checkout/review/${data?.data}`);
     }
     if (isError) {
       toast({

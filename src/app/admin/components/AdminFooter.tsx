@@ -50,5 +50,5 @@ export default AdminFooter;
 const links = [
   { title: "Dashboard", href: "/admin" },
   { title: "Visit store", href: "/" },
-  { title: "link3", href: "/admin" },
+  // { title: "link3", href: "/admin" },
 ];

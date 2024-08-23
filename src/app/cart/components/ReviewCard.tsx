@@ -7,7 +7,6 @@ const ReviewCard = (props: Props) => {
 
   return (
     <div>
-        <Button onClick={()=>console.log("ef")}>Back to shopping</Button>
     </div>
   )
 }

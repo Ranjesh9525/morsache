@@ -47,7 +47,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           "hover:bg-transparent hover:underline",
           "justify-start text-red-500"
         )}
-        onClick={() => signOut()}
+        onClick={() =>  signOut({ redirect: false, callbackUrl: "/" })}
       >
         {" "}
         Log Out

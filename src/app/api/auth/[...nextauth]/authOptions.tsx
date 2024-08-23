@@ -10,6 +10,7 @@ import { connectDB, disconnectDB } from "@/utilities/DB";
 import { UserDocument } from "@/@types/user";
 import { NextApiRequest } from "next";
 import bcrypt from "bcryptjs";
+import { signOut } from "next-auth/react";
 
 interface CustomSignIn {
   user: User | AdapterUser;
