@@ -39,10 +39,10 @@ const HeaderAds = (props: Props) => {
   return (
     <section className="embla">
       <div className="overflow-hidden !relative h-[40px]" ref={emblaRef}>
-        <div className="embla__container bg-gray-900">
+        <div className="embla__container bg-primary">
           {slides.map((item: string, index: number) => (
             <div
-              className="transform translate-x-0 translate-y-0  translate-z-0 flex-shrink-0 text-white flex items-center uppercase tracking-wider justify-center text-[11.5px] w-full p-3 flex-grow-0 flex-basis-[100%] bg-gray-900 w-screen h-[40px] "
+              className="transform translate-x-0 translate-y-0  translate-z-0 flex-shrink-0 text-white flex items-center uppercase tracking-wider justify-center text-[11.5px]  p-3 flex-grow-0 flex-basis-[100%] bg-primary w-screen h-[40px] "
               key={index}
             >
               {/* <div className="embla__slide__number">{index + 1}</div> */}

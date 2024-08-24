@@ -20,6 +20,7 @@ export interface CartItem {
   size: string;
   variant: string;
   totalPrice: number;
+  discountedPrice?: number;
 }
 export interface Cart {
   items: CartItem[];
@@ -34,6 +35,7 @@ export interface Cart {
   isPaid: boolean;
 }
 export interface CartItemForServer {
+  _id?: ObjectId;
   product?: Product;
   productId?: string;
   offersData?:{
@@ -46,6 +48,7 @@ export interface CartItemForServer {
   
   variant: string;
   totalPrice: number;
+  discountedPrice?: number;
 }
 
 

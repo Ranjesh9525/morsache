@@ -36,6 +36,15 @@ export interface Product {
     updatedAt?: Date;
   }
   
+  export interface OptimizedProduct {
+    _id: string;
+    name: string;
+    slug: string;
+    price: number;
+    images: string[];
+    SKU: string;
+    salePrice: number | null;
+  }
   // title: generateRandomTitle(),
   // description: generateRandomDescription(),
   // description2: "Additional description here",

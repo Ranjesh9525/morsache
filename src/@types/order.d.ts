@@ -22,4 +22,42 @@ interface Order extends Document {
         cardCVV?: string;
     };
     paymentStatus: 'pending' | 'paid';
+    paidOn:Date | null;
+    createdAt?:  Date ,
+    updatedAt?:  Date ,
 }
+
+interface OrderReviewData {
+    products: {
+      product: OptimizedProduct;
+      quantity: number;
+      size: string;
+      variant: string;
+      totalPrice: number;
+    }[];
+    paymentDetails: {
+      totalAmount: number;
+      paidOn: Date | null;
+      paymentMethod: {
+        type: 'creditCard' | 'razorPay' | 'stripe' | 'payOnDelivery';
+        cardNumber?: string;
+        cardExpiry?: string;
+        cardCVV?: string;
+      };
+      paymentStatus: 'pending' | 'paid';
+    }
+    orderDetails: {
+      totalAmount: number;
+      createdAt?: Date;
+      totalItems: number;
+      orderStatus: 'pending' | 'confirmed' | 'shipped' | 'delivered';
+      orderNumber: string;
+    };
+    customerDetails: {
+      shippingAddress: string;
+      firstName: string | undefined;
+      lastName: string | undefined;
+      email: string | undefined;
+      phoneNumber: string | undefined;
+    };
+  }

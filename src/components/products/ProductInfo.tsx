@@ -109,13 +109,37 @@ const ProductInfo = ({ product }: Props) => {
         )}
       </div>
       <div className="mt-5">
-        <h1 className="w-full text-[17px]">
-          {format(parseFloat(product?.price))}
-        </h1>
+     {product.salePrice ? (
+  <h1 className="w-full text-[17px] ">
+    {format(parseFloat(product?.salePrice))}
+  </h1>
+) : null} 
+<h1 className={`w-full ${product.salePrice ? "text-[14px] line-through  text-gray-400":"text-[17px]"}`}>
+  {format(parseFloat(product?.price))}
+</h1>
+
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
       <div id="discounts" className="w-[280px] mt-5 ">
-        <div className="flex items-center justify-center gap-3 mb-3">
+      <div className="flex items-center justify-center gap-3 mb-3">
+  <CiDiscount1 color="#fea12f" size={35} />
+  {product?.offers!.map((offer, index:number) => (
+    <p key={index} className="w-full text-[12px]">
+      {offer.title} <br />
+      {offer.effect === "flat" && (
+        <> Get Flat {offer.discount}% Off! <br /></>
+      )}
+      {offer.effect === "percentage" && (
+        <> Get {offer.discount}% Off! <br /></>
+      )}
+      {offer.effect === "quantity" && (
+        <>Buy {offer.quantityEffect} Get Quantity Discount! <br /></>
+      )}
+      Code: <b>{offer.code}</b>{" "}
+    </p>
+  ))}
+</div>
+        {/* <div className="flex items-center justify-center gap-3 mb-3">
           <CiDiscount1 color="#fea12f" size={35} />
           <p className="w-full text-[12px]">
             Get this for <b>INR 1,199</b> <br />
@@ -142,7 +166,7 @@ const ProductInfo = ({ product }: Props) => {
             Get this for <b>INR 1,199</b> <br />
             Buy 5 {"&"} Get Flat 20% Off! Code:<b>BUY5</b>{" "}
           </p>
-        </div>
+        </div> */}
       </div>
       <hr className="my-4" />
       <h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">

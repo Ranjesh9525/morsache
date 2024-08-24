@@ -108,6 +108,7 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
     const optimizedProduct = {
       _id: product._id,
       name: product.name,
+      slug: product.slug,
       price: product.price,
       images: product.images,
       SKU: product.SKU,
@@ -139,9 +140,9 @@ export const FetchProductsFromFilterData = async (
   data: { tag: string; values: string[] }[] | []
 ) => {
   try {
-    await connectDB(); // Assuming connectDB() function is defined to connect to the database
+    await connectDB(); 
 
-    let query: { [key: string]: any } = {}; // Define an index signature for query
+    let query: { [key: string]: any } = {}; 
 
     // Check if data array is empty, return all products
     if (data?.length === 0) {
@@ -149,14 +150,14 @@ export const FetchProductsFromFilterData = async (
       return Response("All products", 200, true, allProducts);
     }
 
-    // Construct the query dynamically for each tag in data
+   
     for (const { tag, values } of data) {
       if (Array.isArray(values) && values.length > 0) {
         query[tag] = { $in: values };
       }
     }
 
-    // Find products that match the query
+ 
     const products = await ProductsModel.find(query);
 
     return Response("searched products", 200, true, products);
@@ -169,7 +170,7 @@ export const FetchProductsFromFilterData = async (
 export const FetchSimilarProducts = async (tags: string[]) => {
   try {
     await connectDB();
-    console.log("tags", tags);
+    // console.log("tags", tags);
     //tags [ 'casual', 'graphic', 'long sleeve', 'collared' ]
     // const similarProducts = await ProductsModel.find({ tags: { $in: tags } })
     //     .sort({ tags: { $size: -1 } })

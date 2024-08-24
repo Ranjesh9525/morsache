@@ -245,7 +245,9 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
 }
 </section>
 }
-          <Separator />
+              {cart && ( 
+              <>
+              <Separator />
           <section id="offers" className="">
             <div className="inline-flex items-center w-full">
               <Input
@@ -263,6 +265,8 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
                 Apply
               </Button>
             </div>
+          
+         
             {offersData?.data && <h1>Active offers</h1>}
             <div className="flex flex-col items-center my-2">
               {isPending ? (
@@ -279,8 +283,9 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
                 ))
               )}
             </div>
-          </section>
-
+          </section>  </> 
+   )
+            }
           <Separator />
           <section
             id="subtotal and shipping"

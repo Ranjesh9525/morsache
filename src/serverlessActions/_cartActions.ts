@@ -6,7 +6,7 @@ import UserModel, { cartSchema } from "../models/User";
 // import CModel from "../models/Products";
 import crypto from "crypto";
 import { getServerSession } from "next-auth";
-import { Cart, CartForServer } from "@/@types/cart.d";
+import { Cart, CartForServer, CartItemForServer } from "@/@types/cart.d";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // Import the Offers model with the offersSchema
 import Offers from "@/models/Offers";
@@ -15,6 +15,9 @@ import { connectDB } from "@/utilities/DB";
 import { ObjectId } from "mongodb";
 import { Document } from "mongoose";
 import { sendOrderConfirmationEmail } from "./sendMail";
+import { FetchSingleProductByIdOptimized } from "./_fetchActions";
+import { Order, OrderReviewData } from "@/@types/order";
+import { OptimizedProduct } from "@/@types/products";
 // import UserModel from "../models/User";
 
 interface Shipping extends Document {
@@ -74,7 +77,7 @@ export async function validateOffers(data: any) {
         throw new Error(`Offer is no longer valid`);
       }
     }
-
+    //there is a general discounted price , be sure to sum up all dicounted prices and set them to that and use it
     return Response("Offers applied", 200, true, results);
   } catch (error) {
     console.log(`Error in validateOffers:`, error);
@@ -187,8 +190,6 @@ export async function validateOffers(data: any) {
 
 export const createCart = async (data: CartForServer) => {
   try {
-    // for (const { items } of data) {
-
     await connectDB();
 
     const session: any = await getServerSession(authOptions);
@@ -208,7 +209,7 @@ export const createCart = async (data: CartForServer) => {
       // Generate a random _id for the cart
       const cartId = new ObjectId();
       data._id = cartId;
-      console.log(data);
+      // console.log(data);
       // Save new cart data into user.cart array
       user.carts.push(data);
 
@@ -218,7 +219,7 @@ export const createCart = async (data: CartForServer) => {
       if (!cartIdFromCart) {
         throw new Error("no cart id");
       }
-      console.log(user);
+      // console.log(user);
       return Response("Cart initialized", 200, true, cartIdFromCart);
     } else {
       // Handle the case where there is no active session
@@ -246,7 +247,7 @@ export const findUserCart = async (cartId: string) => {
       if (!cart) {
         throw new Error("Cart not found");
       }
-      if(cart.isPaid){
+      if (cart.isPaid) {
         throw new Error("Cart closed");
       }
       return Response("Cart found", 200, true, cart);
@@ -351,14 +352,14 @@ export const InitializeOrder = async (paymentMethod: string) => {
     if (!cart) {
       throw new Error("Cart not found");
     }
- 
+
     const order = new OrdersModel({
-      orderNumber:  generateRandomOrderNumber(),
+      orderNumber: generateRandomOrderNumber(),
       customer: userId,
       items: cart.items,
       totalItems: cart.totalItems,
       totalAmount: cart.totalAmount + cart.shippingPrice,
-      shippingPrice:cart.shippingPrice,
+      shippingPrice: cart.shippingPrice,
       orderStatus: "pending",
       shippingAddress: cart.shippingAddress,
       paymentMethod: {
@@ -366,18 +367,82 @@ export const InitializeOrder = async (paymentMethod: string) => {
       },
       paymentStatus: "pending",
     });
-    console.log("order",order);
+    console.log("order", order);
     await order.save();
-    user.carts[0].paymentMethod = {type:paymentMethod}
+    user.carts[0].paymentMethod = { type: paymentMethod };
     user.carts[0].isPaid = true;
     await user.save();
 
-    sendOrderConfirmationEmail(order,user.email,"Order Confirmation");
+    sendOrderConfirmationEmail(order, user.email, "Order Confirmation");
     //if payment on delivery send email for order initiated
-    return Response("Order created", 200, true,order?._id);
+    return Response("Order created", 200, true, order?._id);
   } catch (error) {
     console.error("Error creating order", error);
     throw error;
   }
 };
 
+export const FetchOrderByOrderNo = async (orderNo: string) => {
+  try {
+    const session: any = await getServerSession(authOptions);
+    const userId = session!?.user!?._id;
+    const user = await UserModel.findOne({ _id: userId });
+    const order: Order = await OrdersModel.findOne({ orderNumber: orderNo });
+    if (!order) {
+      throw new Error("Order not found");
+    }
+    if (order.customer !== user._id) {
+      throw new Error("Unauthorized access");
+    }
+    const returnData: OrderReviewData | null = null
+    order.items.forEach(async (item: CartItemForServer) => {
+      const { quantity, size, variant, totalPrice } = item;
+      const product:OptimizedProduct = await FetchSingleProductByIdOptimized(item.productId!);
+      if (product) {
+        returnData!.products.push({
+          product,
+          quantity,
+          size,
+          variant,
+          totalPrice,
+        });
+      }
+    });
+    const {
+      totalItems,
+      totalAmount,
+      createdAt,
+      paidOn,
+      paymentStatus,
+      paymentMethod,
+      orderStatus,
+      orderNumber,
+      shippingAddress,
+    } = order;
+    returnData!.paymentDetails={
+      totalAmount,
+      paidOn,
+      paymentMethod,
+      paymentStatus,
+    };
+    returnData!.orderDetails={
+      totalAmount,
+      createdAt,
+      totalItems,
+      orderStatus,
+      orderNumber,
+    };
+    const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
+    returnData!.customerDetails ={
+      shippingAddress: formattedShippingAddress,
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      email: user?.email,
+      phoneNumber: user?.phoneNumber,
+    };
+    return Response("order information", 200, true, returnData);
+  } catch (error) {
+    console.error("Error fetching order", error);
+    throw error;
+  }
+};

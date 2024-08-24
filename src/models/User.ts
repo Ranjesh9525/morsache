@@ -25,6 +25,9 @@ export const cartItemSchema = new mongoose.Schema({
   totalPrice: {
     type: Number,
   },
+  discountedPrice: {
+    type: Number,
+  },
 });
 export const cartSchema = new mongoose.Schema(
   {
