@@ -11,7 +11,7 @@ const DisplayProductsByCategory = ({ category }: Props) => {
   return (
     <div id="products-category-display-container" className="sm:p-3 md:p-6 lg:p-9">
       <h1 className="text-center w-ful text-2xl font-semibold capitalize my-6">{category.title}</h1>
-      <div id="products-wrapper" className="grid grid-cols-4 gap-x-6   ">
+      <div id="products-wrapper" className="grid lg:grid-cols-4  sm:grid-cols-2 gap-x-6   ">
         {category.items.map((item, index) => (
           <motion.div key={index} whileHover={{scale:1.05}} id="product-item" className=" relative cursor-pointer">
             <div  id="product-image " className="h-[450px]  relative  " >

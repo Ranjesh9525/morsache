@@ -17,7 +17,7 @@ const page = (props: Props) => {
     <HomeLayout title="Review order - Morsache Clothing">
       <div className="w-full container mb-9 mt-4 gap-9">
         <div id="header" className="  pb-5">
-          <section className="flex justify-between ">
+          <section className="flex justify-between items-center ">
             <span className="flex-[6]">
               <h1 className="text-3xl  font-bold tracking-tight capitalize">
                 Review Order {props.params.orderNo}
@@ -29,7 +29,7 @@ const page = (props: Props) => {
                 that this wont be possible when your order has been shipped
               </p>
             </span>
-            <span className="flex-[4] justify-end flex">
+            <span className="flex-[4] justify-end  gap-2 flex">
               <Link href="/search" className="cursor-pointer">
                 <Button className="">Back to shopping</Button>
               </Link>
@@ -40,7 +40,7 @@ const page = (props: Props) => {
           </section>
           <Separator className="mt-7" />
         </div>
-        <ReviewCard />
+        <ReviewCard orderNo={props?.params?.orderNo}/>
       </div>
     </HomeLayout>
   );

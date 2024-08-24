@@ -15,14 +15,16 @@ import { ClipLoader } from "react-spinners";
 
 type Props = {
   category?: string;
-  currentFilter:    { tag: string; values: string[] }[] | [];
-  setCurrentFilter:React.Dispatch<React.SetStateAction<{ tag: string; values: string[] }[] | []>>
+  currentFilter?:    { tag: string; values: string[] }[] | [];
+  setCurrentFilter?:React.Dispatch<React.SetStateAction<{ tag: string; values: string[] }[] | []>>
 };
 //make request to fetch the category
 const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
-  // const [currentFilter, setCurrentFilter] = React.useState<
-  //   { tag: string; values: string[] }[] | []
-  // >([]);
+  const [currentFilterLocal, setCurrentFilterLocal] = React.useState<
+    { tag: string; values: string[] }[] | []
+  >([]);
+  const setCurrentFilterGlobal = setCurrentFilter ? setCurrentFilter : setCurrentFilterLocal
+  const currentFilterGlobal = currentFilter ? currentFilter : currentFilterLocal
   const router = useRouter();
   const [categoryData, setCategoryData] = React.useState<category | {name:string,tags:{tag:string,values:string[]}[]}>({
     name:"",
@@ -88,7 +90,7 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
   ]
   });
   const handleFilter = (selectedFilter: { tag: string; value: string }) => {
-    setCurrentFilter((prevFilter) => {
+    setCurrentFilterGlobal!((prevFilter) => {
       const specificTagExist = prevFilter.findIndex(
         (i) => i.tag === selectedFilter.tag
       );
@@ -140,16 +142,16 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
   //       filterInstance[specificTagExist].values = filterInstance[
   //         specificTagExist
   //       ].values.filter((i) => i !== selectedFilter.value);
-  //       setCurrentFilter([...filterInstance]);
+  //       setCurrentFilterGlobal([...filterInstance]);
   //     } else {
   //       filterInstance[specificTagExist].values = [
   //         ...(filterInstance[specificTagExist]?.values || []),
   //         selectedFilter.value,
   //       ];
-  //       setCurrentFilter([...filterInstance]);
+  //       setCurrentFilterGlobal([...filterInstance]);
   //     }
   //   } else {
-  //     setCurrentFilter([
+  //     setCurrentFilterGlobal([
   //       ...filterInstance,
   //       { tag: selectedFilter.tag, values: [selectedFilter.value] },
   //     ]);
@@ -198,20 +200,20 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
           <>
             {" "}
             <section>
-              {currentFilter?.length > 0 && (
+              {currentFilterGlobal?.length > 0 && (
                 <>
                   <div className="text-sm font-bold mb-3 inline-flex justify-between">
                     <h1>Filters</h1>{" "}
                     <h1
                       className="cursor-pointer"
-                      onClick={() => setCurrentFilter([])}
+                      onClick={() => setCurrentFilterGlobal!([])}
                     >
                       Clear all
                     </h1>
                   </div>
                   <div className="flex flex-col gap-2 ">
                     {" "}
-                    {currentFilter?.map((item, index) => {
+                    {currentFilterGlobal?.map((item, index) => {
                       if (item.values.length > 0) {
                         return (
                           <span

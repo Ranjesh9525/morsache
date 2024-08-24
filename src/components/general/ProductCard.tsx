@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
+import { format } from "../products/ProductInfo";
 
 type Props = {
   item: any;
@@ -31,7 +32,7 @@ const ProductCard = ({ item, index,isLoading,nameOnly }: Props) => {
       //     index % 2 === 0 ? "col-span-3 bg-red-200" : "col-span-2 bg-blue-200"
       //   }`}
     >
-      {!nameOnly ?   <div className="relative w-full h-[370px] cursor-pointer">
+      {!nameOnly ?   <div className="relative w-full h-[370px] lg:h-[380px] xl:h-[400px] md:h-[240px] sm:h-[200px] cursor-pointer">
       <motion.div
           initial={{ opacity: 1 }}
           whileHover={{ opacity: 0 }}
@@ -72,8 +73,8 @@ const ProductCard = ({ item, index,isLoading,nameOnly }: Props) => {
   
       <p className="capitalize">{item.name}</p>
       { !nameOnly && <>
-      <p>INR {item.price}</p>
-      <p>{item.sizes.join(",")}</p>
+      <p>INR {format(parseInt(item.price))}</p>
+      <p className="font-extralight tracking-[0.15em] text-gray-500">{item.sizes.join(",")}</p>
       </>}
     </Link>
   );

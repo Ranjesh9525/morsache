@@ -25,10 +25,11 @@ import { sampleProducts } from "./page/ProductPage";
 type Props = {
   category?: string;
   searchFilterData: any;
+  setProductsAmount:React.Dispatch<React.SetStateAction<number>>
 };
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
-const DisplayProducts = ({ category, searchFilterData }: Props) => {
+const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props) => {
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
@@ -39,7 +40,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "23",
       name: "elementary magenta plain pure linen shirt",
-      price: "$20.00",
+      price: "20.00",
       road: 84,
       sizes: ["S", "M", "L", "XL"],
       images: [
@@ -50,7 +51,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "14",
       name: "Matteo Grey Checks Shirt",
-      price: "$20.00",
+      price: "20.00",
       sizes: ["S", "M", "L", "XL"],
       images: [
         "/items/Matteo-Grey-Checks-Shirt-1.webp",
@@ -60,7 +61,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "15",
       name: "Matteo Light Blue Checks Shirt",
-      price: "$35.00",
+      price: "35.00",
       sizes: ["S", "M", "L"],
       images: [
         "/items/Matteo-Light-Blue-Checks-Shirt1.webp",
@@ -70,7 +71,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "16",
       name: "brush stroke red shirt",
-      price: "$25.00",
+      price: "25.00",
       sizes: ["S", "M", "L"],
       images: [
         "/items/brush-stroke-red-shirt1.jpg",
@@ -80,7 +81,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "17",
       name: "Carmine mauve knitted shirt",
-      price: "$30.00",
+      price: "30.00",
       sizes: ["M", "L", "XL"],
       images: [
         "/items/carmine-mauve-knitted-shirt1.webp",
@@ -90,7 +91,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "27",
       name: "Box Stripe Black Shirt",
-      price: "$35.00",
+      price: "35.00",
       sizes: ["S", "L", "XXL"],
 
       images: [
@@ -102,7 +103,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "28",
       name: "Double Cuff Royal Blue Shirt",
-      price: "$40.00",
+      price: "40.00",
       sizes: ["S", "M", "XL"],
       images: [
         "/items/carmine-mauve-knitted-shirt2.webp",
@@ -112,7 +113,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "29",
       name: "Doric Red Shirt",
-      price: "$30.00",
+      price: "30.00",
       sizes: ["S", "M", "XL", "XXL"],
       images: [
         "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
@@ -122,7 +123,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "30",
       name: "Matteo Grey Checks Shirt",
-      price: "$45.00",
+      price: "45.00",
       sizes: ["M", "L"],
       images: [
         "/items/Matteo-Light-Blue-Checks-Shirt1.webp",
@@ -132,7 +133,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     {
       id: "31",
       name: "Box Stripe White Shirt",
-      price: "$45.00",
+      price: "45.00",
       sizes: ["M", "L"],
       images: [
         "/items/brush-stroke-red-shirt2.jpg",
@@ -141,14 +142,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
     },
   ];
 
-  // const queryClient = useQueryClient()
 
-  // Queries
-  //   const { isPending, isError, data, error } = useQuery({
-  //     queryKey: ["products"],
-  //     queryFn: insertSampleProducts,
-  //   });
-  //  console.log(data);
   const {
     isPending,
     isError,
@@ -167,11 +161,7 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
   } = useMutation({
     mutationFn: FetchProductsFromFilterData,
   });
-  //  server_insertSampleProducts()
-  //console.log(data);
-  //const { isOpen, open, close } = useDropdownMenu({ id: "basic-filter-setting" });
 
-  // console.log(data)
   useEffect(() => {
     if (category && category !== "") {
       server_getProductsByCategory(category);
@@ -183,7 +173,8 @@ const DisplayProducts = ({ category, searchFilterData }: Props) => {
   }, []);
   useEffect(() => {
     if (!isError && response?.data) {
-      console.log("data", response);
+      // console.log("data", response);
+      setProductsAmount(response?.data?.length)
       setProductsData(response?.data)
     }
     if (error) {

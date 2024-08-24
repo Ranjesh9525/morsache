@@ -180,7 +180,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
           }
         >
           {isPending ? (
-            <ClipLoader className="mx-auto my-auto" />
+          <p className="w-fit mx-auto ">   <ClipLoader className="mx-auto my-4" /></p>
           ) : (
             <section className=" flex flex-col gap-4 justify-between h-full ">
               <section className="flex flex-col py-2 px-3 text-lg font-medium uppercase">
