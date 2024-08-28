@@ -15,7 +15,6 @@ import { category } from "@/@types/categories";
 import { Order } from "@/@types/order";
 import { Store } from "@/@types/store";
 
-
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -227,10 +226,14 @@ export const AdminDeleteCategory = async (id: string) => {
   }
 };
 
-export const AdminAddShippingData = async (data:{locationBy:string,name:string,price:string | number}) => {
+export const AdminAddShippingData = async (data: {
+  locationBy: string;
+  name: string;
+  price: string | number;
+}) => {
   try {
     await connectDB();
-    data.price  = parseInt(data?.price as string);
+    data.price = parseInt(data?.price as string);
     const Shipping = new ShippingModel(data);
     console.log(Shipping);
     await Shipping.save();
@@ -242,47 +245,48 @@ export const AdminAddShippingData = async (data:{locationBy:string,name:string,p
 
 export const AdminAddTeam = async ({ email }: { email: string }) => {
   try {
-      await connectDB();
-      const user = await UserModel.findOne({ email });
+    await connectDB();
+    const user = await UserModel.findOne({ email });
 
-      if (!user) {
-          throw new Error('User not found');
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await UserModel.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          role: "admin",
+        },
       }
+    );
 
-      await UserModel.findOneAndUpdate({ email: email }, {
-          $set: {
-              role: "admin"
-          }
-      });
-
-      return Response("Teammate added successfully", 200, true);
+    return Response("Teammate added successfully", 200, true);
   } catch (error) {
-      console.error("Error adding teammate:", error);
-      throw new Error("Error adding teammate");
+    console.error("Error adding teammate:", error);
+    throw new Error("Error adding teammate");
   }
-}
+};
 
-export const AdminGetAllTeam=async()=>{
-  try{
+export const AdminGetAllTeam = async () => {
+  try {
     await connectDB();
-    const Team = await UserModel.find({role:"admin"})
-    return Response("Team fetched successfully",200,true,Team)
-  }catch(error){
-    console.error("Error adding teammate ")
+    const Team = await UserModel.find({ role: "admin" });
+    return Response("Team fetched successfully", 200, true, Team);
+  } catch (error) {
+    console.error("Error adding teammate ");
   }
-}
+};
 
-export const AdminGetAllShippingData=async()=>{
-  try{
+export const AdminGetAllShippingData = async () => {
+  try {
     await connectDB();
-    const ShippingData = await ShippingModel.find({})
-    return Response("Shipping data fetched",200,true,ShippingData)
- 
-  }catch(error){
-    console.error("Error adding teammate ")
+    const ShippingData = await ShippingModel.find({});
+    return Response("Shipping data fetched", 200, true, ShippingData);
+  } catch (error) {
+    console.error("Error adding teammate ");
   }
-}
-
+};
 
 export const AdminGetAllOrders = async () => {
   try {
@@ -293,8 +297,8 @@ export const AdminGetAllOrders = async () => {
     console.error("Error fetching orders:", error);
     throw error;
   }
-}
-export const AdminUpdateOrder = async (orderNo:string) => {
+};
+export const AdminUpdateOrder = async (orderNo: string) => {
   try {
     await connectDB();
     const order = await OrdersModel.findOne({ orderNumber: orderNo });
@@ -307,48 +311,53 @@ export const AdminUpdateOrder = async (orderNo:string) => {
   } catch (error) {
     console.error("Error confirming order", error);
     throw error;
-  }}
-
-  export const AdminUpdateStoreData = async(data:any)=>{
-    try{
-      await connectDB();
-      const fetchedData:Store[] = await StoreModel.find({})
-      const storeData = fetchedData[0]
-      // if(!storeData){
-      //  const newStoreData = new StoreModel(data)
-      //  await newStoreData.save()
-      // return Response("Store data updated successfully",200,true)
-
-      // }
-      if(!storeData){
-        throw new Error("Store data not found")
-      }
-      const {
-        carouselImages,
-        featuredCategories,
-        offerImage,
-        slidingOffers,
-        footerData
-      }=data
-      if(carouselImages){
-        const NewImages: string[] =[]
-        carouselImages.forEach(async(image:any)=>{
-          if(!image.includes("cloudinary")){
-            const cloudPhoto = await cloudinary.uploader.upload(image, {
-              folder: "store/sliderImages",
-              public_id: image,
-            });
-            NewImages.push(cloudPhoto.secure_url);
-          }else{
-            NewImages.push(image)
-          }
-        })
-        storeData.carouselImages = NewImages
-      
-      }
-      return Response("Store data updated successfully",200,true)
-    }catch(error){
-      console.error("Error updating store data",error);
-      throw error
-    }
   }
+};
+
+export const AdminUpdateStoreData = async (data: any) => {
+  try {
+    await connectDB();
+    const fetchedData: any = await StoreModel.find({});
+    const storeData = fetchedData[0];
+    // if(!storeData){
+    //  const newStoreData = new StoreModel(data)
+    //  await newStoreData.save()
+    // return Response("Store data updated successfully",200,true)
+
+    // }
+    if (!storeData) {
+      throw new Error("Store data not found");
+    }
+    const {
+      carouselImages,
+      featuredCategories,
+      offerImage,
+      slidingOffers,
+      footerData,
+    } = data;
+    if (carouselImages) {
+      const NewImages: string[] = [];
+      carouselImages.forEach(async (image: any) => {
+        if (!image.includes("cloudinary")) {
+          const cloudPhoto = await cloudinary.uploader.upload(image, {
+            folder: "store/sliderImages",
+            public_id: image,
+          });
+          NewImages.push(cloudPhoto.secure_url);
+        } else {
+          NewImages.push(image);
+        }
+      });
+      storeData.carouselImages = NewImages;
+    }
+    if (featuredCategories) {
+      console.log(featuredCategories);
+      fetchedData[0].featuredCategories = featuredCategories;
+      await fetchedData[0].save();
+    }
+    return Response("Store data updated successfully", 200, true);
+  } catch (error) {
+    console.error("Error updating store data", error);
+    throw error;
+  }
+};

@@ -1,4 +1,6 @@
-export type Store = {
+import { Document } from "mongoose";
+
+interface Store extends Document  {
   carouselImages: string[];
   featuredCategories: {
     section: string;
