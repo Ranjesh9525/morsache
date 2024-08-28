@@ -246,18 +246,27 @@ export const FetchCategoriesById = async ({
         return Response("category not found", 404, false, null);
       }
       const products = await ProductsModel.find({
-        categories: { $elemMatch: { $eq: category.name } },
-      });
-      const data = { name: category?.name, products };
+        category: { $elemMatch: { $eq: category.name } },
+      }).select("name")
+      .select("slug")
+      .select("salePrice")
+      .select("price")
+      .select("tags")
+      .select("sizes")
+      .select("images")
+      const data = { category: category?.name, items:products };
+      // console.log(data)
       return Response("category", 200, true, data);
     }
     if (type === "section") {
       const category = await CategoryModel.findById(id)
         .select("name")
-        .select("image");
+        .select("image").lean();
       if (!category) {
+        console.log("category not found")
         return Response("category not found", 404, false, null);
       }
+      console.log(category)
       return Response("category", 200, true, category);
     }
   } catch (error) {

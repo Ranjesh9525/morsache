@@ -25,7 +25,7 @@ const ProductGallery = ({ product }: Props) => {
     <div id="product-gallery" className=" relative ">
       <div className="grid grid-cols-5 gap-x-2 sticky top-0">
         <section className="col-span-1 flex flex-col gap-6 pl-5 ">
-          {product.images.map((item: string, index: number) => {
+          {product?.images.map((item: string, index: number) => {
             return (
               <Image
                 key={index}

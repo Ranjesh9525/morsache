@@ -1,6 +1,6 @@
 import Navbar from "@/components/general/navbar/Navbar";
 import AdsPromotions from "@/components/home/AdsPromotions";
-import DisplayNewAndTrending from "@/components/home/displayProducts/DisplayNewAndTrending";
+import DisplayBySections from "@/components/home/displayProducts/DisplaySections";
 import DisplayProductsByCategory from "@/components/home/displayProducts/DisplayProductsByCategory";
 import HeaderAds from "@/components/home/HeaderAds";
 import RecentlyViewed from "@/components/general/RecentlyViewed";
@@ -95,7 +95,7 @@ export default async function Home() {
   ];
   const defaultTabs = [
     {
-      section: "Just Added",
+      category: "Just Added",
       items: [
         {
           id: "23",
@@ -150,7 +150,7 @@ export default async function Home() {
       ],
     },
     {
-      section: "Trending",
+      category: "Trending",
       items: [
         {
           id: "27",
@@ -212,12 +212,12 @@ export default async function Home() {
   return (
     <HomeLayout title="Morsache Clothing">
       <Slider />
-      <DisplayNewAndTrending defaultTabs={defaultTabs} />
+      <DisplayBySections defaultTabs={defaultTabs} />
       <DisplayProductsByCategory category={category[0]} />
-      <DisplayNewAndTrending defaultTabs={defaultTabs} />
+      <DisplayBySections defaultTabs={defaultTabs} />
       <DisplayProductsByCategory category={category[2]} />
       <AdsPromotions />
-      <DisplayNewAndTrending defaultTabs={defaultTabs} />
+      <DisplayBySections defaultTabs={defaultTabs} />
       <RecentlyViewed />
     </HomeLayout>
   );

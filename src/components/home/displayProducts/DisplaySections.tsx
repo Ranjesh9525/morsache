@@ -7,7 +7,7 @@ import Link from "next/link";
 import ProductCard from "@/components/general/ProductCard";
 
 type DefaultTabs = {
-  section: string;
+  category: string;
   items: {
     id: string;
     name: string;
@@ -19,7 +19,7 @@ type DefaultTabs = {
 type Props = {
   defaultTabs: DefaultTabs;
 };
-const DisplayNewAndTrending = ({ defaultTabs }: Props) => {
+const DisplayBySections = ({ defaultTabs }: Props) => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -40,7 +40,7 @@ const DisplayNewAndTrending = ({ defaultTabs }: Props) => {
               onClick={() => setActiveTab(index)}
             >
               {" "}
-              {item.section}
+              {item.category}
             </span>
           ))}
         </div>
@@ -53,7 +53,7 @@ const DisplayNewAndTrending = ({ defaultTabs }: Props) => {
         </div>
         <span className="w-full inline-flex items-center justify-center ">
           <Link
-            href={`/products/category/${defaultTabs[activeTab].section
+            href={`/products/category/${defaultTabs[activeTab].category
               .toLowerCase()
               .replaceAll(" ", "-")}`}
             className="border border-slate-400 p-2 px-6 mb-6 w-fit justify-self-center self-center items-center block text-center"
@@ -66,4 +66,4 @@ const DisplayNewAndTrending = ({ defaultTabs }: Props) => {
   );
 };
 
-export default DisplayNewAndTrending;
+export default DisplayBySections;

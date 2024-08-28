@@ -16,6 +16,7 @@ const ProductPreview = ({setPreview,preview}: Props) => {
   const [values, setValues] = React.useState<Product>();
    useEffect(()=>{
 router.refresh()
+// window.location.reload()
    },[preview])
 
   useEffect(() => {
@@ -24,7 +25,7 @@ router.refresh()
       setValues(JSON.parse(productDraft));
     } else {
       router.refresh();
-      // setPreview(false)
+      setPreview(false)
     }
   }, [preview]);
   return (
@@ -33,7 +34,7 @@ router.refresh()
         <ProductGallery product={values} />
         <ProductInfo product={values!} />
       </div>
-      <Recommendation />
+      <Recommendation tags={values?.tags!}/>
     </>
   );
 };

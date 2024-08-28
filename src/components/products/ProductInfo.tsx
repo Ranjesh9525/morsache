@@ -109,21 +109,21 @@ const ProductInfo = ({ product }: Props) => {
         )}
       </div>
       <div className="mt-5">
-     {product.salePrice ? (
+     {product?.salePrice ? (
   <h1 className="w-full text-[17px] ">
     {format(parseFloat(product?.salePrice))}
   </h1>
 ) : null} 
-<h1 className={`w-full ${product.salePrice ? "text-[14px] line-through  text-gray-400":"text-[17px]"}`}>
+<h1 className={`w-full ${product?.salePrice ? "text-[14px] line-through  text-gray-400":"text-[17px]"}`}>
   {format(parseFloat(product?.price))}
 </h1>
 
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
-      <div id="discounts" className="w-[280px] mt-5 ">
-      <div className="flex items-center justify-center gap-3 mb-3">
+      <div id="discounts" className="w-[280px] flex flex-col mt-5 ">
+    {product?.offers!.map((offer, index:number) => (   <div className="flex items-center  justify-center gap-3 mb-3">
   <CiDiscount1 color="#fea12f" size={35} />
-  {product?.offers!.map((offer, index:number) => (
+ 
     <p key={index} className="w-full text-[12px]">
       {offer.title} <br />
       {offer.effect === "flat" && (
@@ -137,8 +137,8 @@ const ProductInfo = ({ product }: Props) => {
       )}
       Code: <b>{offer.code}</b>{" "}
     </p>
-  ))}
-</div>
+ 
+</div> ))}
         {/* <div className="flex items-center justify-center gap-3 mb-3">
           <CiDiscount1 color="#fea12f" size={35} />
           <p className="w-full text-[12px]">
@@ -169,12 +169,12 @@ const ProductInfo = ({ product }: Props) => {
         </div> */}
       </div>
       <hr className="my-4" />
-      <h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">
+     {product?.variants?.length! >0 && <><h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">
         Variants
       </h1>
       <div id="variants" className="flex items-center gap-4">
-        {product?.variants &&
-          product?.variants.map((item, index) => {
+        {
+          product?.variants!.map((item, index) => {
             return (
               <Image
                 key={index}
@@ -190,7 +190,7 @@ const ProductInfo = ({ product }: Props) => {
               />
             );
           })}
-      </div>
+      </div></>}
       <div id="sizes" className="my-4 ">
         {selectedSize !== "" ? (
           <h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">
@@ -220,7 +220,7 @@ const ProductInfo = ({ product }: Props) => {
         </section>
       </div>
       <div id="buttons" className="my-4 w-full">
-        {!selectedSize || selectedVariant.length === 0 ? (
+        {!selectedSize || product?.variants?.length! > 0 && selectedVariant.length === 0 ? (
           <Button
             variant={"ghost"}
             className="w-full mb-3 py-6 bg-gray-100 cursor-text text-gray-500  font-medium tracking-wider"

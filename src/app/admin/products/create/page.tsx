@@ -33,7 +33,10 @@ import ProductPreview from "../../components/ProductPreview";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
-
+import { useQuery } from "@tanstack/react-query";
+import { FetchCategoriesNamesOnly } from "@/serverlessActions/_fetchActions";
+import { AdminGetAllOffers } from "@/serverlessActions/_adminActions";
+import { Offer } from "@/@types/products";
 
 type Props = {};
 
@@ -53,7 +56,7 @@ const Page = (props: Props) => {
     tags: z.array(z.string()).nonempty(),
     variants: z
       .array(z.object({ variant: z.string(), image: z.string() }))
-      .nonempty(),
+      .optional(),
     offers: z
       .array(
         z.object({
@@ -66,10 +69,10 @@ const Page = (props: Props) => {
       .optional(),
     images: z.array(z.string()).nonempty(),
     stock: z.string(),
-    payOnDelivery:z.boolean(),
+    payOnDelivery: z.boolean(),
     moreInformation: z.string().optional(),
   });
- const router = useRouter()
+  const router = useRouter();
   const variantInput = React.useRef<HTMLInputElement>(null);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [preview, setPreview] = React.useState(false);
@@ -84,9 +87,45 @@ const Page = (props: Props) => {
       tags: [],
       images: [],
       stock: "1",
-      payOnDelivery:true
+      payOnDelivery: true,
     },
   });
+
+  const {
+    data: categoryResponse,
+    isPending: categoryIsPending,
+    error: categoryNameError,
+  } = useQuery({
+    queryKey: ["category"],
+    queryFn: () => FetchCategoriesNamesOnly(),
+  });
+  const {
+    data: offerResponse,
+    isPending: offerIsPending,
+    error: offerError,
+  } = useQuery({
+    queryKey: ["offer"],
+    queryFn: () => AdminGetAllOffers(),
+  });
+
+  useEffect(()=>{
+    if(categoryNameError){
+      console.log(categoryNameError)
+      toast({
+        title:"Error fetching categories",
+        variant:"destructive",
+        description:<p>{categoryNameError?.message}</p>
+      })}
+    if(offerError){
+      console.log(offerError)
+      toast({
+        title:"Error fetching offers",
+        variant:"destructive",
+        description:<p>{offerError?.message}</p>
+      })
+    }
+
+  },[offerError,categoryNameError])
 
   function slugify(str: string) {
     str = str.replace(/^\s+|\s+$/g, ""); // trim
@@ -115,6 +154,8 @@ const Page = (props: Props) => {
     localStorage.setItem("product-draft", JSON.stringify(values));
     setPreview(true);
     console.log("submitted");
+
+
   }
 
   const handleFileChange = (e: any, field: string) => {
@@ -143,17 +184,17 @@ const Page = (props: Props) => {
     e.preventDefault();
     setDragging(false);
   };
-const SKUgenerator = (amount:number)=>{
-const characters = '1234567890qwertyuiopasdfghjklzxcvbnm';
-let random = ''
-for(let i= 0;i < amount; i++){
-  random += characters.charAt(Math.floor(Math.random()*characters.length))
-
-}
-// return charAt(Math.random*characters.length)
-      //  return Math.floor(Math.random() * amount).toString(36).substring(2, 9);
-      
-}
+  const SKUgenerator = (amount: number) => {
+    const characters = "1234567890qwertyuiopasdfghjklzxcvbnm";
+    let random = "";
+    for (let i = 0; i < amount; i++) {
+      random += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    // return charAt(Math.random*characters.length)
+    //  return Math.floor(Math.random() * amount).toString(36).substring(2, 9);
+  };
   const handleDrop = (e: any) => {
     e.preventDefault();
     setDragging(false);
@@ -215,9 +256,9 @@ for(let i= 0;i < amount; i++){
     "polyester",
     "denim",
     "floral",
-    "plaid"
-];
-  const sizes = ["xxl","xl", "l", "m","sm","xs"];
+    "plaid",
+  ];
+  const sizes = ["xxl", "xl", "l", "m", "sm", "xs"];
   const offers = [
     {
       title: "10% off",
@@ -249,7 +290,7 @@ for(let i= 0;i < amount; i++){
     },
   ];
   if (preview) {
-    return <ProductPreview preview={preview}  setPreview={setPreview}/>;
+    return <ProductPreview preview={preview} setPreview={setPreview} />;
   }
 
   return (
@@ -336,8 +377,8 @@ for(let i= 0;i < amount; i++){
                       Category
                     </h1>
                     <FormDescription className="text-[12px]">
-                      Please fill in a category, use a comma &quot;,&quot; to insert more
-                      than one or select from below
+                      Please fill in a category, use a comma &quot;,&quot; to
+                      insert more than one or select from below
                     </FormDescription>
                     <FormControl>
                       <Input
@@ -346,24 +387,30 @@ for(let i= 0;i < amount; i++){
                       />
                     </FormControl>
                     <div className="flex gap-2">
-                      {categories.map((item, index) => (
-                        <Button
-                          type="button"
-                          variant={
-                            field.value.includes(item) ? "default" : "outline"
-                          }
-                          onClick={() => {
-                            const updatedValue = updateSelectedOptionArray(
-                              field.value,
-                              item
-                            );
-                            field.onChange(updatedValue);
-                          }}
-                          key={index}
-                        >
-                          {item}
-                        </Button>
-                      ))}
+                      {categoryIsPending ? (
+                        <ClipLoader size={20}/>
+                      ) : categoryResponse.data ? (
+                        categoryResponse?.data.map((item:{_id:string,name:string}, index:number) => (
+                          <Button
+                            type="button"
+                            variant={
+                              field.value.includes(item.name) ? "default" : "outline"
+                            }
+                            onClick={() => {
+                              const updatedValue = updateSelectedOptionArray(
+                                field.value,
+                                item.name
+                              );
+                              field.onChange(updatedValue);
+                            }}
+                            key={index}
+                          >
+                            {item.name}
+                          </Button>
+                        ))
+                      ) : (
+                        <p>Couldnt fetch categories</p>
+                      )}
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -378,8 +425,8 @@ for(let i= 0;i < amount; i++){
                       sizes
                     </h1>
                     <FormDescription className="text-[12px]">
-                      Please fill in a size, use a comma &quot;,&quot; to insert more than
-                      one or select from below
+                      Please fill in a size, use a comma &quot;,&quot; to insert
+                      more than one or select from below
                     </FormDescription>
                     <FormControl>
                       <Input
@@ -436,7 +483,7 @@ for(let i= 0;i < amount; i++){
                   </FormItem>
                 )}
               />
-          
+
               <FormField
                 control={form.control}
                 name={"variants" as never}
@@ -459,8 +506,9 @@ for(let i= 0;i < amount; i++){
                             Input a name and upload a picture
                           </DialogTitle>
                           <DialogDescription>
-                            This will be displayed in the variants section of the products
-                            if the variant is a product in the store, just paste the link in the input field below
+                            This will be displayed in the variants section of
+                            the products if the variant is a product in the
+                            store, just paste the link in the input field below
                           </DialogDescription>
                         </DialogHeader>
                         <div className="w-full space-y-4">
@@ -487,7 +535,7 @@ for(let i= 0;i < amount; i++){
                                 reader.onload = (e: any) => {
                                   if (reader.readyState === 2) {
                                     form.setValue("variants", [
-                                      ...form.getValues("variants"),
+                                      ...form.getValues("variants")!,
                                       {
                                         variant: variantInput!.current!.value,
                                         image: reader.result as string,
@@ -516,7 +564,7 @@ for(let i= 0;i < amount; i++){
                             form.setValue(
                               "variants",
                               form
-                                .getValues("variants")
+                                .getValues("variants")!
                                 .filter(
                                   (i: any) => i.variant !== item.variant
                                 ) as any
@@ -641,7 +689,7 @@ for(let i= 0;i < amount; i++){
                   </FormItem>
                 )}
               />
-                  <FormField
+              <FormField
                 control={form.control}
                 name={"payOnDelivery" as never}
                 render={({ field }: { field: any }) => (
@@ -654,12 +702,12 @@ for(let i= 0;i < amount; i++){
                       Default is true
                     </FormDescription>
                     <FormControl>
-                    <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
-                 
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -680,7 +728,7 @@ for(let i= 0;i < amount; i++){
                     <FormControl></FormControl>
 
                     <div className="max-w-full mx-auto  overflow-hidden hover:overflow-x-auto whitespace-nowrap">
-                      {offers.map((item, index) => (
+                      {offerIsPending ? <ClipLoader size={20}/> : offerResponse.data ? offerResponse.data.map((item:Offer, index:number) => (
                         <div
                           key={index}
                           onClick={() => {
@@ -727,7 +775,7 @@ for(let i= 0;i < amount; i++){
                             <p>Effect: {item.effect}</p>
                           </span>
                         </div>
-                      ))}
+                      )):<p>Something went wrong fetching offers</p>}
                     </div>
 
                     <FormMessage />
@@ -743,8 +791,8 @@ for(let i= 0;i < amount; i++){
                       tags
                     </h1>
                     <FormDescription className="text-[12px]">
-                      Please fill in a Tag, use a comma &quot;,&quot; to insert more than
-                      one or select from below
+                      Please fill in a Tag, use a comma &quot;,&quot; to insert
+                      more than one or select from below
                     </FormDescription>
                     <FormControl>
                       <Input
