@@ -140,7 +140,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
       />
       <div>
         {/* <Sidebar sideNav={sideNav} setSideNav={setSideNav} /> */}
-        <div className="min-h-screen w-full relative">
+        <div className="min-h-screen w-full relative overflow-hidden">
           {/* <HeaderAds /> */}
           {/* <Navbar scrolling={scrolling} setSideNav={setSideNav} /> */}
           <div className="container mt-9 space-y-3">
@@ -184,7 +184,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <main className="relative ">{children}</main>
+          <main className="relative overflow-hidden">{children}</main>
           <Footer />
         </div>
       </div>

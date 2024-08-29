@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { UserIsNewUser } from "@/serverlessActions/_userActions";
 import { ClipLoader } from "react-spinners";
+import Link from "next/link";
 
 type Props = {
   email: string;
@@ -22,6 +23,9 @@ type Props = {
 };
 
 const OTPVerification = ({ email, setEmail }: Props) => {
+  const [requestCountdown,setRequestCountdown] = useState<number>(0)
+  const [timesRequested,setTimesRequested] = useState<number>(1)
+  const [countdown, setCountdown] = useState(timesRequested*60);
   const [isNewUser, setIsNewUser] = useState(false);
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,20 +91,57 @@ const OTPVerification = ({ email, setEmail }: Props) => {
       );
     }
   }, [isNewUser]);
+  useEffect(() => {
+    let timer:any;
+
+    const resetTimer = () => {
+        if (timer) {
+            clearInterval(timer);
+        }
+
+        setCountdown(timesRequested * 60); 
+        timer = setInterval(() => {
+            setCountdown((prevCountdown) => {
+                if (prevCountdown === 0) {
+                    clearInterval(timer);
+                    // Handle requestc otpp enable resend OTP button
+                }
+                return prevCountdown > 0 ? prevCountdown - 1 : 0;
+            });
+        }, 1000); 
+    };
+
+    resetTimer(); 
+
+    return () => clearInterval(timer); 
+}, [timesRequested]);
+
+  useEffect(()=>{
+    if(timesRequested > 2){
+toast({
+
+  title:'Need help signing in?',
+  description:<p>Contact support <Link href="/support" className="underline text-blue-400">support</Link></p>
+})
+    }
+  },[])
+  const formattedCountdown = new Date(countdown * 1000).toISOString().substr(14, 5);
 
   return (
     <div
       id="otp-form-container"
-      className="min-h-screen items-start justify-center flex  lg:p-12 sm:p-6"
+      className="md:min-h-screen min-h-[70vh] items-start justify-center flex  md:p-12 p-6"
     >
       {isFetching ? (
         <ClipLoader size={40} />
       ) : (
         <form
           onSubmit={handleOTPVerification}
-          className="flex flex-col w-full  justify-center items-center max-w-[400px] space-y-4"
+      
+
+          className="flex flex-col w-full  justify-center items-center  md:max-w-[400px]  px-6 md:px-4  space-y-4 md:space-y-8"
         >
-          <h1 className="uppercase  text-center tracking-tight font-semibold text-3xl">
+          <h1 className="uppercase  text-center tracking-tight font-semibold  lg:text-3xl text-xl">
             Enter otp
           </h1>
           <p className="text-[12px] text-center text-gray-500 mb-2">
@@ -122,7 +163,7 @@ const OTPVerification = ({ email, setEmail }: Props) => {
             </InputOTPGroup>
           </InputOTP>
 
-          <span>
+          <span className="w-full">
             <Button
               type="submit"
               disabled={isSubmitting || !code || code.length !== 6}
@@ -130,10 +171,10 @@ const OTPVerification = ({ email, setEmail }: Props) => {
             >
               {isSubmitting ? "Verifying..." : "Verify"}
             </Button>
-            <p className="text-[12.5px] mt-3 w-full capitalize text-center">
-              Code sent to your email becomes invalid after{" "}
-              <strong>3 minutes</strong>
-            </p>
+           {countdown === 0 ? <span className="w-full text-[12.5px] mt-3 text-center" onClick={()=>   setTimesRequested(timesRequested+1)}>Request</span> : <p className="text-[12.5px] mt-3 w-full text-center">
+              Code not recieved ? Request a new one in <br />
+              <strong>{formattedCountdown}</strong>
+            </p>}
           </span>
           <p
             className="text-[13px] underline  hover:text-gray-700 cursor-pointer"

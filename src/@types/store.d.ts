@@ -1,12 +1,18 @@
-import { Document } from "mongoose";
+import { Document, ObjectId } from "mongoose";
 
 interface Store extends Document  {
   carouselImages: string[];
   featuredCategories: {
-    section: string;
-  } | {
-    title: string;
-    items: string[];
+    _id?: string;
+    type: {
+      type: string;
+      enum: ["categoriesWithProducts", "multipleCategories"];
+      required: true;
+    };
+    name?: string;
+    section?: string;
+    categories?: string[];
+    categoriesId?: string[];
   }[];
   offerImage: string;
   slidingOffers: {

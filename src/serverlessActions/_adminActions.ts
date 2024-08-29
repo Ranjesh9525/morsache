@@ -349,6 +349,7 @@ export const AdminUpdateStoreData = async (data: any) => {
         }
       });
       storeData.carouselImages = NewImages;
+      await storeData.save()
     }
     if (featuredCategories) {
       console.log(featuredCategories);

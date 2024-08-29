@@ -1,3 +1,4 @@
+"use client";
 import Navbar from "@/components/general/navbar/Navbar";
 import AdsPromotions from "@/components/home/AdsPromotions";
 import DisplayBySections from "@/components/home/displayProducts/DisplaySections";
@@ -8,6 +9,12 @@ import Slider from "@/components/home/slider/Slider";
 import HomeLayout from "@/components/layouts/HomeLayout";
 import Image from "next/image";
 import Protected from "@/_hooks/useProtected";
+import { toast } from "@/components/ui/use-toast";
+import { useContext, useEffect, useState } from "react";
+import { StoreContext } from "@/context/storeContext";
+import { FetchCategoriesById } from "@/serverlessActions/_fetchActions";
+import { FeaturedCategories } from "@/@types/categories";
+import ProductCard from "@/components/general/ProductCard";
 // import { getServerSession } from "next-auth";
 // import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // import { redirect } from "next/navigation";
@@ -26,11 +33,11 @@ import Protected from "@/_hooks/useProtected";
 // const page = async(props: Props) => {
 //
 
-export default async function Home() {
+export default function Home() {
   // await authenticationPrecheck()
   const category = [
     {
-      title: "Something for the summer season",
+      section: "Something for the summer season",
       items: [
         {
           name: "Cargos",
@@ -51,7 +58,7 @@ export default async function Home() {
       ],
     },
     {
-      title: "Something for the winter season",
+      section: "Something for the winter season",
       items: [
         {
           name: "Cargos",
@@ -72,7 +79,7 @@ export default async function Home() {
       ],
     },
     {
-      title: "Trending Now",
+      section: "Trending Now",
       items: [
         {
           name: "Cargos",
@@ -208,14 +215,151 @@ export default async function Home() {
     },
   ];
 
+  const [featuredCategories, setFeaturedCategories] =
+    useState<FeaturedCategories | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [featuredCategoriesData, setFeaturedCategoriesData] =
+    useState<any>(null);
+  const defaultt = [
+    {
+      type: "categoriesWithProducts",
+      name: "categories 1",
+      categories: ["66c87e9595331f958fd232f8", "66bf23775f02cf03f026a348"],
+    },
+    {
+      type: "multipleCategories",
+      section: "Title 1",
+      categoriesId: ["66bf23775f02cf03f026a348"],
+    },
+    {
+      type: "categoriesWithProducts",
+      name: "categories 2",
+      categories: ["66c87e9595331f958fd232f8", "66bf23775f02cf03f026a348"],
+    },
+    {
+      type: "multipleCategories",
+      section: "Title 2",
+      categoriesId: ["66bf23775f02cf03f026a348"],
+    },
+    {
+      type: "categoriesWithProducts",
+      name: "categories 3",
+      categories: ["66c87e9595331f958fd232f8"],
+    },
+  ];
+
+  const {
+    store,
+    storeDataIsPending,
+    storeDataError,
+    storeDataIsError,
+    refetchStoreData,
+  } = useContext(StoreContext)!;
+
+  async function fetchCategories() {
+    const allData: any[] = [];
+
+    if (featuredCategories === null || featuredCategories.length === 0) return;
+    setIsLoading(true);
+    await Promise.all(
+      featuredCategories!.map(async (item) => {
+        if ("name" in item && item.categories) {
+          const Categories = await Promise.all(
+            item.categories.map(async (categoryId) => {
+              const response = await FetchCategoriesById({
+                type: "category",
+                id: categoryId,
+              });
+              return response?.data;
+            })
+          );
+
+          allData.push({
+            name: item.name,
+            categories: Categories,
+          });
+        }
+
+        if ("section" in item && item.categoriesId) {
+          const sectionCategories = await Promise.all(
+            item.categoriesId.map(async (categoryId) => {
+              const response = await FetchCategoriesById({
+                type: "section",
+                id: categoryId,
+              });
+
+              return response?.data;
+            })
+          );
+
+          allData.push({
+            section: item.section,
+            items: sectionCategories.filter(Boolean), // Filter out undefined values
+          });
+        }
+      })
+    );
+    setIsLoading(false);
+    console.log("allData", allData);
+    setFeaturedCategoriesData(allData);
+  }
+  useEffect(() => {
+    if (featuredCategories !== null) {
+      fetchCategories();
+    }
+  }, [featuredCategories]);
+  useEffect(() => {
+    if (store) {
+      setFeaturedCategories(store!?.featuredCategories!);
+    }
+  }, [store]);
   // <Protected>
   return (
     <HomeLayout title="Morsache Clothing">
       <Slider />
-      <DisplayBySections defaultTabs={defaultTabs} />
-      <DisplayProductsByCategory category={category[0]} />
-      <DisplayBySections defaultTabs={defaultTabs} />
-      <DisplayProductsByCategory category={category[2]} />
+      {isLoading || storeDataIsPending ? (
+        <>
+          <div id="tab-content" className="w-full overflow-x-auto mb-8">
+            <div
+              className=" gap-x-4 items-start flex whitespace-nowrap ml-[17px] lg:ml-0"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
+              {Array.from({ length: 5 }).map((_, index) => (
+                <ProductCard
+                  item={null}
+                  index={index}
+                  key={index}
+                  isLoading={true}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div id="section_wrapper">
+          {featuredCategoriesData && featuredCategoriesData?.length > 0 ? (
+            featuredCategoriesData.map((item: any, index: number) => {
+              if ("name" in item) {
+                return (
+                  <DisplayBySections
+                    key={index}
+                    defaultTabs={item.categories!}
+                  />
+                );
+              }
+              if ("section" in item) {
+                return (
+                  <DisplayProductsByCategory key={index} category={item} />
+                );
+              }
+                  
+                  return <div key={index}></div>;
+            })
+          ) : (
+            <div></div>
+          )}
+        </div>
+      )}
       <AdsPromotions />
       <DisplayBySections defaultTabs={defaultTabs} />
       <RecentlyViewed />

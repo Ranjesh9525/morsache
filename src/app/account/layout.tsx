@@ -40,7 +40,7 @@ interface SettingsLayoutProps {
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (
     <HomeLayout title="Account - Morsache Clothing">
-      <div className="md:hidden">
+      <div className="hidden">
         <Image
           src="/examples/forms-light.png"
           width={1280}
@@ -56,7 +56,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
           className="hidden dark:block"
         />
       </div>
-      <div className="hidden space-y-6 p-10 pb-16 md:block">
+      <div className=" space-y-6 md:p-10 p-6  pb-16 block">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Account</h2>
           <p className="text-muted-foreground">

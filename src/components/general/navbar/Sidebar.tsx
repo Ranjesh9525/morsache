@@ -16,6 +16,8 @@ import { MdLogout } from "react-icons/md";
 import { useQuery } from "@tanstack/react-query";
 import { FetchCategoriesNamesOnly } from "@/serverlessActions/_fetchActions";
 import { ClipLoader } from "react-spinners";
+import { useMediaQuery } from "@react-hook/media-query";
+
 
 type Props = {
   sideNav: { open: boolean };
@@ -24,6 +26,7 @@ type Props = {
 
 const Sidebar = ({ sideNav, setSideNav }: Props) => {
   const [openAccordions, setOpenAccordions] = useState<number[]>([]);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const { data: session }: any = useSession();
   const pathname = usePathname();
   const [navItems, setNavItems] = useState<any[]>([]);
@@ -120,6 +123,24 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
   };
 
   useEffect(() => {
+    if(isMobile ){
+      userNavItems[0].section.push(
+        {
+          name: "Search",
+          path: "/search",
+          showIfNotLoggedIn: true,
+          exact: true,
+        },
+      )
+      userNavItems[2].section.push(
+        {
+          name: "Wishlist",
+          path: "/account/wishlist",
+          showIfNotLoggedIn: true,
+          exact: true,
+        },
+      )
+    }
       setNavItems(userNavItems);
   }, []);
 
@@ -135,7 +156,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
     >
       <motion.div
         initial={"closed"}
-        className={` h-screen w-[380px] bg-white  `}
+        className={` h-screen w-[380px]  bg-white  `}
         variants={sideNavVariants}
         animate={sideNav.open ? "open" : "closed"}
       >

@@ -78,7 +78,7 @@ export const getProducts = async () => {
 export const GetProductsByCategory = async (category: string) => {
   try {
     await connectDB();
-    const products = await ProductsModel.find({ category: category });
+    const products = await ProductsModel.find({ category: category }).sort({createdAt: -1});;
     return Response("products", 200, true, products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -146,7 +146,7 @@ export const FetchProductsFromFilterData = async (
 
     // Check if data array is empty, return all products
     if (data?.length === 0) {
-      const allProducts = await ProductsModel.find();
+      const allProducts = await ProductsModel.find().sort({createdAt: -1});;
       return Response("All products", 200, true, allProducts);
     }
 
@@ -247,13 +247,8 @@ export const FetchCategoriesById = async ({
       }
       const products = await ProductsModel.find({
         category: { $elemMatch: { $eq: category.name } },
-      }).select("name")
-      .select("slug")
-      .select("salePrice")
-      .select("price")
-      .select("tags")
-      .select("sizes")
-      .select("images")
+    }).select("name slug salePrice price tags sizes images")
+    .sort({createdAt: -1});
       const data = { category: category?.name, items:products };
       // console.log(data)
       return Response("category", 200, true, data);

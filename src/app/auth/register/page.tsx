@@ -28,6 +28,7 @@ type Props = {};
 
 const Page = (props: Props) => {
   const router = useRouter();
+  // const[showPassword,setShowPassword]= useState(false)
   const callbackUrl = useSearchParams().get("callbackUrl");
   const formSchema = z.object({
     firstName: z.string().min(2, {
@@ -96,16 +97,19 @@ const Page = (props: Props) => {
     <HomeLayout title="Create an account - Morsache Clothing">
       <div
         id="auth-container"
-        className="flex flex-col min-h-screen  items-center lg:p-12 sm:p-6"
+        className="flex flex-col min-h-screen  items-center md:p-12 p-6"
       >
-        <h1 className="text-2xl uppercase font-semibold text-center mt-4 mb-12">
+        {/* <h1 className="text-2xl uppercase font-semibold text-center mt-4 mb-12"> */}
+        <h1 className="uppercase font-semibold tracking-tight lg:text-2xl mt-4 text-center mb-12 text-xl">
+
           Create your account
         </h1>
         <DropdownMenuSeparator />
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="w-[400px] space-y-8"
+            className="w-full md:max-w-[400px]  px-6 md:px-4  space-y-4 md:space-y-8"
+
           >
             <FormField
               control={form.control}

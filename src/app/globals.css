@@ -10,7 +10,8 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 0 0% 33%;
+    --primary: 0 0% 33%; /*#545454*/
+    --primary-dark: 0 2% 23%; /*#3b3838*/
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -73,6 +74,8 @@ title{
   text-transform: capitalize !important;
 }
 
+
+
 .embla {
   position: relative;
   margin: auto;
@@ -84,7 +87,7 @@ title{
   --text-body: 0 0% 0%;
 }
 .embla__viewport {
-  height: var(--slide-height);
+  /* height: var(--slide-height); */
   position: relative;
   overflow: hidden;
 }
@@ -104,7 +107,7 @@ title{
   /* padding-left: var(--slide-spacing); */
   background: white;
   width: 100vw;
-  height: var(--slide-height);
+  /* height: var(--slide-height); */
 }
 .embla__slide__number {
   box-shadow: inset 0 0 0 0.2rem var(--detail-medium-contrast);

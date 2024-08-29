@@ -121,10 +121,10 @@ const ProductInfo = ({ product }: Props) => {
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
       <div id="discounts" className="w-[280px] flex flex-col mt-5 ">
-    {product?.offers!.map((offer, index:number) => (   <div className="flex items-center  justify-center gap-3 mb-3">
+    {product?.offers!.map((offer, index:number) => (   <div key={index} className="flex items-center  justify-center gap-3 mb-3">
   <CiDiscount1 color="#fea12f" size={35} />
  
-    <p key={index} className="w-full text-[12px]">
+    <p  className="w-full text-[12px]">
       {offer.title} <br />
       {offer.effect === "flat" && (
         <> Get Flat {offer.discount}% Off! <br /></>

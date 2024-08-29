@@ -79,19 +79,19 @@ const SigninForm = ({ setEmail }: Props) => {
   return (
     <div
       id="auth-container"
-      className="flex flex-col min-h-screen  items-center lg:p-12 sm:p-6"
+      className="flex flex-col md:min-h-screen min-h-[80vh] items-center md:p-12 p-6"
     >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full max-w-[400px] space-y-8"
+          className="w-full md:max-w-[400px]  px-6 md:px-4  space-y-4 md:space-y-8"
         >
           <FormField
             control={form.control}
             name={"email" as never}
             render={({ field }) => (
               <FormItem className="items-center flex w-full flex-col justify-center">
-                <h1 className="uppercase font-semibold tracking-tight text-3xl">
+                <h1 className="uppercase font-semibold tracking-tight lg:text-3xl text-xl">
                   Signin With Email
                 </h1>
                 <FormDescription className="text-[12px]">
@@ -126,12 +126,12 @@ const SigninForm = ({ setEmail }: Props) => {
           </div>
         </form>
       </Form>
-      <span className="mx-auto my-4 flex w-[20%] items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400">
+      <span className="mx-auto my-4 flex lg:w-[20%] w-full px-6 md:px-0 text-[12.5px] md:text-base  items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-300 md:before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow md:after:bg-stone-400 after:bg-stone-300">
         or continue with
       </span>
       <Button
         variant="outline"
-        className="w-[20%] cursor-pointer gap-4 inline-flex items-center justify-center"
+        className="lg:w-[20%] cursor-pointer gap-4 inline-flex items-center justify-center"
       >
         <FcGoogle
           title="Google"

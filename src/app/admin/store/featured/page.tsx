@@ -38,23 +38,10 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
+import { FeaturedCategories } from "@/@types/categories";
 
 type Props = {};
-type SectionCategory = {
-  _id: string;
-  section: string;
-  categoriesId: string[];
-};
 
-type TitleCategory = {
-  _id: string;
-  name: string;
-  categories: string[];
-};
-
-type FeaturedCategory = SectionCategory | TitleCategory;
-
-type FeaturedCategories = FeaturedCategory[];
 const Page = (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -134,7 +121,7 @@ const Page = (props: Props) => {
       featuredCategories!.map(async (item) => {
         if ("name" in item) {
           const Categories = await Promise.all(
-            item.categories.map(async (categoryId) => {
+            item.categories!.map(async (categoryId) => {
               console.log(categoryId);
               const response = await FetchCategoriesById({
                 type: "category",
@@ -151,9 +138,9 @@ const Page = (props: Props) => {
           });
         }
 
-        if ("section" in item) {
+        if ("section" in item ) {
           const sectionCategories = await Promise.all(
-            item.categoriesId.map(async (categoryId) => {
+            item.categoriesId!.map(async (categoryId) => {
               const response = await FetchCategoriesById({
                 type: "section",
                 id: categoryId,
@@ -174,6 +161,7 @@ const Page = (props: Props) => {
     console.log("allData", allData);
     setFeaturedCategoriesData(allData);
   }
+ 
   // useEffect(() => {
   //   // fetchCategories();
   //   const req = { featuredCategories: defaultt };
@@ -595,7 +583,7 @@ const Page = (props: Props) => {
                 );
                 // console.log(EditableData);
                 return (
-                  <section className="relative">
+                  <section key={index} className="relative">
                     <section
                       className="absolute top-10 items-center gap-2 transition-all  p-2 px-6 border-primary hover:scale-[105%] border rounded-md right-10 cursor-pointer inline-flex font-semibold tracking-tight "
                       onClick={() => {
@@ -609,14 +597,14 @@ const Page = (props: Props) => {
                     <section
                       className="absolute top-10 hover:scale-[105%] transition-all text-white p-2 px-4 gap-1 rounded-md bg-red-500 left-10 items-center cursor-pointer inline-flex tracking-tight "
                       onClick={() => {
-                        handleCategoryDelete(EditableData!._id);
+                        handleCategoryDelete(EditableData!._id!);
                       }}
                     >
                       <Trash className="" color="#fff" size={18} />
                       Delete
                     </section>
                     <DisplayBySections
-                      key={index}
+                     
                       defaultTabs={item.categories!}
                     />
                   </section>
@@ -627,11 +615,11 @@ const Page = (props: Props) => {
                   (i) => "section" in i && i.section === item.section
                 );
                 return (
-                  <section className="relative">
+                  <section  key={index} className="relative">
                     <section
                       className="absolute top-10 hover:scale-[105%] transition-all text-white p-2 px-4 gap-1 rounded-md bg-red-500 left-10 items-center cursor-pointer inline-flex tracking-tight "
                       onClick={() => {
-                        handleCategoryDelete(EditableData!._id);
+                        handleCategoryDelete(EditableData!._id!);
                       }}
                     >
                       <Trash className="" color="#fff" size={18} />
@@ -647,11 +635,11 @@ const Page = (props: Props) => {
                       <PencilIcon className="" size={18} />
                       Edit
                     </section>
-                    <DisplayProductsByCategory key={index} category={item} />
+                    <DisplayProductsByCategory  category={item} />
                   </section>
                 );
               }
-              return <div></div>;
+              return <div  key={index}></div>;
             })
           ) : (
             <p className="text-center w-full">

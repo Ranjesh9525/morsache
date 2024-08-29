@@ -17,9 +17,9 @@ const Footer = (props: Props) => {
   return (
     <div className="min-h-[40vh]  bg-white border-t border-t-gray-200">
       <div className="p-9">
-        <section className="grid grid-cols-4 gap-6 py-4">
+        <section className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 py-4">
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+            <h1 className="text-[14px] uppercase underline tracking-wider mb-4">
               Offline Store
             </h1>
             <ul className="text-[12px] tracking-wide">
@@ -29,7 +29,7 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+            <h1 className="text-[14px] underline uppercase tracking-wider mb-4">
               Get to know us
             </h1>
             <ul className="text-[12px] tracking-wide">
@@ -48,7 +48,7 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+            <h1 className="text-[14px] underline uppercase tracking-wider mb-4">
               TRACK OR RETURN/EXCHANGE ORDER
             </h1>
             <ul className="text-[12px] tracking-wide">
@@ -64,7 +64,7 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] uppercase tracking-wider mb-4">
+            <h1 className="text-[14px] underline uppercase tracking-wider mb-4">
               CUSTOMER CARE
             </h1>
             <ul className="text-[12px] tracking-wide">
@@ -79,7 +79,7 @@ const Footer = (props: Props) => {
 
         <section className="my-6">
           <span>
-            <h1 className="text-[15px] uppercase tracking-wider mb-4">
+            <h1 className="text-[15px]  uppercase tracking-wider mb-4">
               {" "}
               Sign up and save
             </h1>
