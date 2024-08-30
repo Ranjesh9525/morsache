@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator"
-import { DisplayForm } from "./display-form"
+import WishlistForm  from "./wishlistForm"
 
 export default function SettingsDisplayPage() {
   return (
@@ -13,6 +13,7 @@ export default function SettingsDisplayPage() {
       </div>
       <Separator />
       {/* <DisplayForm /> */}
+      <WishlistForm/>
     </div>
   )
 }

@@ -8,29 +8,64 @@ import UsersModel from "../models/User";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import bcrypt from "bcryptjs"
 import { Response } from "./responseClass";
+import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 
-export const UserAddToWishList = async (userId: string, productId: string) => {
+export const UserAddToWishList = async ({ productId}:{productId:string}) => {
   try {
     await connectDB();
     const product = await ProductsModel.findOne({ _id: productId });
     if (!product) {
       throw new Error("Product not found");
     }
+    const session: any = await getServerSession(authOptions);
+    const userId = session!?.user!?._id;
     const user = await UsersModel.findOne({ _id: userId });
     if (!user) {
       throw new Error("User not found");
     }
-    if (user.wishList.includes(productId)) {
-      throw new Error("Product already in wishlist");
+    const wishlistIsExist = user?.wishlist.find((item:any)=>{
+      return item.productId === productId
+    })
+    if (user?.wishlist && wishlistIsExist) {
+      return { message: "You already have this in your wishlist", success: true };
     }
-    user.wishList.push(productId);
+    const prodId = {productId:productId}
+    user.wishlist = [prodId,...user?.wishlist]
+    console.log(user)
     await user.save();
-    return { message: "Product added to wishlist successfully", success: true };
+
+
+    return { message: "Added to wishlist ❤", success: true };
   } catch (error) {
     console.error("Error adding product to wishlist:", error);
     throw new Error("Error adding product to wishlist:");
   }
 };
+
+export const UserGetWishlists = async() => {
+  try{
+  await connectDB()
+  const session: any = await getServerSession(authOptions);
+  const userId = session!?.user!?._id;
+  const user = await UsersModel.findOne({ _id: userId });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const products = await Promise.all(
+    (user?.wishlist || []).map(async (item: any) => {
+      const product = await FetchSingleProductByIdOptimized(item?.productId);
+      return product.data;
+    })
+  );
+  console.log(products,user?.wishlist)
+  // If there is only one product, convert it to an array
+ 
+  
+  return Response("wishlist fetched", 200, true, products);
+}catch(error){
+  console.error("Error fetching wishlist:", error);
+  throw new Error("Error fetching wishlist");
+}}
 
 export const UserUpdateShippingAddress = async ({
   userId,

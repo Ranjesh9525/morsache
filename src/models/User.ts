@@ -132,10 +132,7 @@ const userSchema = new mongoose.Schema(
     carts: [cartSchema],
     wishlist: [
       {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-        },
+        productId:String,
       },
     ],
     sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Session" }],

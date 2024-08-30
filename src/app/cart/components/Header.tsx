@@ -12,7 +12,7 @@ const Header = ({ cart }: Props) => {
     <div className="w-full ">
       <h1 className="text-3xl font-semibold w-full mb-10 ">Your Cart</h1>
       <div className="w-full ">
-        <span className="w-full flex -items-center justify-between mb-1 ">
+        <span className="w-full flex items-center justify-between mb-1 ">
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-900">
             continue shopping
           </Link>

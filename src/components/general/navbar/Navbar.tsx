@@ -109,7 +109,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
               </Link>
             ) : (
               <Link href={"/auth/login"}>
-                <User className="w-4 h-4 lg:h-6 lg:w-6" />{" "}
+                <User className="w-5 h-5 lg:h-6 lg:w-6" />{" "}
               </Link>
             )}
 
@@ -129,7 +129,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
                   `after:bg-red-500 lg:after:p-[0.15rem] after:p-[0.08rem] lg:after:px-[0.45rem] after:px-[0.30rem] after:absolute after:text-white lg:after:top-[-12px] after:top-[-9px] after:right-[-10.5px] lg:after:right-[-12.5px] lg:after:text-[11px] after:text-[9px] after:rounded-full lg:after:width-1 after:width-[0.3px] after:height-[0.3px] lg:after:height-1 after:content-[attr(data-content)]`
               )}
             >
-              <ShoppingBagIcon className="w-4 h-4 lg:h-6 lg:w-6" />
+              <ShoppingBagIcon className="w-5 h-5 lg:h-6 lg:w-6" />
             </Link>
           </span>
         </div>

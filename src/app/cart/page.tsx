@@ -28,12 +28,12 @@ const Page = (props: Props) => {
  // console.log(cart);
   return (
     <HomeLayout title="Cart - Morsache Clothing">
-      <div className="min-h-screen p-9 ">
+      <div className="min-h-screen md:p-9 p-5">
         <Header cart={cart} />
         {cart.items.length < 1 ? (
           <EmptyCart />
         ) : (
-          <div className="grid grid-cols-10  py-4 gap-x-4">
+          <div className="md:grid md:grid-cols-10 flex flex-col py-4 gap-x-4">
             <section className="col-span-7 space-y-2">
               {cart.items.length > 0 &&
                 cart.items.map((item, index) => (

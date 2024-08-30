@@ -23,8 +23,8 @@ const ProductGallery = ({ product }: Props) => {
   const [imageIndex, setImageIndex] = useState(0);
   return (
     <div id="product-gallery" className=" relative ">
-      <div className="grid grid-cols-5 gap-x-2 sticky top-0">
-        <section className="col-span-1 flex flex-col gap-6 pl-5 ">
+      <div className="md:grid md:grid-cols-5 flex flex-col-reverse gap-2 mb-6 md:mb-0 sticky top-0">
+        <section className="md:col-span-1  flex md:flex-col gap-6 md:pl-5 ">
           {product?.images.map((item: string, index: number) => {
             return (
               <Image
@@ -41,7 +41,7 @@ const ProductGallery = ({ product }: Props) => {
             );
           })}
         </section>
-        <section className="col-span-4 pr-5">
+        <section className="md:col-span-4 row-span-4 pr-5">
           <Image
             src={product?.images[imageIndex]}
             alt=""

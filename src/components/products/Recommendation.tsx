@@ -34,7 +34,7 @@ const Recommendation = ({tags}: Props) => {
   className="border-b border-b-gray-200 p-9 mt-6 px-16 "
 >
   <h1 className="w-full text-center text-2xl font-semibold uppercase my-6">See Also</h1>
-  <section id="products" className="grid grid-cols-5 gap-4 gap-y-7">
+  <section id="products" className="grid md:grid-cols-5 grid-cols-3 gap-4 gap-y-7">
         {isPending ? sampleProducts.map((item, index) => (
               <ProductCard
                 item={item}

@@ -214,7 +214,7 @@ const DisplayProducts = ({
         className="flex items-center justify-between w-full mb-7"
       >
         <section className="text-[14px] flex items-center gap-2">
-          <h1> View as</h1>
+          <h1 className="md:block hidden"> View as</h1>
           <span
             className="flex border p-[0.15rem] cursor-pointer"
             onClick={() => setViewAs(2)}
@@ -279,7 +279,7 @@ const DisplayProducts = ({
         <section>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <span className="w-44 cursor-pointer border p-3 py-[0.65rem] rounded-sm text-[13px] border-gray-300 justify-between gap-6 inline-flex items-center ">
+              <span className="md:w-44 cursor-pointer border p-3 py-[0.40rem] md:py-[0.65rem] rounded-sm text-[12px] md:text-[13px] border-gray-300 justify-between gap-6 inline-flex items-center ">
                 Sort <ChevronDown size={18} />
               </span>
             </DropdownMenuTrigger>

@@ -10,9 +10,10 @@ type Props = {
   index: number;
   isLoading?: boolean;
   nameOnly?: true;
+  showPriceWhenNameOnly?: true;
 };
 
-const ProductCard = ({ item, index, isLoading, nameOnly }: Props) => {
+const ProductCard = ({ item, index, isLoading, nameOnly,showPriceWhenNameOnly }: Props) => {
   if (isLoading) {
     return (
       <div className="relative flex flex-col  bg-white">
@@ -81,27 +82,30 @@ const ProductCard = ({ item, index, isLoading, nameOnly }: Props) => {
           </motion.div>
         </div>
       ) : (
-        <div>
+        <div className="relative  pb-[150%] cursor-pointer">
+       
           <Image
-            src={item.images[1]}
+            src={item.images[1] || item.images[0]}
             alt={item.name}
-            width={300}
-            height={300}
-            className=""
+            // width={300}
+            // height={300}
+            fill
+            className="object-cover w-full h-full"
           />
+   
         </div>
       )}
       <div className="min-w-[123px] py-2 lg:py-0">
       <p className="capitalize xl:text-base md:text-base text-[0.75rem] whitespace-break-spaces w-full lg:whitespace-pre-line">
         {item.name}
       </p>
-      {!nameOnly && (
-        <>
-          <p className=" xl:text-base md:text-base text-[0.82rem]">INR {format(parseInt(item.price))}</p>
-          <p className="font-light tracking-[0.15em] lg:text-[14px] text-[0.78rem] uppercase text-gray-600">
+     
+ 
+          {!nameOnly || showPriceWhenNameOnly && <p className=" xl:text-base md:text-base text-[0.82rem]">INR {format(parseInt(item.price))}</p> }
+          {!nameOnly && ( <p className="font-light tracking-[0.15em] lg:text-[14px] text-[0.78rem] uppercase text-gray-600">
             {item.sizes.join(",")}
           </p>
-        </>
+    
       )}</div>
     </Link>
   );

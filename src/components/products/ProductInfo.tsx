@@ -21,6 +21,7 @@ import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
 import { UserAddToWishList } from "@/serverlessActions/_userActions";
 import { toast } from "../ui/use-toast";
+import { ClipLoader } from "react-spinners";
 type Props = {
   product: Product;
 };
@@ -38,11 +39,26 @@ const ProductInfo = ({ product }: Props) => {
   const [selectedVariant, setSelectedVariant] = useState<any>([]);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
-  const { data: session } = useSession();
+  const { data: session }: any = useSession();
   const router = useRouter();
-  // const {isPending, isError,isSuccess, data: response, error, mutate: server_addToWishList} = useMutation({
-  //   mutationFn: UserAddToWishList,
-  // })
+  const {
+    isPending,
+    isError,
+    isSuccess,
+    data: response,
+    error,
+    mutate: server_addToWishList,
+  } = useMutation({
+    mutationFn: UserAddToWishList,
+    onSuccess: (response) => {
+      toast({
+        title: `${response?.message}`,
+      });
+    },
+    onError: (error) => {
+      console.log("Error:", error);
+    },
+  });
   // const session = await getSession({ req });
 
   // console.log(session);
@@ -51,15 +67,16 @@ const ProductInfo = ({ product }: Props) => {
     if (!session) {
       router.push("/auth/login");
     } else {
-      // server_addToWishList(session.user._id,product.id)
+      const requestData = {  productId: product.id };
+      server_addToWishList(requestData);
       // const res = await UserAddToWishList(session!.user?._id,product.id)
       // console.log(res)
     }
   }
   const setProductDetails = () => {
     if (
-      (product!?.variants!.length === 0 || 
-      (product!?.variants!.length > 0 && selectedVariant.length > 0))&& 
+      (product!?.variants!.length === 0 ||
+        (product!?.variants!.length > 0 && selectedVariant.length > 0)) &&
       selectedQuantity !== 0 &&
       selectedSize !== ""
     ) {
@@ -74,12 +91,13 @@ const ProductInfo = ({ product }: Props) => {
         totalPrice,
       });
     } else {
-    
-      console.log("Invalid Add to cart operation : you've not selected all necessary fields");
+      console.log(
+        "Invalid Add to cart operation : you've not selected all necessary fields"
+      );
       toast({
-        title:"Please select all fields",
-        description:"You must select all fields before adding to cart",
-      })
+        title: "Please select all fields",
+        description: "You must select all fields before adding to cart",
+      });
     }
   };
 
@@ -88,9 +106,9 @@ const ProductInfo = ({ product }: Props) => {
       console.log("selectedProduct", selectedProduct);
       dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
       toast({
-        variant:"default",
-        title:"Added to cart"
-      })
+        variant: "default",
+        title: "Added to cart",
+      });
     } else {
       console.log("selected product is null");
     }
@@ -114,36 +132,54 @@ const ProductInfo = ({ product }: Props) => {
         )}
       </div>
       <div className="mt-5">
-     {product?.salePrice ? (
-  <h1 className="w-full text-[17px] ">
-    {format(parseFloat(product?.salePrice))}
-  </h1>
-) : null} 
-<h1 className={`w-full ${product?.salePrice ? "text-[14px] line-through  text-gray-400":"text-[17px]"}`}>
-  {format(parseFloat(product?.price))}
-</h1>
+        {product?.salePrice ? (
+          <h1 className="w-full text-[17px] ">
+            {format(parseFloat(product?.salePrice))}
+          </h1>
+        ) : null}
+        <h1
+          className={`w-full ${
+            product?.salePrice
+              ? "text-[14px] line-through  text-gray-400"
+              : "text-[17px]"
+          }`}
+        >
+          {format(parseFloat(product?.price))}
+        </h1>
 
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
       <div id="discounts" className="w-[280px] flex flex-col mt-5 ">
-    {product?.offers!.map((offer, index:number) => (   <div key={index} className="flex items-center  justify-center gap-3 mb-3">
-  <CiDiscount1 color="#fea12f" size={35} />
- 
-    <p  className="w-full text-[12px]">
-      {offer.title} <br />
-      {offer.effect === "flat" && (
-        <> Get Flat {offer.discount}% Off! <br /></>
-      )}
-      {offer.effect === "percentage" && (
-        <> Get {offer.discount}% Off! <br /></>
-      )}
-      {offer.effect === "quantity" && (
-        <>Buy {offer.quantityEffect} Get Quantity Discount! <br /></>
-      )}
-      Code: <b>{offer.code}</b>{" "}
-    </p>
- 
-</div> ))}
+        {product?.offers!.map((offer, index: number) => (
+          <div
+            key={index}
+            className="flex items-center  justify-center gap-3 mb-3"
+          >
+            <CiDiscount1 color="#fea12f" size={35} />
+
+            <p className="w-full text-[12px]">
+              {offer.title} <br />
+              {offer.effect === "flat" && (
+                <>
+                  {" "}
+                  Get Flat {offer.discount}% Off! <br />
+                </>
+              )}
+              {offer.effect === "percentage" && (
+                <>
+                  {" "}
+                  Get {offer.discount}% Off! <br />
+                </>
+              )}
+              {offer.effect === "quantity" && (
+                <>
+                  Buy {offer.quantityEffect} Get Quantity Discount! <br />
+                </>
+              )}
+              Code: <b>{offer.code}</b>{" "}
+            </p>
+          </div>
+        ))}
         {/* <div className="flex items-center justify-center gap-3 mb-3">
           <CiDiscount1 color="#fea12f" size={35} />
           <p className="w-full text-[12px]">
@@ -174,28 +210,31 @@ const ProductInfo = ({ product }: Props) => {
         </div> */}
       </div>
       <hr className="my-4" />
-     {product?.variants?.length! >0 && <><h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">
-        Variants
-      </h1>
-      <div id="variants" className="flex items-center gap-4">
-        {
-          product?.variants!.map((item, index) => {
-            return (
-              <Image
-                key={index}
-                onClick={() => setSelectedVariant(item.variant)}
-                src={item.image}
-                alt={`${item.variant} variant`}
-                width={50}
-                height={50}
-                className={cn(
-                  `cursor-pointer rounded-lg  hover:border-black hover:border`,
-                  selectedVariant === item.variant && "border-black border-2"
-                )}
-              />
-            );
-          })}
-      </div></>}
+      {product?.variants?.length! > 0 && (
+        <>
+          <h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">
+            Variants
+          </h1>
+          <div id="variants" className="flex items-center gap-4">
+            {product?.variants!.map((item, index) => {
+              return (
+                <Image
+                  key={index}
+                  onClick={() => setSelectedVariant(item.variant)}
+                  src={item.image}
+                  alt={`${item.variant} variant`}
+                  width={50}
+                  height={50}
+                  className={cn(
+                    `cursor-pointer rounded-lg  hover:border-black hover:border`,
+                    selectedVariant === item.variant && "border-black border-2"
+                  )}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
       <div id="sizes" className="my-4 ">
         {selectedSize !== "" ? (
           <h1 className="capitalize mb-3 text-[18px] font-medium tracking-wider">
@@ -225,7 +264,8 @@ const ProductInfo = ({ product }: Props) => {
         </section>
       </div>
       <div id="buttons" className="my-4 w-full">
-        {!selectedSize || product?.variants?.length! > 0 && selectedVariant.length === 0 ? (
+        {!selectedSize ||
+        (product?.variants?.length! > 0 && selectedVariant.length === 0) ? (
           <Button
             variant={"ghost"}
             className="w-full mb-3 py-6 bg-gray-100 cursor-text text-gray-500  font-medium tracking-wider"
@@ -246,8 +286,13 @@ const ProductInfo = ({ product }: Props) => {
           onClick={handleAddToWishlist}
           className="w-full py-6 border-gray-900 font-medium tracking-wider"
         >
-          {" "}
-          Add to wishlist <Heart className="ml-2" stroke="0" fill="red" />{" "}
+          {isPending ? (
+            <ClipLoader size={21} />
+          ) : (
+            <p className="inline-flex">
+              Add to wishlist <Heart className="ml-2" stroke="0" fill="red" />
+            </p>
+          )}
         </Button>
       </div>
       <div id="accordion">

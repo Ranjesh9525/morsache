@@ -15,34 +15,35 @@ type Props = {
 
 const CartItem = ({ cartItem }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
-  const inStock = cartItem?.product?.stock && parseInt(cartItem?.product?.stock) > 0;
+  const inStock =
+    cartItem?.product?.stock && parseInt(cartItem?.product?.stock) > 0;
 
   // const [hideDecreaseBtn, sethideDecreaseBtn] = React.useState(false);
 
-    const [hideIncreaseBtn, sethideIncreaseBtn] = React.useState(false);
+  const [hideIncreaseBtn, sethideIncreaseBtn] = React.useState(false);
 
-function decreaseQuantity (){
-  if (cartItem.quantity > 1) {
-    dispatch({ type: "DECREASE", payload: cartItem });
-  }else{
-    dispatch({ type: "REMOVE_FROM_CART", payload: cartItem });
+  function decreaseQuantity() {
+    if (cartItem.quantity > 1) {
+      dispatch({ type: "DECREASE", payload: cartItem });
+    } else {
+      dispatch({ type: "REMOVE_FROM_CART", payload: cartItem });
+    }
   }
-}
 
-function increaseQuantity (){
-  if(parseInt(cartItem?.product?.stock!) > (cartItem.quantity+1)){
-    dispatch({ type: "INCREASE", payload: cartItem });
-  } else {
-    sethideIncreaseBtn(true);
-    return null
+  function increaseQuantity() {
+    if (parseInt(cartItem?.product?.stock!) > cartItem.quantity + 1) {
+      dispatch({ type: "INCREASE", payload: cartItem });
+    } else {
+      sethideIncreaseBtn(true);
+      return null;
+    }
   }
-}
 
   return (
     <div>
       <div
         id="item-container"
-        className="border p-3 w-full flex lg:flex-row sm:flex-col  gap-4"
+        className="border p-3 w-full flex md:flex-row flex-col  gap-4"
       >
         <div className="w-full align-middle ">
           <h1 className="text-lg font-semibold w-full">
@@ -92,9 +93,22 @@ function increaseQuantity (){
           <section>
             <p className="font-medium uppercase">QUANTITY</p>
             <section className="flex gap-2 items-center">
-              <Minus color="#ffffff" className={cn("rounded-full border p-1 bg-[#545454] border-[#545454] cursor-pointer text-white")} onClick={decreaseQuantity}/>
+              <Minus
+                color="#ffffff"
+                className={cn(
+                  "rounded-full border p-1 bg-[#545454] border-[#545454] cursor-pointer text-white"
+                )}
+                onClick={decreaseQuantity}
+              />
               <p className=" text-lg">{cartItem?.quantity}</p>
-              <Plus color="#ffffff" className={cn("rounded-full border p-1 bg-[#545454] border-[#545454] cursor-pointer text-white", hideIncreaseBtn && "hidden" )} onClick={increaseQuantity} />
+              <Plus
+                color="#ffffff"
+                className={cn(
+                  "rounded-full border p-1 bg-[#545454] border-[#545454] cursor-pointer text-white",
+                  hideIncreaseBtn && "hidden"
+                )}
+                onClick={increaseQuantity}
+              />
             </section>
           </section>
           <section className="flex flex-col items-center gap-2">
@@ -103,12 +117,12 @@ function increaseQuantity (){
           </section>
         </div>
         <div
-          className="lg:m-none sm:bg-gray-100 lg:bg-transparent cursor-pointer group sm:w-full lg:w-fit font-bold text-lg"
+          className="md:m-none bg-gray-100 md:bg-transparent cursor-pointer group w-full md:w-fit font-bold text-lg"
           onClick={() =>
             dispatch({ type: "REMOVE_FROM_CART", payload: cartItem })
           }
         >
-          <p className="lg:m-none text-center sm:m-auto group-hover:text-gray-700">
+          <p className="md:m-none text-center m-auto group-hover:text-gray-700">
             {" "}
             x
           </p>
