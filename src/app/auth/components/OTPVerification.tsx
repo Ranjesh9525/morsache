@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ const OTPVerification = ({ email, setEmail }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const callbackUrl = useSearchParams().get("callbackUrl");
   const { data, refetch, isFetching } = useQuery({
     queryKey: ["checkUser"],
     queryFn: () => UserIsNewUser(),
@@ -42,15 +43,14 @@ const OTPVerification = ({ email, setEmail }: Props) => {
   async function handleOTPVerification(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSubmitting(true);
-
     const formattedEmail = encodeURIComponent(email.toLowerCase().trim());
     const formattedCode = encodeURIComponent(code);
-    const formattedCallback = encodeURIComponent("/account");
+    const formattedCallback = callbackUrl ? callbackUrl : encodeURIComponent("/account");
     const otpRequestURL = `/api/auth/callback/email?email=${formattedEmail}&token=${formattedCode}&callbackUrl=${formattedCallback}`;
     const response = await fetch(otpRequestURL);
 
     if (response) {
-      if (response.url.includes("/account")) {
+      if (response.url.includes(formattedCallback)) {
         await refetch().then((dat) => {
           // console.log("check", dat);
           setIsNewUser(dat.data?.data?.isNewUser);
@@ -171,7 +171,7 @@ toast({
             >
               {isSubmitting ? "Verifying..." : "Verify"}
             </Button>
-           {countdown === 0 ? <span className="w-full text-[12.5px] mt-3 text-center" onClick={()=>   setTimesRequested(timesRequested+1)}>Request</span> : <p className="text-[12.5px] mt-3 w-full text-center">
+           {countdown === 0 ? <span className="w-full text-[12.5px] py-3 inline-flex items-center justify-center text-center" onClick={()=>   setTimesRequested(timesRequested+1)}>Request</span> : <p className="text-[12.5px] mt-3 w-full text-center">
               Code not recieved ? Request a new one in <br />
               <strong>{formattedCountdown}</strong>
             </p>}

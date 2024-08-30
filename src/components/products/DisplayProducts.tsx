@@ -21,21 +21,29 @@ import {
   FetchProductsFromFilterData,
 } from "@/serverlessActions/_fetchActions";
 import { sampleProducts } from "./page/ProductPage";
+import { useRouter } from "next/navigation";
+import { useMediaQuery } from "@react-hook/media-query";
 
 type Props = {
   category?: string;
-  searchFilterData: any;
-  setProductsAmount:React.Dispatch<React.SetStateAction<number>>
+  searchFilterData: { tag: string; values: string[] }[] | [];
+  setProductsAmount: React.Dispatch<React.SetStateAction<number>>;
 };
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
-const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props) => {
+const DisplayProducts = ({
+  category,
+  searchFilterData,
+  setProductsAmount,
+}: Props) => {
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
-  const [viewAs, setViewAs] = React.useState<number>(4);
-  const [productsData,setProductsData] = React.useState([])
-
+   const isMobile = useMediaQuery("only screen and (max-width: 768px)");
+  const isTablet = useMediaQuery("only screen and (max-width: 1024px)");
+  const [viewAs, setViewAs] = React.useState<number>(!isMobile ? 4 : 2);
+  const [productsData, setProductsData] = React.useState([]);
+  const router = useRouter();
   const items = [
     {
       id: "23",
@@ -141,8 +149,7 @@ const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props
       ],
     },
   ];
-
-
+ 
   const {
     isPending,
     isError,
@@ -174,20 +181,32 @@ const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props
   useEffect(() => {
     if (!isError && response?.data) {
       // console.log("data", response);
-      setProductsAmount(response?.data?.length)
-      setProductsData(response?.data)
+      setProductsAmount(response?.data?.length);
+      // console.log(response?.data?.length);
+      setProductsData(response?.data);
     }
     if (error) {
       console.log("error", error);
+      router.push("/serverError");
     }
     if (!productsFromFilterIsError && productsFromFilterResponse?.data) {
-      console.log("data", productsFromFilterResponse);
-      setProductsData(productsFromFilterResponse?.data)
+      // console.log("data", productsFromFilterResponse);/
+      setProductsAmount(productsFromFilterResponse?.data?.length);
+      // console.log(productsFromFilterResponse?.data?.length);
+      setProductsData(productsFromFilterResponse?.data);
     }
-    if ( productsFromFilterError) {
-      console.log("error",  productsFromFilterError);
+    if (productsFromFilterError) {
+      console.log("error", productsFromFilterError);
+      router.push("/serverError");
     }
-  }, [isError, response, error,productsFromFilterIsError,productsFromFilterResponse, productsFromFilterError]);
+  }, [
+    isError,
+    response,
+    error,
+    productsFromFilterIsError,
+    productsFromFilterResponse,
+    productsFromFilterError,
+  ]);
   return (
     <div>
       <section
@@ -231,7 +250,7 @@ const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props
               width={18}
             />
           </span>
-          <span
+          { !isMobile && <span
             className="flex border   p-[0.15rem] cursor-pointer"
             onClick={() => setViewAs(4)}
           >
@@ -255,7 +274,7 @@ const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props
               stroke={""}
               width={18}
             />
-          </span>
+          </span>}
         </section>
         <section>
           <DropdownMenu>
@@ -302,9 +321,9 @@ const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props
                 isLoading={isPending || productsFromFilterIsPending}
               />
             ))
-          : sampleProducts.map((item, index) => (
+          : Array.from({ length: 10 }).map((_, index) => (
               <ProductCard
-                item={item}
+                item={null}
                 index={index}
                 key={index}
                 isLoading={true}
@@ -316,3 +335,4 @@ const DisplayProducts = ({ category, searchFilterData,setProductsAmount }: Props
 };
 
 export default DisplayProducts;
+

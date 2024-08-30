@@ -16,9 +16,9 @@ const ProductCard = ({ item, index, isLoading, nameOnly }: Props) => {
   if (isLoading) {
     return (
       <div className="relative flex flex-col  bg-white">
-        <Skeleton className="h-[250px] w-[200px] rounded-lg" />
-        <Skeleton className="h-[30px] w-[160px] my-3 rounded-lg" />
-        <Skeleton className="h-[30px] w-[100px] rounded-lg " />
+        <Skeleton className="h-[250px] w-[200px] rounded-xl" />
+        <Skeleton className="h-[30px] w-[160px] my-3 rounded-xl" />
+        <Skeleton className="h-[30px] w-[100px] rounded-xl " />
       </div>
     );
   }

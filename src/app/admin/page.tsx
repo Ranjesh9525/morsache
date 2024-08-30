@@ -26,6 +26,11 @@ const page = (props: Props) => {
           <TopSellingCategoriesChart />
         </div>
       </div>
+      <div>
+        <div>Accept stripe</div>
+        <div>Accept razorpay</div>
+        <div>Accept pay on delivery</div>
+      </div>
     </div>
   );
 };

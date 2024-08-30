@@ -9,7 +9,7 @@ import { FetchOrderByOrderNo } from "@/serverlessActions/_cartActions";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 
 const sample = {
@@ -162,7 +162,7 @@ const returnData: OrderReviewData = {
 type Props = {
   orderNo:string
 };
-const ReviewCard = ({orderNo}: Props) => {
+const OrderReviewCard = ({orderNo}: Props) => {
   const [order, setOrder] = useState<OrderReviewData | null>(returnData);
   const {
     isSuccess,
@@ -170,8 +170,9 @@ const ReviewCard = ({orderNo}: Props) => {
     mutate: server_fetchOrderById,
   } = useMutation({
     mutationFn: FetchOrderByOrderNo,
-    onSuccess(data) {
-      setOrder(data);
+    onSuccess(response) {
+      // console.log(response)
+      setOrder(response.data);
     },
     onError(error) {
       console.log(error)
@@ -182,6 +183,10 @@ const ReviewCard = ({orderNo}: Props) => {
       });
     },
   });
+  useEffect(() => {
+    server_fetchOrderById(orderNo)
+  },[])
+
   //fetch products FetchSingleProductByIdOptimized
   //fetch customer details from server
   //payment details comes from server
@@ -191,14 +196,14 @@ const ReviewCard = ({orderNo}: Props) => {
   return (
     <div>
       {isPending ? (
-        <ClipLoader />
+       <div className="flex justify-center items-center h-[50%]"> <ClipLoader size={30} /></div>
       ) : (
         <div className="max-w-[80vw] w-full">
           <section id="products" className="rounded-t-md">
-            <section className="bg-[#545454]/60 p-3 rounded-t-md">
+            <section className="bg-primary-dark p-3 rounded-t-md">
               <h1 className="font-medium text-lg text-white">Products</h1>
             </section>
-            {order?.products.map((item, index) => {
+            {order?.products?.map((item, index) => {
               return (
                 <div
                   key={index}
@@ -269,7 +274,7 @@ const ReviewCard = ({orderNo}: Props) => {
             })}
           </section>
           <section id="order_details">
-            <section className="bg-[#545454]/60 p-4">
+            <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">Details</h1>
             </section>
             <section className="grid border-x px-4">
@@ -303,7 +308,7 @@ const ReviewCard = ({orderNo}: Props) => {
             </section>
           </section>
           <section id="payment_details">
-            <section className="bg-[#545454]/60 p-4">
+            <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">
                 Payment Details
               </h1>
@@ -333,7 +338,7 @@ const ReviewCard = ({orderNo}: Props) => {
             </section>
           </section>
           <section id="customer_details " className="border-b">
-          <section className="bg-[#545454]/60 p-4">
+          <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">
                 Customer Details
               </h1>
@@ -371,7 +376,7 @@ const ReviewCard = ({orderNo}: Props) => {
   );
 };
 
-export default ReviewCard;
+export default OrderReviewCard;
 
 export function formatDate(timeStamp: string | number | Date) {
   const formattedDate = new Date(timeStamp).toLocaleString("en-US", {

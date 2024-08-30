@@ -22,12 +22,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   route:string
+  rowKey?:string
 }
 //id,firstname,totalorders,datejoined,role,email
 export function DataTable<TData, TValue>({
   columns,
   data,
-  route
+  route,
+  rowKey
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const table = useReactTable({
@@ -69,7 +71,7 @@ export function DataTable<TData, TValue>({
                       `/admin/${route}/` +
                         row
                           .getVisibleCells()
-                          .find((cell) => cell.column.id === "id")
+                          .find((cell) => cell.column.id === (rowKey || "id"))
                           ?.getContext()
                           .getValue()
                     )

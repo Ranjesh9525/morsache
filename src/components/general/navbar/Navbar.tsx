@@ -24,8 +24,10 @@ type CustomPosition = "static" | "relative" | "absolute" | "sticky" | "fixed";
 
 const Navbar = ({ scrolling, setSideNav }: Props) => {
    const isMobile = useMediaQuery("only screen and (max-width: 768px)");
+   const isTablet = useMediaQuery("only screen and (max-width: 1024px)");
   //  const mobile = window.matchMedia("(max-width: 768px)").matches;
-  
+  // console.log("isMobile",isMobile)
+  // console.log("isTablet",isTablet)
   const navbarScrollVariants = {
     scroll: {
       position: "fixed" as CustomPosition,
@@ -67,14 +69,14 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
             />
           </span>
           {session?.user?.role === "admin" ? (
-            <Link href="/admin" className="inline-flex items-end uppercase">
+            <Link href="/admin" className="inline-flex mr-6 md:mr-0 items-end uppercase">
               <Image
                 src="/morsache-clothing-logo-small.png"
                 alt="logo"
                 width={40}
                 height={40}
               />
-              <h1 className="font-medium whitespace-nowrap text-[#474747] text-2xl">
+              <h1 className="font-medium whitespace-nowrap text-[#474747] md:text-2xl">
                 orsache - Admin
               </h1>
             </Link>
@@ -103,7 +105,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
           >
             {session?.user ? (
               <Link scroll={true} href={"/account"}>
-                <AiOutlineUser className="bg-gray-200 p-[0.35rem] h-[30px] w-[30px] rounded-[50%]" />{" "}
+                <AiOutlineUser className="bg-gray-200 md:p-[0.35rem] p-[0.2rem] md:h-[30px] md:w-[30px] h-[20px] w-[20px] rounded-[50%]" />{" "}
               </Link>
             ) : (
               <Link href={"/auth/login"}>

@@ -20,6 +20,7 @@ import { CiDiscount1 } from "react-icons/ci";
 import { Skeleton } from "@/components/ui/skeleton";
 import CartCard from "./CartCard";
 import { ShippingContext } from "@/context/shippingContext";
+import { useSession } from "next-auth/react";
 
 type Props = {
   cart?: Cart;
@@ -101,7 +102,12 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     }
   }, []);
 
+  const { data: session } = useSession();
+
   function uploadCartSubmit() {
+    if (!session?.user) {
+      router.push(`/auth/login?callbackUrl=${encodeURIComponent("/cart")}`);
+    }else{
     const modifiedCart: CartForServer = cart!;
     for (const item of modifiedCart.items) {
       item.productId = item.product.id ? item.product.id : item.product._id;
@@ -115,6 +121,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
       delete item.product;
     }
     server_CreateCartMutate(modifiedCart);
+  }
   }
 
   useEffect(() => {
@@ -148,8 +155,11 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   useEffect(() => {
     if (findCartIsSuccess) {
       setUserCartWithDiscount(findCartData?.data);
-      if(findCartData?.data?.recieveBy){
-        dispatch({type:"SET_SHIPPING_CHOICE",payload:findCartData?.data?.recieveBy})
+      if (findCartData?.data?.recieveBy) {
+        dispatch({
+          type: "SET_SHIPPING_CHOICE",
+          payload: findCartData?.data?.recieveBy,
+        });
       }
       console.log(findCartData?.data);
     }
@@ -164,7 +174,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     }
     if (uploadCartIsError) {
       console.log(uploadCartError);
-      redirect('/cart?error=401')
+      redirect("/cart?error=401");
     }
   }, [uploadCartIsSuccess, uploadCartData, uploadCartIsError]);
 
@@ -210,17 +220,16 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     enabled: false,
   });
   useEffect(() => {
-    if(Shipping.choice){
-    refetch()
-  }
+    if (Shipping.choice) {
+      refetch();
+    }
   }, [Shipping]);
   useEffect(() => {
     if (shippingDataIsError) {
       console.log(shippingDataError);
     }
     if (shippingDataResponse) {
-      
-      console.log(shippingDataResponse,userCartWithDiscount);
+      console.log(shippingDataResponse, userCartWithDiscount);
     }
   }, [shippingDataIsError, shippingDataResponse]);
   return (
@@ -236,56 +245,53 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
         </div>
       ) : userCartWithDiscount !== null ? (
         <div className="flex flex-col gap-2 w-full">
-            {!cart &&
-          <section className="h-[200px] overflow-y-auto">
-{
-              userCartWithDiscount.items.map((product: any, ind: number) => {
+          {!cart && (
+            <section className="h-[200px] overflow-y-auto">
+              {userCartWithDiscount.items.map((product: any, ind: number) => {
                 return <CartCard key={ind} product={product} />;
-              })
-}
-</section>
-}
-              {cart && ( 
-              <>
+              })}
+            </section>
+          )}
+          {cart && (
+            <>
               <Separator />
-          <section id="offers" className="">
-            <div className="inline-flex items-center w-full">
-              <Input
-                type={"text"}
-                placeholder={"Enter code"}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full  rounded-r-none focus-visible:ring-none focus-visible:ring-0"
-              />
-              <Button
-                type="submit"
-                className="rounded-l-none"
-                onClick={() => validateOffersMutate(allOfferData)}
-              >
-                Apply
-              </Button>
-            </div>
-          
-         
-            {offersData?.data && <h1>Active offers</h1>}
-            <div className="flex flex-col items-center my-2">
-              {isPending ? (
-                <ClipLoader />
-              ) : (
-                offersData?.data &&
-                offersData?.data.map((i: any, ind: number) => (
-                  <OfferCard
-                    key={ind}
-                    offer={i.offer}
-                    offerDiscountedPrice={i.offerDiscountedPrice}
-                    product={i.optimizedProduct}
+              <section id="offers" className="">
+                <div className="inline-flex items-center w-full">
+                  <Input
+                    type={"text"}
+                    placeholder={"Enter code"}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    className="w-full  rounded-r-none focus-visible:ring-none focus-visible:ring-0"
                   />
-                ))
-              )}
-            </div>
-          </section>  </> 
-   )
-            }
+                  <Button
+                    type="submit"
+                    className="rounded-l-none"
+                    onClick={() => validateOffersMutate(allOfferData)}
+                  >
+                    Apply
+                  </Button>
+                </div>
+
+                {offersData?.data && <h1>Active offers</h1>}
+                <div className="flex flex-col items-center my-2">
+                  {isPending ? (
+                    <ClipLoader />
+                  ) : (
+                    offersData?.data &&
+                    offersData?.data.map((i: any, ind: number) => (
+                      <OfferCard
+                        key={ind}
+                        offer={i.offer}
+                        offerDiscountedPrice={i.offerDiscountedPrice}
+                        product={i.optimizedProduct}
+                      />
+                    ))
+                  )}
+                </div>
+              </section>{" "}
+            </>
+          )}
           <Separator />
           <section
             id="subtotal and shipping"
@@ -298,7 +304,15 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             <span className="inline-flex items-center justify-between text-[15px]">
               <h1 className="font-medium text-gray-800">Shipping</h1>
               <span className="text-gray-400 text-[14px]">
-                {shippingDataIsPending ? <p>Calulating... <ClipLoader size={17} /></p>: Shipping.choice ?  format(shippingDataResponse?.data?.price) : "calculated at checkout"}
+                {shippingDataIsPending ? (
+                  <p>
+                    Calulating... <ClipLoader size={17} />
+                  </p>
+                ) : Shipping.choice ? (
+                  format(shippingDataResponse?.data?.price)
+                ) : (
+                  "calculated at checkout"
+                )}
               </span>
             </span>
             <span className="inline-flex items-center justify-between text-[15px]">
@@ -318,7 +332,12 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             <span className="inline-flex items-center text-sm">
               INR{" "}
               <p className="font-semibold text-[1.35rem] ml-1">
-                {format((userCartWithDiscount.totalAmount + (shippingDataResponse?.data?.price ? shippingDataResponse?.data?.price: 0)))}
+                {format(
+                  userCartWithDiscount.totalAmount +
+                    (shippingDataResponse?.data?.price
+                      ? shippingDataResponse?.data?.price
+                      : 0)
+                )}
               </p>
             </span>
           </section>

@@ -12,83 +12,31 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { FetchCategoryData } from "@/serverlessActions/_fetchActions";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   category?: string;
-  currentFilter?:    { tag: string; values: string[] }[] | [];
-  setCurrentFilter?:React.Dispatch<React.SetStateAction<{ tag: string; values: string[] }[] | []>>
+  currentFilter?: { tag: string; values: string[] }[] | [];
+  setCurrentFilter?: React.Dispatch<
+    React.SetStateAction<{ tag: string; values: string[] }[] | []>
+  >;
 };
 //make request to fetch the category
-const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
+const Filter = ({ category, currentFilter, setCurrentFilter }: Props) => {
   const [currentFilterLocal, setCurrentFilterLocal] = React.useState<
     { tag: string; values: string[] }[] | []
   >([]);
-  const setCurrentFilterGlobal = setCurrentFilter ? setCurrentFilter : setCurrentFilterLocal
-  const currentFilterGlobal = currentFilter ? currentFilter : currentFilterLocal
+  const setCurrentFilterGlobal = setCurrentFilter
+    ? setCurrentFilter
+    : setCurrentFilterLocal;
+  const currentFilterGlobal = currentFilter
+    ? currentFilter
+    : currentFilterLocal;
   const router = useRouter();
-  const [categoryData, setCategoryData] = React.useState<category | {name:string,tags:{tag:string,values:string[]}[]}>({
-    name:"",
-    tags:[
-      {
-          tag:"size",
-          values:[
-              "S",
-              "M",
-              "L",
-              "XL",
-              "XXL"
-          ]
-      },
-      {
-          tag:"color",
-          values:[
-              "red",
-              "blue",
-              "green"
-          ]
-      },
-      {
-          tag:"material",
-          values:[
-              "cotton",
-              "polyester"
-          ]
-      },
-      {
-          tag:"gender",
-          values:[
-              "men",
-              "women",
-              "unisex"
-          ]
-      },
-      {
-          tag:"season",
-          values:[
-              "spring",
-              "summer",
-              "autumn",
-              "winter"
-          ]
-      },
-      {
-          tag:"style",
-          values:[
-              "casual",
-              "sport",
-              "formal"
-          ]
-      },
-      {
-          tag:"fit",
-          values:[
-              "slim",
-              "regular",
-              "oversize",
-          ]
-      }
-  ]
-  });
+  const [categoryData, setCategoryData] = React.useState<
+    category | { name: string; tags: { tag: string; values: string[] }[] }
+  >();
   const handleFilter = (selectedFilter: { tag: string; value: string }) => {
     setCurrentFilterGlobal!((prevFilter) => {
       const specificTagExist = prevFilter.findIndex(
@@ -163,6 +111,21 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
   //   queryKey: ["categories-data"],
   //   queryFn: () => FetchAllCategories(),
   // })
+  // console.log([...categoryData?.tags.map((i) => i.tag)])
+  const clearAllFilters = () => {
+    // Uncheck all checkboxes
+    const checkboxes = document.querySelectorAll('[data-state="checked"]');
+    checkboxes.forEach((checkbox) => {
+      checkbox.setAttribute("data-state", "unchecked");
+      //checkbox.classList.remove('data-[state=checked]:bg-primary', 'data-[state=checked]:text-primary-foreground');
+      checkbox!.querySelector(".flex.items-center.justify-center.text-current")
+        ? (checkbox!.querySelector(
+            ".flex.items-center.justify-center.text-current"
+          )!.innerHTML = "")
+        : null;
+    });
+    setCurrentFilterGlobal([]);
+  };
   const {
     isPending,
     isSuccess,
@@ -174,44 +137,91 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
     mutationFn: FetchCategoryData,
   });
   useEffect(() => {
-    if(category){
-    server_FetchCategoryData(category.toString().replaceAll("-", " "));
+    if (category) {
+      server_FetchCategoryData(category.toString().replaceAll("-", " "));
+    } else {
+      setCategoryData({
+        name: "",
+        tags: [
+          {
+            tag: "size",
+            values: ["S", "M", "L", "XL", "XXL"],
+          },
+
+          {
+            tag: "color",
+            values: ["red", "blue", "green"],
+          },
+          {
+            tag: "material",
+            values: ["cotton", "polyester"],
+          },
+          {
+            tag: "gender",
+            values: ["men", "women", "unisex"],
+          },
+          {
+            tag: "season",
+            values: ["spring", "summer", "autumn", "winter"],
+          },
+          {
+            tag: "style",
+            values: ["casual", "sport", "formal"],
+          },
+          {
+            tag: "fit",
+            values: ["slim", "regular", "oversize"],
+          },
+        ],
+      });
     }
   }, []);
   useEffect(() => {
     if (isSuccess) {
       if (response?.data) {
         setCategoryData(response?.data);
-      } else {
-        // router.push("/500");
       }
     }
     if (error) {
       console.log(error);
-      // router.push("/500");
+      router.push("/serverError");
     }
   }, [error, response]);
   return (
-    <div id="filter-container" className="w-full sticky top-0">
-      <div className=" bg-white h-screen  overflow-auto p-5 pl-10">
+    <div id="filter-container" className="w-full md:sticky md:right-0 md:top-0">
+         <Button className="md:hidden z-[199]">Filter</Button>
+      <div className=" bg-white h-screen  overflow-auto p-5 pl-10 md:block hidden">
         {isPending ? (
-        <ClipLoader className="mx-auto my-auto" />
-        ) : categoryData ? (
+          <div className="relative flex flex-col  bg-white">
+            <Skeleton className="h-[20px] w-[50%] mb-5 rounded-lg" />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+          </div>
+        ) : //  <span className="mx-auto my-[50%] inline-flex items-center w-full justify-center"><ClipLoader className="" /></span>
+        categoryData ? (
           <>
             {" "}
             <section>
               {currentFilterGlobal?.length > 0 && (
                 <>
-                  <div className="text-sm font-bold mb-3 inline-flex justify-between">
+                  <div className="text-sm font-bold  items-center inline-flex justify-between w-full">
                     <h1>Filters</h1>{" "}
                     <h1
-                      className="cursor-pointer"
-                      onClick={() => setCurrentFilterGlobal!([])}
+                      className="font-light p-1 rounded px-3 hover:bg-gray-100 cursor-pointer"
+                      onClick={clearAllFilters}
                     >
                       Clear all
                     </h1>
                   </div>
-                  <div className="flex flex-col gap-2 ">
+                  <div className="flex flex-col gap-2 mb-6 mt-3">
                     {" "}
                     {currentFilterGlobal?.map((item, index) => {
                       if (item.values.length > 0) {
@@ -230,7 +240,11 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
                 </>
               )}
             </section>
-           {categoryData?.name && <div id="categories">{categoryData?.name }</div> }
+            {categoryData?.name && (
+              <div id="categories" className="capitalize">
+                {categoryData?.name}
+              </div>
+            )}
             <div id="filters">
               <Accordion
                 type="multiple"
@@ -264,8 +278,24 @@ const Filter = ({ category,currentFilter,setCurrentFilter }: Props) => {
               </Accordion>{" "}
             </div>
           </>
-        ):<p>Something went wrong, please refresh</p>}
+        ) : (
+          <div className="relative flex flex-col  bg-white">
+            <Skeleton className="h-[20px] w-[50%] mb-5 rounded-lg" />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+            <Skeleton className="h-[40px] w-full my-2 rounded-lg" />
+            <Skeleton className="h-[30px] w-[80%] rounded-lg " />
+          </div>
+          //  <span className="mx-auto my-[50%] inline-flex items-center w-full justify-center"><ClipLoader className="" /></span>
+        )}
       </div>
+   
     </div>
   );
 };

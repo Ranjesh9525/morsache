@@ -321,7 +321,7 @@ export default function Home() {
         <>
           <div id="tab-content" className="w-full overflow-x-auto mb-8">
             <div
-              className=" gap-x-4 items-start flex whitespace-nowrap ml-[17px] lg:ml-0"
+              className=" gap-x-4 items-center justify-center flex whitespace-nowrap ml-[17px] lg:ml-0 p-9"
               style={{ scrollSnapType: "x mandatory" }}
             >
               {Array.from({ length: 5 }).map((_, index) => (
@@ -338,7 +338,7 @@ export default function Home() {
       ) : (
         <div id="section_wrapper">
           {featuredCategoriesData && featuredCategoriesData?.length > 0 ? (
-            featuredCategoriesData.map((item: any, index: number) => {
+            featuredCategoriesData.slice(0,featuredCategoriesData.length-1).map((item: any, index: number) => {
               if ("name" in item) {
                 return (
                   <DisplayBySections
@@ -361,7 +361,49 @@ export default function Home() {
         </div>
       )}
       <AdsPromotions />
-      <DisplayBySections defaultTabs={defaultTabs} />
+      {isLoading || storeDataIsPending ? (
+        <>
+          <div id="tab-content" className="w-full overflow-x-auto mb-8">
+            <div
+              className=" gap-x-4 items-center justify-center flex whitespace-nowrap ml-[17px] lg:ml-0 p-9"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
+              {Array.from({ length: 5 }).map((_, index) => (
+                <ProductCard
+                  item={null}
+                  index={index}
+                  key={index}
+                  isLoading={true}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div id="section_wrapper">
+          {featuredCategoriesData && featuredCategoriesData?.length > 0 ? (
+            featuredCategoriesData.slice(featuredCategoriesData.length-1).map((item: any, index: number) => {
+              if ("name" in item) {
+                return (
+                  <DisplayBySections
+                    key={index}
+                    defaultTabs={item.categories!}
+                  />
+                );
+              }
+              if ("section" in item) {
+                return (
+                  <DisplayProductsByCategory key={index} category={item} />
+                );
+              }
+                  
+                  return <div key={index}></div>;
+            })
+          ) : (
+            <div></div>
+          )}
+        </div>
+      )}
       <RecentlyViewed />
     </HomeLayout>
   );

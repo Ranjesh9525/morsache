@@ -1,11 +1,25 @@
-import React from 'react'
+import React from "react";
+import OrderReviewCard from "../../components/OrderReviewCard";
+import PageHeadingText from "../../components/PageHeadingText";
 
-type Props = {}
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
 const Page = (props: Props) => {
   return (
-    <div>page</div>
-  )
-}
+    <>
+      <PageHeadingText
+        pageHeading="Review Orders"
+        description="Approve,confirm,cancel orders and so on"
+      />
+      <div className="container mx-auto min-h-[70vh] py-10 ">
+        <OrderReviewCard  orderNo={props.params.id} />
+      </div>
+    </>
+  );
+};
 
-export default Page
+export default Page;

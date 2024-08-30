@@ -102,12 +102,13 @@ const Page = (props: Props) => {
       {/**/}
 
       <div className="container mx-auto min-h-[70vh] py-10">
+        <div>Auto confrim orders</div>
         {isPending ? (
           <p className="text-center">
             <ClipLoader size={50} />
           </p>
         ) : orders && orders?.length > 0 ? (
-          <DataTable columns={orderColumns} route={"orders"} data={orders!} />
+          <DataTable rowKey={"orderNumber"} columns={orderColumns} route={"orders"} data={orders!} />
         ):<p>No orders found</p>}
       </div>
     </>

@@ -102,6 +102,7 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
   try {
     await connectDB();
     const product = await ProductsModel.findById(id);
+    console.log("product", product);
     if (!product) {
       return null;
     }

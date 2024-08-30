@@ -148,7 +148,7 @@ useEffect(()=>{
     <>
       <PageHeadingText
         pageHeading="Shipping Data"
-        description="Here a list of all active shipping price list, users would be charged for shipping based on this information, if you add a location for a state and city and also street and the user fills in all these places they'd be charged according to the location with the highest price"
+        description="Here a list of all active shipping price list sorted in alphabetical order A-Z. If you add a location, users would be charged for shipping based on this information, if you add a location for a state and city and also street and the user fills in all these places they'd be charged according to the location with the highest price"
       />
          <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogTrigger>

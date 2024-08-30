@@ -1,7 +1,7 @@
 "use server";
 import { connectDB } from "@/utilities/DB";
 import { UserSearch } from "lucide-react";
-import { v2 as cloudinary } from "cloudinary";
+import { cloudinaryUpload } from "@/utilities/config";
 import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
 import CategoryModel from "../models/Category";
@@ -15,11 +15,6 @@ import { category } from "@/@types/categories";
 import { Order } from "@/@types/order";
 import { Store } from "@/@types/store";
 
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -36,7 +31,7 @@ async function SKUgenerator(amount: number, characters: string) {
 export const AdminGetAllUsers = async () => {
   try {
     await connectDB();
-    const users = await UserModel.find();
+    const users = await UserModel.find().sort({ createdAt: -1 });
     // console.log(users);
     return JSON.parse(JSON.stringify(users));
   } catch (error) {
@@ -77,7 +72,7 @@ export const AdminUploadProduct = async (data: any) => {
       for (let i = 0; i < data.images.length; i++) {
         const base64Image = data.images[i];
         const publicId = `${data.slug || data.name}-${i}`;
-        const uploadedImage = await cloudinary.uploader.upload(base64Image, {
+        const uploadedImage = await cloudinaryUpload(base64Image, {
           folder: `products/${data.slug || "unknown"}`,
           public_id: publicId,
         });
@@ -89,7 +84,7 @@ export const AdminUploadProduct = async (data: any) => {
       const varaintsModified: { variant: string; image: string }[] = [];
       data.variants.forEach(async (variant: any) => {
         const publicId = `${data.slug || data.name}-${variant.variant}`;
-        const uploadedImage = await cloudinary.uploader.upload(variant.image, {
+        const uploadedImage = await cloudinaryUpload(variant.image, {
           folder: `products/${data.slug || "unknown"}/variants`,
           public_id: publicId,
         });
@@ -115,7 +110,7 @@ export const AdminUploadProduct = async (data: any) => {
 export const AdminGetAllProducts = async () => {
   try {
     await connectDB();
-    const products: Product[] = await ProductsModel.find();
+    const products: Product[] = await ProductsModel.find().sort({ createdAt: -1 });
     return Response("Products fetched successfully", 200, true, products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -167,7 +162,7 @@ export const AdminCreateOffer = async (data: Offer) => {
 export const AdminGetAllOffers = async () => {
   try {
     await connectDB();
-    const offers: Offer[] = await OffersModel.find();
+    const offers: Offer[] = await OffersModel.find().sort({ createdAt: -1 });
     return Response("Offers fetched successfully", 200, true, offers);
   } catch (error) {
     console.error("Error fetching offers:", error);
@@ -183,7 +178,7 @@ export const AdminCreateCategory = async (data: category) => {
       throw new Error("Tags cannot be empty");
     }
     if (data.image) {
-      const cloudPhoto = await cloudinary.uploader.upload(data.image, {
+      const cloudPhoto = await cloudinaryUpload(data.image, {
         folder: "categories",
         public_id: data.name,
         // width: 150,
@@ -207,7 +202,9 @@ export const AdminCreateCategory = async (data: category) => {
 export const AdminGetAllCategories = async () => {
   try {
     await connectDB();
-    const categories: category[] = await CategoryModel.find();
+    const categories: category[] = await CategoryModel.find().sort({
+      createdAt: -1,
+    });
     return Response("Categories fetched successfully", 200, true, categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -271,7 +268,7 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
 export const AdminGetAllTeam = async () => {
   try {
     await connectDB();
-    const Team = await UserModel.find({ role: "admin" });
+    const Team = await UserModel.find({ role: "admin" }).sort({email: 1});
     return Response("Team fetched successfully", 200, true, Team);
   } catch (error) {
     console.error("Error adding teammate ");
@@ -281,7 +278,7 @@ export const AdminGetAllTeam = async () => {
 export const AdminGetAllShippingData = async () => {
   try {
     await connectDB();
-    const ShippingData = await ShippingModel.find({});
+    const ShippingData = await ShippingModel.find({}).sort({ name: 1 });
     return Response("Shipping data fetched", 200, true, ShippingData);
   } catch (error) {
     console.error("Error adding teammate ");
@@ -291,7 +288,7 @@ export const AdminGetAllShippingData = async () => {
 export const AdminGetAllOrders = async () => {
   try {
     await connectDB();
-    const orders: Order[] = await OrdersModel.find();
+    const orders: Order[] = await OrdersModel.find().sort({ createdAt: -1 });
     return Response("Orders fetched successfully", 200, true, orders);
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -339,7 +336,7 @@ export const AdminUpdateStoreData = async (data: any) => {
       const NewImages: string[] = [];
       carouselImages.forEach(async (image: any) => {
         if (!image.includes("cloudinary")) {
-          const cloudPhoto = await cloudinary.uploader.upload(image, {
+          const cloudPhoto = await cloudinaryUpload(image, {
             folder: "store/sliderImages",
             public_id: image,
           });

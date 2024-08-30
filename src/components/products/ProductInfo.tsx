@@ -45,7 +45,7 @@ const ProductInfo = ({ product }: Props) => {
   // })
   // const session = await getSession({ req });
 
-  console.log(session);
+  // console.log(session);
 
   async function handleAddToWishlist() {
     if (!session) {
@@ -58,7 +58,8 @@ const ProductInfo = ({ product }: Props) => {
   }
   const setProductDetails = () => {
     if (
-      selectedVariant.length > 0 &&
+      (product!?.variants!.length === 0 || 
+      (product!?.variants!.length > 0 && selectedVariant.length > 0))&& 
       selectedQuantity !== 0 &&
       selectedSize !== ""
     ) {
@@ -73,8 +74,12 @@ const ProductInfo = ({ product }: Props) => {
         totalPrice,
       });
     } else {
-      //toast message
-      console.log("youve not selected all necessary fields");
+    
+      console.log("Invalid Add to cart operation : you've not selected all necessary fields");
+      toast({
+        title:"Please select all fields",
+        description:"You must select all fields before adding to cart",
+      })
     }
   };
 

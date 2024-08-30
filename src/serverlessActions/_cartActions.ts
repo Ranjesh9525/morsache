@@ -388,26 +388,35 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
     const userId = session!?.user!?._id;
     const user = await UserModel.findOne({ _id: userId });
     const order: Order = await OrdersModel.findOne({ orderNumber: orderNo });
+    const customer = await UserModel.findOne({ _id: order.customer });
     if (!order) {
       throw new Error("Order not found");
     }
-    if (order.customer !== user._id) {
-      throw new Error("Unauthorized access");
-    }
-    const returnData: OrderReviewData | null = null
-    order.items.forEach(async (item: CartItemForServer) => {
-      const { quantity, size, variant, totalPrice } = item;
-      const product:OptimizedProduct = await FetchSingleProductByIdOptimized(item.productId!);
-      if (product) {
-        returnData!.products.push({
-          product,
-          quantity,
-          size,
-          variant,
-          totalPrice,
-        });
-      }
-    });
+    // if (!user || order.customer !== user?._id && user?.role !== "admin") {
+    //   throw new Error("Unauthorized access");
+    // }
+    const returnData: OrderReviewData | any = { products: [] };
+    await Promise.all(
+      order.items.map(async (item: CartItemForServer) => {
+        const { quantity, size, variant, totalPrice } = item;
+        const product: {
+          success: string;
+          statusCode: number;
+          data: OptimizedProduct;
+        } = await FetchSingleProductByIdOptimized(item.productId!);
+        if (product) {
+       
+          // returnData.products = []
+          returnData.products.push({
+            product: product?.data,
+            quantity,
+            size,
+            variant,
+            totalPrice,
+          });
+        }
+      })
+    );
     const {
       totalItems,
       totalAmount,
@@ -419,13 +428,13 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       orderNumber,
       shippingAddress,
     } = order;
-    returnData!.paymentDetails={
+    returnData.paymentDetails = {
       totalAmount,
       paidOn,
       paymentMethod,
       paymentStatus,
     };
-    returnData!.orderDetails={
+    returnData.orderDetails = {
       totalAmount,
       createdAt,
       totalItems,
@@ -433,12 +442,12 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       orderNumber,
     };
     const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
-    returnData!.customerDetails ={
+    returnData.customerDetails = {
       shippingAddress: formattedShippingAddress,
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      email: user?.email,
-      phoneNumber: user?.phoneNumber,
+      firstName: customer?.firstName,
+      lastName: customer?.lastName,
+      email: customer?.email,
+      phoneNumber: customer?.phoneNumber,
     };
     return Response("order information", 200, true, returnData);
   } catch (error) {
