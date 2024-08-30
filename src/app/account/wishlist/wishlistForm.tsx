@@ -60,12 +60,12 @@ const WishlistForm = (props: Props) => {
     >
       {wishLists && wishLists?.length > 0 ? (
         wishLists?.map((item: Product, index: number) => (
-          <div className="flex flex-col gap-2">
-            {" "}
+          <div key={index} className="flex flex-col gap-2">
+           
             <ProductCard
               item={item}
               index={index}
-              key={index}
+              
               nameOnly
               showPriceWhenNameOnly
               isLoading={isPending}
