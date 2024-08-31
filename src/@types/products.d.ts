@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export type Offer = {
   title: string;
   description: string;
@@ -12,6 +14,7 @@ export type Offer = {
 
 // Product type
 export interface Product {
+  _id?:ObjectId;
     id: string;
     SKU:string;
     name: string;

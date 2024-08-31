@@ -18,7 +18,6 @@ import { FetchCategoriesNamesOnly } from "@/serverlessActions/_fetchActions";
 import { ClipLoader } from "react-spinners";
 import { useMediaQuery } from "@react-hook/media-query";
 
-
 type Props = {
   sideNav: { open: boolean };
   setSideNav: React.Dispatch<React.SetStateAction<{ open: boolean }>>;
@@ -45,8 +44,7 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
     },
     {
       sectionName: "Categories",
-      section: [
-      ],
+      section: [],
     },
     {
       sectionName: "",
@@ -70,7 +68,6 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
           showIfNotLoggedIn: false,
           exact: true,
         },
-     
       ],
     },
   ];
@@ -85,15 +82,22 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
   });
   useEffect(() => {
     if (response?.data) {
-      //  console.log(response)
-      response.data.forEach((item: any) => {
+      const newData = response.data.filter((item:any) => {
+        // Check if the new item is already in the section
+        return !userNavItems[1].section.some(
+          (existingItem) => existingItem.name === item.name
+        );
+      });
+
+      newData.forEach((newItem:any) => {
         userNavItems[1].section.push({
-          name: item.name,
-          path: `/products/category/${item.name.replaceAll(" ", "-")}`,
+          name: newItem.name,
+          path: `/products/category/${newItem.name.replaceAll(" ", "-")}`,
           showIfNotLoggedIn: true,
           exact: true,
         });
       });
+
       setNavItems(userNavItems);
     }
   }, [response]);
@@ -123,26 +127,46 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
   };
 
   useEffect(() => {
-    if(isMobile ){
-      userNavItems[0].section.push(
-        {
-          name: "Search",
-          path: "/search",
-          showIfNotLoggedIn: true,
-          exact: true,
-        },
-      )
-      userNavItems[2].section.push(
-        {
-          name: "Wishlist",
-          path: "/account/wishlist",
-          showIfNotLoggedIn: true,
-          exact: true,
-        },
-      )
-    }
+    const isItemAlreadyExists = (section:any, itemName:string) => {
+      return section.some((item:any) => item.name === itemName);
+    };
+
+    const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+
+    if (isMobileScreen && userNavItems && userNavItems.length > 0) {
+      const searchItem = {
+        name: "Search",
+        path: "/search",
+        showIfNotLoggedIn: true,
+        exact: true,
+      };
+
+      const wishlistItem = {
+        name: "Wishlist",
+        path: "/account/wishlist",
+        showIfNotLoggedIn: true,
+        exact: true,
+      };
+
+      if (
+        userNavItems[0] &&
+        userNavItems[0].section &&
+        !isItemAlreadyExists(userNavItems[0].section, "Search")
+      ) {
+        userNavItems[0].section.push(searchItem);
+      }
+
+      if (
+        userNavItems[2] &&
+        userNavItems[2].section &&
+        !isItemAlreadyExists(userNavItems[2].section, "Wishlist")
+      ) {
+        userNavItems[2].section.push(wishlistItem);
+      }
+
       setNavItems(userNavItems);
-  }, []);
+    }
+  }, [isMobile]);
 
   return (
     <motion.div
@@ -201,7 +225,10 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
           }
         >
           {isPending ? (
-          <p className="w-fit mx-auto ">   <ClipLoader className="mx-auto my-4" /></p>
+            <p className="w-fit mx-auto ">
+              {" "}
+              <ClipLoader className="mx-auto my-4" />
+            </p>
           ) : (
             <section className=" flex flex-col gap-4 justify-between h-full ">
               <section className="flex flex-col py-2 px-3 text-lg font-medium uppercase">

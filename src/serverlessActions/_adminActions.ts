@@ -15,7 +15,6 @@ import { category } from "@/@types/categories";
 import { Order } from "@/@types/order";
 import { Store } from "@/@types/store";
 
-
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
   let formattedCharacters = characters.replaceAll(" ", "");
@@ -110,7 +109,9 @@ export const AdminUploadProduct = async (data: any) => {
 export const AdminGetAllProducts = async () => {
   try {
     await connectDB();
-    const products: Product[] = await ProductsModel.find().sort({ createdAt: -1 });
+    const products: Product[] = await ProductsModel.find().sort({
+      createdAt: -1,
+    });
     return Response("Products fetched successfully", 200, true, products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -268,7 +269,7 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
 export const AdminGetAllTeam = async () => {
   try {
     await connectDB();
-    const Team = await UserModel.find({ role: "admin" }).sort({email: 1});
+    const Team = await UserModel.find({ role: "admin" }).sort({ email: 1 });
     return Response("Team fetched successfully", 200, true, Team);
   } catch (error) {
     console.error("Error adding teammate ");
@@ -316,15 +317,11 @@ export const AdminUpdateStoreData = async (data: any) => {
     await connectDB();
     const fetchedData: any = await StoreModel.find({});
     const storeData = fetchedData[0];
-    // if(!storeData){
-    //  const newStoreData = new StoreModel(data)
-    //  await newStoreData.save()
-    // return Response("Store data updated successfully",200,true)
 
-    // }
     if (!storeData) {
       throw new Error("Store data not found");
     }
+
     const {
       carouselImages,
       featuredCategories,
@@ -332,24 +329,32 @@ export const AdminUpdateStoreData = async (data: any) => {
       slidingOffers,
       footerData,
     } = data;
+
     if (carouselImages) {
-      const NewImages: string[] = [];
-      carouselImages.forEach(async (image: any) => {
+      const newImages: string[] = [];
+
+      for (let i = 0; i < carouselImages.length; i++) {
+        const image = carouselImages[i];
+        const publicId = `image${i}`;
+    
         if (!image.includes("cloudinary")) {
           const cloudPhoto = await cloudinaryUpload(image, {
-            folder: "store/sliderImages",
-            public_id: image,
+            folder: "store/slider-images",
+            public_id: publicId,
           });
-          NewImages.push(cloudPhoto.secure_url);
+          newImages.push(cloudPhoto.secure_url);
         } else {
-          NewImages.push(image);
+          newImages.push(image);
         }
-      });
-      storeData.carouselImages = NewImages;
-      await storeData.save()
+      
+      }
+
+      storeData.carouselImages = newImages;
+
+      await storeData.save();
     }
     if (featuredCategories) {
-      console.log(featuredCategories);
+      // console.log(featuredCategories);
       fetchedData[0].featuredCategories = featuredCategories;
       await fetchedData[0].save();
     }

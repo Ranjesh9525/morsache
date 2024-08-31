@@ -7,7 +7,7 @@ import HeaderAds from "../home/HeaderAds";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 import Heading from "@/utilities/Heading";
 import { useToast } from "../ui/use-toast";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -57,6 +57,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const error: any = searchParams!.get("error");
+  const router = useRouter()
   const [scrolling, setScrolling] = useState<boolean>(false);
   const [sideNav, setSideNav] = useState({
     open: false,
@@ -79,21 +80,24 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
           title: Exceptions[0].title,
           description: Exceptions[0].description,
         });
-      clearParams("error");
+        clearParams("error");
+        router.push('/cart')
       } else if (error === "400") {
         toast({
           variant: "destructive",
           title: Exceptions[1].title,
           description: Exceptions[1].description,
         });
-      clearParams("error");
+        clearParams("error");
+        router.push('/cart')
       } else if (error === "500") {
         toast({
           variant: "destructive",
           title: Exceptions[2].title,
           description: Exceptions[2].description,
         });
-      clearParams("error");
+        clearParams("error");
+    router.push('/cart')
       } else if (error === "401") {
         toast({
           variant: "destructive",
@@ -101,7 +105,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
           description: Exceptions[3].description,
         });
       clearParams("error");
-
+      router.push('/cart')
       } else if (error === "403") {
         toast({
           variant: "destructive",
@@ -109,6 +113,7 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
           description: Exceptions[4].description,
         });
         clearParams("error");
+        router.push('/cart')
       }
     }
   }, [error]);

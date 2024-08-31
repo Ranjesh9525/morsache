@@ -36,9 +36,10 @@ const Page = (props: Props) => {
           <div className="md:grid md:grid-cols-10 flex flex-col py-4 gap-x-4">
             <section className="col-span-7 space-y-2">
               {cart.items.length > 0 &&
-                cart.items.map((item, index) => (
-                  <CartItem key={index} cartItem={item} />
-                ))}
+                cart.items.map((item, index) => {
+                  console.log(item)
+                 return <CartItem key={index} cartItem={item} />
+})}
             </section>
             <section className="col-span-3">
               <CheckoutCard cart={cart} />

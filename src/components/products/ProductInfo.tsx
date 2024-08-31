@@ -36,7 +36,7 @@ export function format(value: number): string {
 const ProductInfo = ({ product }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
   const [selectedProduct, setSelectedProduct] = useState<CartItem | null>(null);
-  const [selectedVariant, setSelectedVariant] = useState<any>([]);
+  const [selectedVariant, setSelectedVariant] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
   const { data: session }: any = useSession();

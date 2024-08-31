@@ -37,7 +37,7 @@ export interface Cart {
 export interface CartItemForServer {
   _id?: ObjectId;
   product?: Product;
-  productId?: string;
+  productId?: any;
   offersData?:{
     code:string,
     quantity:number,
@@ -65,7 +65,7 @@ export interface CartItemForServer {
 // Cart type
 export interface CartForServer  {
   _id?:ObjectId;
-  items: CartItemForServerm[];
+  items: CartItemForServer[];
   totalItems: number;
   totalAmount: number;
   shippingAddress?: ShippingAddress[];

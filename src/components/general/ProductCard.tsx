@@ -101,7 +101,7 @@ const ProductCard = ({ item, index, isLoading, nameOnly,showPriceWhenNameOnly }:
       </p>
      
  
-          {!nameOnly || showPriceWhenNameOnly && <p className=" xl:text-base md:text-base text-[0.82rem]">INR {format(parseInt(item.price))}</p> }
+          {(!nameOnly || showPriceWhenNameOnly) && <p className=" xl:text-base md:text-base text-[0.82rem]">INR {format(parseInt(item.price))}</p> }
           {!nameOnly && ( <p className="font-light tracking-[0.15em] lg:text-[14px] text-[0.78rem] uppercase text-gray-600">
             {item.sizes.join(",")}
           </p>

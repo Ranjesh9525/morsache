@@ -9,12 +9,14 @@ import { format } from "@/components/products/ProductInfo";
 import { MdOutlineCancel } from "react-icons/md";
 import { CartContext } from "@/context/cartContext";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 type Props = {
   cartItem: CartItem;
 };
 
 const CartItem = ({ cartItem }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
+  const router = useRouter()
   const inStock =
     cartItem?.product?.stock && parseInt(cartItem?.product?.stock) > 0;
 
@@ -30,6 +32,7 @@ const CartItem = ({ cartItem }: Props) => {
     }
   }
 
+
   function increaseQuantity() {
     if (parseInt(cartItem?.product?.stock!) > cartItem.quantity + 1) {
       dispatch({ type: "INCREASE", payload: cartItem });
@@ -38,12 +41,18 @@ const CartItem = ({ cartItem }: Props) => {
       return null;
     }
   }
-
+  console.log(cartItem)
+  if(!cartItem?.product?.name || !cartItem?.product?.slug || !cartItem.product){
+    console.log("dont have cart product")
+    console.log(cartItem)
+  
+    window.location.reload()
+  }
   return (
     <div>
       <div
         id="item-container"
-        className="border p-3 w-full flex md:flex-row flex-col  gap-4"
+        className="border p-3 w-full flex lg:flex-row flex-col  gap-4"
       >
         <div className="w-full align-middle ">
           <h1 className="text-lg font-semibold w-full">
@@ -117,12 +126,12 @@ const CartItem = ({ cartItem }: Props) => {
           </section>
         </div>
         <div
-          className="md:m-none bg-gray-100 md:bg-transparent cursor-pointer group w-full md:w-fit font-bold text-lg"
+          className="lg:m-none bg-gray-100 lg:bg-transparent cursor-pointer group w-full lg:w-fit font-bold text-lg"
           onClick={() =>
             dispatch({ type: "REMOVE_FROM_CART", payload: cartItem })
           }
         >
-          <p className="md:m-none text-center m-auto group-hover:text-gray-700">
+          <p className="lg:m-none text-center m-auto group-hover:text-gray-700">
             {" "}
             x
           </p>

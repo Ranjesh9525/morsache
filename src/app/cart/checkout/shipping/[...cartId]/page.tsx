@@ -16,7 +16,7 @@ const page = (props: Props) => {
 
   return (
     <CheckoutLayout title="Checkout - Morsache Clothing">
-      <div className="w-full container grid grid-cols-9 mb-9 mt-4 gap-9">
+      <div className="w-full container lg:grid lg:grid-cols-9 flex flex-col-reverse mb-9 mt-4 gap-9">
       <div className="col-span-6 flex flex-col h-full">
       <div className="flex-1">
         <ShippingInformation/></div>

@@ -218,35 +218,8 @@ export default function Home() {
   const [featuredCategories, setFeaturedCategories] =
     useState<FeaturedCategories | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [featuredCategoriesData, setFeaturedCategoriesData] =
-    useState<any>(null);
-  const defaultt = [
-    {
-      type: "categoriesWithProducts",
-      name: "categories 1",
-      categories: ["66c87e9595331f958fd232f8", "66bf23775f02cf03f026a348"],
-    },
-    {
-      type: "multipleCategories",
-      section: "Title 1",
-      categoriesId: ["66bf23775f02cf03f026a348"],
-    },
-    {
-      type: "categoriesWithProducts",
-      name: "categories 2",
-      categories: ["66c87e9595331f958fd232f8", "66bf23775f02cf03f026a348"],
-    },
-    {
-      type: "multipleCategories",
-      section: "Title 2",
-      categoriesId: ["66bf23775f02cf03f026a348"],
-    },
-    {
-      type: "categoriesWithProducts",
-      name: "categories 3",
-      categories: ["66c87e9595331f958fd232f8"],
-    },
-  ];
+  // const [featuredCategoriesData, setFeaturedCategoriesData] =
+  //   useState<any>(null);
 
   const {
     store,
@@ -254,72 +227,17 @@ export default function Home() {
     storeDataError,
     storeDataIsError,
     refetchStoreData,
+    featuredCategoriesData,
+    isFetchingFeaturedCategory,
   } = useContext(StoreContext)!;
 
-  async function fetchCategories() {
-    const allData: any[] = [];
-
-    if (featuredCategories === null || featuredCategories.length === 0) return;
-    setIsLoading(true);
-    await Promise.all(
-      featuredCategories!.map(async (item) => {
-        if ("name" in item && item.categories) {
-          const Categories = await Promise.all(
-            item.categories.map(async (categoryId) => {
-              const response = await FetchCategoriesById({
-                type: "category",
-                id: categoryId,
-              });
-              return response?.data;
-            })
-          );
-
-          allData.push({
-            name: item.name,
-            categories: Categories,
-          });
-        }
-
-        if ("section" in item && item.categoriesId) {
-          const sectionCategories = await Promise.all(
-            item.categoriesId.map(async (categoryId) => {
-              const response = await FetchCategoriesById({
-                type: "section",
-                id: categoryId,
-              });
-
-              return response?.data;
-            })
-          );
-
-          allData.push({
-            section: item.section,
-            items: sectionCategories.filter(Boolean), // Filter out undefined values
-          });
-        }
-      })
-    );
-    setIsLoading(false);
-    console.log("allData", allData);
-    setFeaturedCategoriesData(allData);
-  }
-  useEffect(() => {
-    if (featuredCategories !== null) {
-      fetchCategories();
-    }
-  }, [featuredCategories]);
-  useEffect(() => {
-    if (store) {
-      setFeaturedCategories(store!?.featuredCategories!);
-    }
-  }, [store]);
   // <Protected>
   return (
     <HomeLayout title="Morsache Clothing">
       <Slider />
-      {isLoading || storeDataIsPending ? (
+      {isFetchingFeaturedCategory || storeDataIsPending ? (
         <>
-          <div id="tab-content" className="w-full overflow-x-auto mb-8">
+          <div id="tab-content-1" className="w-full overflow-x-auto mb-8">
             <div
               className=" gap-x-4 items-center justify-center flex whitespace-nowrap ml-[17px] lg:ml-0 p-9"
               style={{ scrollSnapType: "x mandatory" }}
@@ -336,34 +254,36 @@ export default function Home() {
           </div>
         </>
       ) : (
-        <div id="section_wrapper">
+        <div id="section_wrapper-1">
           {featuredCategoriesData && featuredCategoriesData?.length > 0 ? (
-            featuredCategoriesData.slice(0,featuredCategoriesData.length-1).map((item: any, index: number) => {
-              if ("name" in item) {
-                return (
-                  <DisplayBySections
-                    key={index}
-                    defaultTabs={item.categories!}
-                  />
-                );
-              }
-              if ("section" in item) {
-                return (
-                  <DisplayProductsByCategory key={index} category={item} />
-                );
-              }
-                  
-                  return <div key={index}></div>;
-            })
+            featuredCategoriesData
+              .slice(0, featuredCategoriesData.length - 1)
+              .map((item: any, index: number) => {
+                if ("name" in item) {
+                  return (
+                    <DisplayBySections
+                      key={index}
+                      defaultTabs={item.categories!}
+                    />
+                  );
+                }
+                if ("section" in item) {
+                  return (
+                    <DisplayProductsByCategory key={index} category={item} />
+                  );
+                }
+
+                return <div key={index}></div>;
+              })
           ) : (
             <div></div>
           )}
         </div>
       )}
       <AdsPromotions />
-      {isLoading || storeDataIsPending ? (
+      {isFetchingFeaturedCategory || storeDataIsPending ? (
         <>
-          <div id="tab-content" className="w-full overflow-x-auto mb-8">
+          <div id="tab-content-2" className="w-full overflow-x-auto mb-8">
             <div
               className=" gap-x-4 items-center justify-center flex whitespace-nowrap ml-[17px] lg:ml-0 p-9"
               style={{ scrollSnapType: "x mandatory" }}
@@ -380,25 +300,27 @@ export default function Home() {
           </div>
         </>
       ) : (
-        <div id="section_wrapper">
+        <div id="section_wrapper-2">
           {featuredCategoriesData && featuredCategoriesData?.length > 0 ? (
-            featuredCategoriesData.slice(featuredCategoriesData.length-1).map((item: any, index: number) => {
-              if ("name" in item) {
-                return (
-                  <DisplayBySections
-                    key={index}
-                    defaultTabs={item.categories!}
-                  />
-                );
-              }
-              if ("section" in item) {
-                return (
-                  <DisplayProductsByCategory key={index} category={item} />
-                );
-              }
-                  
-                  return <div key={index}></div>;
-            })
+            featuredCategoriesData
+              .slice(featuredCategoriesData.length - 1)
+              .map((item: any, index: number) => {
+                if ("name" in item) {
+                  return (
+                    <DisplayBySections
+                      key={index}
+                      defaultTabs={item.categories!}
+                    />
+                  );
+                }
+                if ("section" in item) {
+                  return (
+                    <DisplayProductsByCategory key={index} category={item} />
+                  );
+                }
+
+                return <div key={index}></div>;
+              })
           ) : (
             <div></div>
           )}

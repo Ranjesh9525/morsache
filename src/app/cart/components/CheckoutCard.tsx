@@ -1,14 +1,15 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Cart, CartForServer, CartItem } from "@/@types/cart.d";
 import { Product } from "@/@types/products.d";
 import { Separator } from "@/components/ui/separator";
 import { format } from "@/components/products/ProductInfo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { CartContext } from "@/context/cartContext";
 import {
   createCart,
   validateOffers,
@@ -21,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CartCard from "./CartCard";
 import { ShippingContext } from "@/context/shippingContext";
 import { useSession } from "next-auth/react";
+import { ObjectId } from "mongoose";
 
 type Props = {
   cart?: Cart;
@@ -50,11 +52,14 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   );
 };
 
-const CheckoutCard = ({ cart, cartId }: Props) => {
+const CheckoutCard = ({cart, cartId }: Props) => {
   const [code, setCode] = useState<string>("");
+  // const { cart } = useContext(CartContext)!;
   const [userCartWithDiscount, setUserCartWithDiscount] = useState<Cart | null>(
     !cart ? null : cart
   );
+  const pathname = usePathname()
+  
   const { Shipping, dispatch } = React.useContext<any>(ShippingContext)!;
   const [totalDiscount, setTotalDiscount] = useState<number>(0);
   const [allOfferData, setAllOfferData] = useState<
@@ -108,18 +113,22 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     if (!session?.user) {
       router.push(`/auth/login?callbackUrl=${encodeURIComponent("/cart")}`);
     }else{
-    const modifiedCart: CartForServer = cart!;
-    for (const item of modifiedCart.items) {
-      item.productId = item.product.id ? item.product.id : item.product._id;
-      item.offersData = item.product.offers.map((offer: any) => {
+    const modifiedCart: CartForServer =  { ...cart! };
+    for (let i = 0; i < modifiedCart.items.length; i++) {
+      const item = modifiedCart.items[i];
+      item.productId = item!.product!.id ? item!.product!.id : item!.product!._id;
+    
+      item.offersData = item!.product!.offers!.map((offer) => {
         return {
           code: offer.code || "",
           productId: item.productId,
           quantity: item.quantity,
         };
       });
+    
       delete item.product;
     }
+    console.log(modifiedCart)
     server_CreateCartMutate(modifiedCart);
   }
   }
@@ -169,14 +178,20 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
     }
   }, [findCartIsSuccess, findCartData, findCartIsError]);
   useEffect(() => {
-    if (uploadCartIsSuccess && uploadCartData.data) {
+    if (uploadCartIsSuccess && uploadCartData?.data) {
       redirect(`/cart/checkout/${uploadCartData?.data}`);
     }
     if (uploadCartIsError) {
       console.log(uploadCartError);
-      redirect("/cart?error=401");
+      redirect("/cart?error=500");
     }
   }, [uploadCartIsSuccess, uploadCartData, uploadCartIsError]);
+
+  // useEffect(()=>{
+  //   if(!findCartData?.data){
+  //   setUserCartWithDiscount(cart)
+  //   }
+  // },[cart])
 
   useEffect(() => {
     if (offersData && userCartWithDiscount) {
@@ -342,7 +357,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
             </span>
           </section>
 
-          {cart && (
+          {(cart && pathname === "/cart") && (
             <>
               {" "}
               <Separator />
