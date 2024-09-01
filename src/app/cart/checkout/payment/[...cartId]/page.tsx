@@ -42,7 +42,6 @@ const Page = (props: Props) => {
   };
 
   const handleRazorPay = async () => {
-    server_InitializeOrder("razorPay");
     setIsLoading(true);
     const res = await loadRazorpayScript();
 
@@ -53,13 +52,14 @@ const Page = (props: Props) => {
     }
 
     // Call your API to create an order
-    const result = await fetch("/api/razorpay", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ amount: 500, currency: "INR" }),
-    });
+    // const result = await fetch("/api/razorpay", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ amount: 500, currency: "INR" }),
+    // });
+    server_InitializeOrder("razorPay");
 
     const {
       id: order_id,
@@ -130,13 +130,13 @@ const Page = (props: Props) => {
         <div className="col-span-6 flex flex-col h-full">
           <div className="flex-1 flex flex-col items-start gap-4">
             <button
-              className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+              className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
               onClick={handlePayOnDelivery}
             >
               <IoCardOutline /> <p className="font-medium">Pay on delivery</p>
             </button>
             <button
-              className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+              className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
               onClick={handleRazorPay}
               disabled={isLoading}
             >
@@ -151,7 +151,7 @@ const Page = (props: Props) => {
               </p>
             </button>
             <button
-              className="w-[60%] p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+              className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
               disabled={true}
             >
               <Image src="/stripe.png" alt="razorPay" width={80} height={50} />{" "}

@@ -16,8 +16,8 @@ type Props = {
 const ProductCard = ({ item, index, isLoading, nameOnly,showPriceWhenNameOnly }: Props) => {
   if (isLoading) {
     return (
-      <div className="relative flex flex-col  bg-white">
-        <Skeleton className="h-[250px] w-[200px] rounded-xl" />
+      <div className="relative flex flex-col  bg-white mx-1">
+        <Skeleton className="h-[250px] md:w-[200px]  rounded-xl" />
         <Skeleton className="h-[30px] w-[160px] my-3 rounded-xl" />
         <Skeleton className="h-[30px] w-[100px] rounded-xl " />
       </div>
@@ -28,29 +28,11 @@ const ProductCard = ({ item, index, isLoading, nameOnly,showPriceWhenNameOnly }:
       href={`/products/${item.name.toLowerCase().replaceAll(" ", "-")}`}
       key={index}
       scroll={true}
-      className={`w-full flex flex-col lg:max-w-[300px] lg:gap-2 sm:gap-1`}
-      //   className={`w-full ${
-      //     index % 2 === 0 ? "col-span-3 bg-red-200" : "col-span-2 bg-blue-200"
-      //   }`}
-      // {!nameOnly ?   <div className="relative w-full h-[370px]  cursor-pointer">
-      // <motion.div
-      //     initial={{ opacity: 1 }}
-      //     whileHover={{ opacity: 0 }}
-      //     transition={{ duration: 0.5 }}
-      //     className="absolute w-full h-full top-0 left-0"
-      //   >
-      //     <Image
-      //       src={item.images[0]}
-      //       alt={item.name}
-      //       width={300}
-      //       height={300}
-      //       className=""
-      //     />
-      //   </motion.div>
-      //md:h-[320px] h-[240px] lg:h-[370px]
+      className={`w-full flex flex-col h-full lg:max-w-[300px] lg:gap-2 sm:gap-1`}
+
     >
       {!nameOnly ? (
-        <div className="relative  pb-[150%] cursor-pointer">
+        <div className="relative   pb-[150%] cursor-pointer">
           <motion.div
             initial={{ opacity: 1 }}
             whileHover={{ opacity: 0 }}

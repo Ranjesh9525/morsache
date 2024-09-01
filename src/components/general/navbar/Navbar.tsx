@@ -11,10 +11,11 @@ import { useMediaQuery } from "@react-hook/media-query";
 import Link from "next/link";
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+// import { useuserData } from "next-auth/react";
 import { AiOutlineUser } from "react-icons/ai";
 import { CartContext } from "@/context/cartContext";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/context/globalContext";
 
 type Props = {
   scrolling: boolean;
@@ -23,6 +24,7 @@ type Props = {
 type CustomPosition = "static" | "relative" | "absolute" | "sticky" | "fixed";
 
 const Navbar = ({ scrolling, setSideNav }: Props) => {
+  const {userData} = useContext(GlobalContext)!
    const isMobile = useMediaQuery("only screen and (max-width: 768px)");
    const isTablet = useMediaQuery("only screen and (max-width: 1024px)");
   //  const mobile = window.matchMedia("(max-width: 768px)").matches;
@@ -45,7 +47,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
     },
   };
 
-  const { data: session }: any = useSession();
+  // const { data: session }: any = useSession();
   const { cart, dispatch } = useContext(CartContext)!;
   // console.log(session);
   // console.log("session from client",session)
@@ -68,7 +70,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
               onClick={() => setSideNav({ open: true })}
             />
           </span>
-          {session?.user?.role === "admin" ? (
+          {userData?.user?.role === "admin" ? (
             <Link href="/admin" className="inline-flex mr-6 md:mr-0 items-end uppercase">
               <Image
                 src="/morsache-clothing-logo-small.png"
@@ -103,7 +105,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
             id="icons"
             className="flex  items-center justify-end md:gap-4 gap-2 w-full "
           >
-            {session?.user ? (
+            {userData?.user ? (
               <Link scroll={true} href={"/account"}>
                 <AiOutlineUser className="bg-gray-200 md:p-[0.35rem] p-[0.2rem] md:h-[30px] md:w-[30px] h-[20px] w-[20px] rounded-[50%]" />{" "}
               </Link>

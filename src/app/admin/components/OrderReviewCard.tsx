@@ -197,7 +197,7 @@ const OrderReviewCard = ({orderNo}: Props) => {
     <div>
       {isPending ? (
        <div className="flex justify-center items-center h-[50%]"> <ClipLoader size={30} /></div>
-      ) : (
+      ) : order ? (
         <div className="max-w-[80vw] w-full">
           <section id="products" className="rounded-t-md">
             <section className="bg-primary-dark p-3 rounded-t-md">
@@ -371,7 +371,7 @@ const OrderReviewCard = ({orderNo}: Props) => {
           </section>
           <section id="recommendations"></section>
         </div>
-      )}
+      ): <p>Nothing to display here,<br /> either an error occured or order has been deleted</p>}
     </div>
   );
 };

@@ -304,7 +304,7 @@ export const FetchUserCartShippingData = async () => {
     }, null);
     // console.log(shippingData);
     user.carts[0].shippingAddress = userShippingAddress;
-    user.carts[0].recieveBy = "delivery";
+    user.carts[0].receiveBy = "delivery";
     if (shippingData) {
       user.carts[0].shippingPrice = shippingData?.price;
       await user.save();
@@ -318,7 +318,7 @@ export const FetchUserCartShippingData = async () => {
       if (!DefaultShippingData) {
         throw new Error("No default shipping data found");
       } else {
-        console.log(DefaultShippingData);
+        // console.log(DefaultShippingData);
         user.carts[0].shippingPrice = DefaultShippingData?.price;
         await user.save();
         return Response("shipping data", 200, true, DefaultShippingData);
@@ -330,6 +330,24 @@ export const FetchUserCartShippingData = async () => {
   }
 };
 
+export const UpdateCartOrderRecieveBy = async(choice:string)=>{
+  try{
+    await connectDB();
+    const session: any = await getServerSession(authOptions);
+    const userId = session!?.user!?._id;
+    const user = await UserModel.findOne({ _id: userId });
+    if (!user) {
+      throw new Error("No User found");
+    }
+    user.carts[0].receiveBy = choice;
+      await user.save();
+      return Response("shipping data", 200, true);
+
+  }catch(err){
+    console.log("error updating Receive method",err)
+    throw err
+  }
+}
 const generateRandomOrderNumber = () => {
   const randomValue = crypto.randomBytes(12).toString("hex");
   const hash = crypto.createHash("sha256").update(randomValue).digest("hex");
@@ -348,17 +366,48 @@ export const InitializeOrder = async (paymentMethod: string) => {
     if (!user) {
       throw new Error("No User found");
     }
-    const cart = user.carts[0];
+    const cart:CartForServer = user.carts[0];
     if (!cart) {
       throw new Error("Cart not found");
     }
+    
+    if(paymentMethod === 'razorPay'){
+      const razorPayRequest = await fetch("/api/razorpay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
+      });
+      const {
+        id: order_id,
+        status,
+        currency: order_currency,
+        amount: order_amount,
+      } = await razorPayRequest.json();
+      if(status === "captured"){
+      const order = new OrdersModel({
+        orderNumber: order_id,
+        customer: userId,
+        items: cart.items,
+        totalItems: cart.totalItems,
+        totalAmount: cart.totalAmount + (parseInt(cart?.shippingPrice) || 0),
+        shippingPrice: cart.shippingPrice,
+        orderStatus: "pending",
+        shippingAddress: cart.shippingAddress,
+        paymentMethod: {
+          type: paymentMethod,
+        },
+        paymentStatus: "pending",
+      });}
 
+    }
     const order = new OrdersModel({
       orderNumber: generateRandomOrderNumber(),
       customer: userId,
       items: cart.items,
       totalItems: cart.totalItems,
-      totalAmount: cart.totalAmount + cart.shippingPrice,
+      totalAmount: cart.totalAmount + cart?.shippingPrice,
       shippingPrice: cart.shippingPrice,
       orderStatus: "pending",
       shippingAddress: cart.shippingAddress,

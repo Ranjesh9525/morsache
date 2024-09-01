@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Cart, CartForServer, CartItem } from "@/@types/cart.d";
 import { Product } from "@/@types/products.d";
 import { Separator } from "@/components/ui/separator";
@@ -55,6 +55,7 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
 const CheckoutCard = ({cart, cartId }: Props) => {
   const [code, setCode] = useState<string>("");
   // const { cart } = useContext(CartContext)!;
+  const shippingRef:any = useRef(null)
   const [userCartWithDiscount, setUserCartWithDiscount] = useState<Cart | null>(
     !cart ? null : cart
   );
@@ -110,7 +111,7 @@ const CheckoutCard = ({cart, cartId }: Props) => {
   const { data: session } = useSession();
 
   function uploadCartSubmit() {
-    if (!session?.user) {
+    if (!session?.user ) {
       router.push(`/auth/login?callbackUrl=${encodeURIComponent("/cart")}`);
     }else{
     const modifiedCart: CartForServer =  { ...cart! };
@@ -128,7 +129,7 @@ const CheckoutCard = ({cart, cartId }: Props) => {
     
       delete item.product;
     }
-    console.log(modifiedCart)
+    // console.log(modifiedCart)
     server_CreateCartMutate(modifiedCart);
   }
   }
@@ -235,13 +236,16 @@ const CheckoutCard = ({cart, cartId }: Props) => {
     enabled: false,
   });
   useEffect(() => {
-    if (Shipping.choice) {
+    if (Shipping.choice ==="delivery") {
       refetch();
+    }else{
+      shippingRef.current?.innerHTML === ""
     }
   }, [Shipping]);
   useEffect(() => {
     if (shippingDataIsError) {
       console.log(shippingDataError);
+      router.push('/serverError')
     }
     if (shippingDataResponse) {
       console.log(shippingDataResponse, userCartWithDiscount);
@@ -318,7 +322,7 @@ const CheckoutCard = ({cart, cartId }: Props) => {
             </span>
             <span className="inline-flex items-center justify-between text-[15px]">
               <h1 className="font-medium text-gray-800">Shipping</h1>
-              <span className="text-gray-400 text-[14px]">
+              <span className="text-gray-400 text-[14px]" ref={shippingRef}>
                 {shippingDataIsPending ? (
                   <p>
                     Calulating... <ClipLoader size={17} />

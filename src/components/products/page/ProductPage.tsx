@@ -502,7 +502,16 @@ const ProductPage = ({ slug }: Props) => {
   // }
   useEffect(() => {
     if (product) {
-      saveRecentlyViewedProduct(product);
+      const optimizedProduct = {
+        id: product.id,
+        images: product?.images,
+        name: product?.name,
+        slug: product?.slug,
+        sizes: product?.sizes,
+        price: product?.price,
+        salePrice: product?.salePrice,
+      };
+      saveRecentlyViewedProduct(optimizedProduct);
     }
   }, [product]);
   return (

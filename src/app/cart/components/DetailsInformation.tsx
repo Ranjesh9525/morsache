@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Image from "next/image";
 import { AiOutlineUser } from "react-icons/ai";
 import { z } from "zod";
@@ -26,10 +26,24 @@ import { toast } from "@/components/ui/use-toast";
 import { ShippingAddress } from "@/@types/cart";
 import { UserDocument } from "@/@types/user";
 import { FaPlus } from "react-icons/fa6";
+import PrevAndNextBtn from "./PrevAndNextBtn";
 
-const DetailsInformation = () => {
+const DetailsInformation = ({cartId}:{cartId:any}) => {
   const [userData, setUserData] = useState<UserDocument | null>(null);
   const [addShippingAddress, setaddShippingAddress] = useState<boolean>(false);
+  // const [onclickFunc, setOnclickFunc] = useState();
+const router = useRouter()
+
+  function onclickFunc(){
+    if(userData && !addShippingAddress){
+      router.push(`/cart/checkout/shipping/${cartId}`)
+    }else{
+      toast({
+        title:"Please enter a shipping address first"
+      })
+    }
+  }
+
 
   async function fetchUserData() {
     try {
@@ -134,7 +148,7 @@ const DetailsInformation = () => {
             </div>{" "}
            <div>
             <h1 className="w-full text-sm mb-4">Saved Shipping Addresses:</h1>
-             <div className="w-full grid grid-cols-4 gap-6">
+             <div className="w-full grid md:grid-cols-4 gap-6">
               { userData!.address!.map((a: ShippingAddress, a_index: number) => {
                 if (!a.city || !a.state || !a.country || !a.street) return null;
                 return (
@@ -282,6 +296,15 @@ const DetailsInformation = () => {
           </Form>
         </section>
       )}
+       <div className="mt-auto">
+        <PrevAndNextBtn
+          showBack={true}
+          showNext={true}
+          onclickFunc={onclickFunc}
+          nextLink={`/cart/checkout/shipping/${cartId}`}
+          prevLink={`/cart`}
+        />
+      </div>
     </div>
   );
 };

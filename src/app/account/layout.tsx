@@ -1,14 +1,17 @@
-import { Metadata } from "next"
-import Image from "next/image"
 
-import { Separator } from "@/components/ui/separator"
-import { SidebarNav } from "./components/sidebar-nav"
-import HomeLayout from "@/components/layouts/HomeLayout"
+import { Metadata } from "next";
+import Image from "next/image";
+
+import { Separator } from "@/components/ui/separator";
+import { SidebarNav } from "./components/sidebar-nav";
+import HomeLayout from "@/components/layouts/HomeLayout";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Account - Morsache Clothing",
   description: "your account",
-}
+};
 
 const sidebarNavItems = [
   {
@@ -31,13 +34,14 @@ const sidebarNavItems = [
   //   title: "Display",
   //   href: "/account/display",
   // },
-]
+];
 
 interface SettingsLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
+  
   return (
     <HomeLayout title="Account - Morsache Clothing">
       <div className="hidden">
@@ -72,5 +76,5 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         </div>
       </div>
     </HomeLayout>
-  )
+  );
 }

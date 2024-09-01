@@ -15,11 +15,11 @@ type Props = {
 const page = (props: Props) => {
   return (
     <HomeLayout title="Review order - Morsache Clothing">
-      <div className="w-full container mb-9 mt-4 gap-9">
+      <div className="w-full md:container p-4 mb-9 mt-4 gap-9">
         <div id="header" className="  pb-5">
-          <section className="flex justify-between items-center ">
+          <section className="flex md:flex-row flex-col gap-3 justify-between items-center ">
             <span className="flex-[6]">
-              <h1 className="text-3xl  font-bold tracking-tight capitalize">
+              <h1 className="text-3xl w-full md:w-fit mb-3 md:mb-0 font-bold tracking-tight capitalize">
                 Review Order {props.params.orderNo}
               </h1>{" "}
               <p className="text-gray-500 text-[14px] my-1">
@@ -29,7 +29,7 @@ const page = (props: Props) => {
                 that this wont be possible when your order has been shipped
               </p>
             </span>
-            <span className="flex-[4] justify-end  gap-2 flex">
+            <span className="flex-[4] justify-end flex-row gap-2 flex">
               <Link href="/search" className="cursor-pointer">
                 <Button className="">Back to shopping</Button>
               </Link>

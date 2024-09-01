@@ -174,3 +174,14 @@ title{
 
   background-color: white;
 }
+
+
+@media screen and (max-width: 767px) {
+  /* Remove scrollbar */
+.hideScroll {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    overflow: -moz-scrollbars-none; /* Firefox */
+  }
+ 
+}

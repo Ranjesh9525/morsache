@@ -63,7 +63,7 @@ export const cartSchema = new mongoose.Schema(
       //   type: String,
       // },
     },
-    recieveBy: {
+    receiveBy: {
       type: String,
       enum: ["delivery", "pickup"],
     },

@@ -7,9 +7,16 @@ type props = {
   showNext: boolean;
   nextLink?: string;
   prevLink?: string;
+  onclickFunc?: any;
 };
 
-const PrevAndNextBtn = ({ showBack, showNext, nextLink, prevLink }: props) => {
+const PrevAndNextBtn = ({
+  showBack,
+  onclickFunc,
+  showNext,
+  nextLink,
+  prevLink,
+}: props) => {
   return (
     <div className="w-full items-center  mb-2 flex justify-between">
       {showBack ? (
@@ -23,12 +30,13 @@ const PrevAndNextBtn = ({ showBack, showNext, nextLink, prevLink }: props) => {
         <span></span>
       )}
       {showNext ? (
-        <Link
-                    
-          className="text-sm text-white hover:bg-[#c6c5c5] bg-[#ababab] rounded-md px-4 py-2"
-          href={nextLink || ""}
+        <span
+          onClick={onclickFunc}
+          className="text-sm cursor-pointer text-white hover:bg-[#c6c5c5] bg-[#ababab] rounded-md px-4 py-2"
+          // href={nextLink || ""}
         >
-      Next</Link>
+          Next
+        </span>
       ) : (
         <span></span>
       )}

@@ -185,9 +185,9 @@ const CheckoutLayout = ({ title, description, keywords, children }: Props) => {
                                 : "text-[#9F9F9F] font-medium capitalize"
                             }
                           >
-                            <BreadcrumbLink href={page.path}>
+                            {/* <BreadcrumbLink href={page.path}> */}
                               {page.name}
-                            </BreadcrumbLink>
+                            {/* </BreadcrumbLink> */}
                           </BreadcrumbItem>
                           {index + 1 !== PagesNames.length && (
                             <BreadcrumbSeparator />
