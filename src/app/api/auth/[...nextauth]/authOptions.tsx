@@ -85,7 +85,7 @@ export const authOptions: AuthOptions = {
         const existingUser = await UserModel.findOne({ email: user.email });
         if (existingUser) {
           console.log("User already exists in the database");
-                await disconnectDB()
+                // await disconnectDB()
           return existingUser;
         }
         // if(!registered){

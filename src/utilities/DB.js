@@ -4,7 +4,7 @@ const dbUrl = process.env.DBURL;
 const connectDB = async () => {
   if (mongoose.connections[0].readyState) return;
   try {
-    console.log("connecting to db");
+    console.log("connecting to db...");
      await mongoose.connect(dbUrl);
 
     console.log(`Database connection to MongoDB successful`);
@@ -12,20 +12,22 @@ const connectDB = async () => {
     console.log("Error connecting to MongoDB:", error.message);
     // Implement retry logic
     // setTimeout(connectDB, 5000);
+    
   }
 
   mongoose.connection.on("error", (err) => {
     console.log("MongoDB connection error:", err);
+    throw err
   });
 
   mongoose.connection.on("disconnected", () => {
-    console.log("MongoDB disconnected. Reconnecting...");
+    console.log("MongoDB disconnected.");
   });
   // reconnect();
 
-  mongoose.connection.on("connected", () => {
-    console.log("MongoDB connected!");
-  });
+  // mongoose.connection.on("connected", () => {
+  //   console.log("MongoDB connected!");
+  // });
 };
 
 let reconnectAttempts = 0;
