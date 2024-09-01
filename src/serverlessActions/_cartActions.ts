@@ -367,7 +367,7 @@ export const InitializeOrder = async (paymentMethod: string) => {
       },
       paymentStatus: "pending",
     });
-    console.log("order", order);
+    // console.log("order", order);
     await order.save();
     user.carts[0].paymentMethod = { type: paymentMethod };
     user.carts[0].isPaid = true;

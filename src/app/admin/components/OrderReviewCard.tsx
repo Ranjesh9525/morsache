@@ -171,7 +171,7 @@ const OrderReviewCard = ({orderNo}: Props) => {
   } = useMutation({
     mutationFn: FetchOrderByOrderNo,
     onSuccess(response) {
-      // console.log(response)
+     console.log(response)
       setOrder(response.data);
     },
     onError(error) {

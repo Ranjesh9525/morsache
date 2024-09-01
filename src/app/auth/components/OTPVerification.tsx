@@ -50,7 +50,7 @@ const OTPVerification = ({ email, setEmail }: Props) => {
     const response = await fetch(otpRequestURL);
 
     if (response) {
-      if (response.url.includes(formattedCallback)) {
+      if (response.url.includes(decodeURIComponent(formattedCallback))) {
         await refetch().then((dat) => {
           // console.log("check", dat);
           setIsNewUser(dat.data?.data?.isNewUser);

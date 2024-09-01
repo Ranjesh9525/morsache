@@ -57,7 +57,7 @@ export const UserGetWishlists = async() => {
       return product.data;
     })
   );
-  console.log(products,user?.wishlist)
+  // console.log(products,user?.wishlist)
   // If there is only one product, convert it to an array
  
   
@@ -164,11 +164,11 @@ export const UserUpdateProfile = async ({
     const userId= session!?.user!?._id;
     const user = await UsersModel.findOne({ _id: userId });
     const hashedPassword = await bcrypt.hash(password, 12)
-    console.log("here", userId,
-    firstName,
-    lastName,
-    hashedPassword,
-    phoneNumber,)
+    // console.log("here", userId,
+    // firstName,
+    // lastName,
+    // hashedPassword,
+    // phoneNumber,)
     // if (userId?.toString() !== userIdFromServer?.toString()) {
     //   console.log("unauthorized")
     //   throw new Error("Unauthorized");

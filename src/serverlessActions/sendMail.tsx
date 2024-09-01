@@ -1,5 +1,7 @@
 import nodemailer from "nodemailer";
-
+const senderName = process.env.SMTP_FROM_NAME;
+const senderEmail = process.env.SMTP_FROM;
+const sender = `"${senderName}" <${senderEmail}>`;
 export const sendOrderConfirmationEmail = (
   order: any,
   recipient: string,
@@ -8,7 +10,7 @@ export const sendOrderConfirmationEmail = (
   const server = {
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
-    secure: process.env.MAIL_SECURE === "true", // true for 465, false for other ports
+    secure: process.env.MAIL_SECURE === "true",
     service: process.env.SMTP_SERVICE,
     auth: {
       user: process.env.SMTP_USER,
@@ -19,8 +21,8 @@ export const sendOrderConfirmationEmail = (
 
   // Email content
   const mailOptions = {
-    from: process.env.MAIL_FROM,
-    to: recipient, // Replace with the recipient's email
+    from: sender,
+    to: recipient, 
     subject: subject,
     html: `
     <p style="font-family: Arial, sans-serif; font-size: 18px; color: #333;">Dear Customer,</p>
