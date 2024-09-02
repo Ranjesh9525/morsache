@@ -169,21 +169,22 @@ const router = useRouter()
   const [order, setOrder] = useState<OrderReviewData | null>(null);
   const {
     isSuccess,
+    error,
     isPending,
     mutate: server_fetchOrderById,
   } = useMutation({
     mutationFn: FetchOrderByOrderNo,
     onSuccess(response) {
-     console.log(response)
+    //  console.log(response)
       setOrder(response.data);
     },
     onError(error) {
-      console.log(error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: <p>{error?.message}</p>,
-      });
+       console.log(error)
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Error",
+    //     description: <p>{error?.message}</p>,
+    //   });
     },
   });
   useEffect(() => {
@@ -200,7 +201,8 @@ if(!orderNo){
   return (
     <div>
       {isPending ? (
-        <ClipLoader />
+        <p className="text-center">
+        <ClipLoader /></p>
       ) : order ? (
         <div className="md:max-w-[80vw] w-full">
           <section id="products" className="rounded-t-md">
@@ -375,7 +377,7 @@ if(!orderNo){
           </section>
           <section id="recommendations"></section>
         </div>
-      ) : <p>Nothing to display here,<br /> either an error occured or order has been deleted</p>}
+      ) : <p className="text-center font-semibold text-base">Nothing to display here<br /> {error? <p className="capitalize font-light text-[14px]"> {error?.message}</p>: "This order was not found. Either it has been deleted or removed by admin"}</p>}
     </div>
   );
 };

@@ -276,7 +276,7 @@ const router = useRouter()
                       </h1>
                       <FormMessage />
                       <FormControl>
-                        <Input placeholder="Enter zip code" {...field} />
+                        <Input placeholder="Enter your country" {...field} />
                       </FormControl>
                     </FormItem>
                   )}

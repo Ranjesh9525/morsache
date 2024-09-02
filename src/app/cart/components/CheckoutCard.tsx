@@ -171,7 +171,7 @@ const CheckoutCard = ({cart, cartId }: Props) => {
           payload: findCartData?.data?.recieveBy,
         });
       }
-      console.log(findCartData?.data);
+      // console.log(findCartData?.data);
     }
     if (findCartIsError) {
       console.log(findCartError);
@@ -239,7 +239,7 @@ const CheckoutCard = ({cart, cartId }: Props) => {
     if (Shipping.choice ==="delivery") {
       refetch();
     }else{
-      shippingRef.current?.innerHTML === ""
+      shippingRef.current?.innerHTML === 0
     }
   }, [Shipping]);
   useEffect(() => {

@@ -434,7 +434,7 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
       user.carts[0].isPaid = true;
       await user.save();
       sendOrderConfirmationEmail(order, user.email, "You placed an order!");
-      return Response("Order created", 200, true, order?._id);
+      return Response("Order created", 200, true, order?.orderNumber);
     }
   } catch (error) {
     console.error("Error creating order", error);
@@ -444,14 +444,16 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
 
 export const FetchOrderByOrderNo = async (orderNo: string) => {
   try {
+    await connectDB()
+    // console.log(orderNo)
     const session: any = await getServerSession(authOptions);
     const userId = session!?.user!?._id;
     const user = await UserModel.findOne({ _id: userId });
     const order: Order = await OrdersModel.findOne({ orderNumber: orderNo });
-    const customer = await UserModel.findOne({ _id: order.customer });
     if (!order) {
       throw new Error("Order not found");
     }
+    const customer = await UserModel.findOne({ _id: order?.customer });
     // if (!user || order.customer !== user?._id && user?.role !== "admin") {
     //   throw new Error("Unauthorized access");
     // }

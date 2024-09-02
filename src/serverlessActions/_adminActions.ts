@@ -4,6 +4,7 @@ import { UserSearch } from "lucide-react";
 import { cloudinaryUpload } from "@/utilities/config";
 import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
+import AdminModel from "../models/Admin";
 import CategoryModel from "../models/Category";
 import ShippingModel from "../models/Shipping";
 import StoreModel from "../models/Store";
@@ -14,6 +15,7 @@ import { Offer, Product } from "@/@types/products";
 import { category } from "@/@types/categories";
 import { Order } from "@/@types/order";
 import { Store } from "@/@types/store";
+import Admin from "@/models/Admin";
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -336,7 +338,7 @@ export const AdminUpdateStoreData = async (data: any) => {
       for (let i = 0; i < carouselImages.length; i++) {
         const image = carouselImages[i];
         const publicId = `image${i}`;
-    
+
         if (!image.includes("cloudinary")) {
           const cloudPhoto = await cloudinaryUpload(image, {
             folder: "store/slider-images",
@@ -346,7 +348,6 @@ export const AdminUpdateStoreData = async (data: any) => {
         } else {
           newImages.push(image);
         }
-      
       }
 
       storeData.carouselImages = newImages;
@@ -362,5 +363,22 @@ export const AdminUpdateStoreData = async (data: any) => {
   } catch (error) {
     console.error("Error updating store data", error);
     throw error;
+  }
+};
+
+export const AdminData = async () => {
+  try {
+    await connectDB();
+    const adminData = await AdminModel.find({});
+    // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
+    if (!adminData) {
+      // throw new Error("Couldnt retrieve admin data");
+
+    }
+
+    return Response("Store data updated successfully", 200, true, adminData);
+  } catch (Error) {
+    console.log("Error fetching admin data", Error);
+    throw Error;
   }
 };

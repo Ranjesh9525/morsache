@@ -62,7 +62,7 @@ const orderColumns: ColumnDef<Order>[] = [
 ];
 const Page = (props: Props) => {
   const [orders, setOrders] = React.useState<Order[] | null>(null);
-
+  const [switchValue, setSwitchValue] = React.useState<boolean>(false);
   // const {
   //   isPending,
   //   isError,
@@ -102,14 +102,32 @@ const Page = (props: Props) => {
       {/**/}
 
       <div className="container mx-auto min-h-[70vh] py-10">
-        <div>Auto confrim orders</div>
+        <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+          <div className="space-y-0.5">
+            <h1 className="text-base">Auto confirm orders?</h1>
+            <p>
+              Set all orders to be confirmed after they are placed, NOTE that by
+              default every other would be approved and wouldnt need an admin to
+              review them
+            </p>
+          </div>
+
+          <Switch checked={switchValue} onCheckedChange={setSwitchValue} />
+        </div>
         {isPending ? (
           <p className="text-center">
             <ClipLoader size={50} />
           </p>
         ) : orders && orders?.length > 0 ? (
-          <DataTable rowKey={"orderNumber"} columns={orderColumns} route={"orders"} data={orders!} />
-        ):<p>No orders found</p>}
+          <DataTable
+            rowKey={"orderNumber"}
+            columns={orderColumns}
+            route={"orders"}
+            data={orders!}
+          />
+        ) : (
+          <p>No orders found</p>
+        )}
       </div>
     </>
   );

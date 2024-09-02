@@ -40,7 +40,7 @@ const page = (props: Props) => {
           </section>
           <Separator className="mt-7" />
         </div>
-        <ReviewCard orderNo={props?.params?.orderNo}/>
+        <ReviewCard orderNo={props?.params?.orderNo.toString()}/>
       </div>
     </HomeLayout>
   );
