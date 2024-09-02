@@ -330,8 +330,8 @@ export const FetchUserCartShippingData = async () => {
   }
 };
 
-export const UpdateCartOrderRecieveBy = async(choice:string)=>{
-  try{
+export const UpdateCartOrderRecieveBy = async (choice: string) => {
+  try {
     await connectDB();
     const session: any = await getServerSession(authOptions);
     const userId = session!?.user!?._id;
@@ -340,14 +340,13 @@ export const UpdateCartOrderRecieveBy = async(choice:string)=>{
       throw new Error("No User found");
     }
     user.carts[0].receiveBy = choice;
-      await user.save();
-      return Response("shipping data", 200, true);
-
-  }catch(err){
-    console.log("error updating Receive method",err)
-    throw err
+    await user.save();
+    return Response("shipping data", 200, true);
+  } catch (err) {
+    console.log("error updating Receive method", err);
+    throw err;
   }
-}
+};
 const generateRandomOrderNumber = () => {
   const randomValue = crypto.randomBytes(12).toString("hex");
   const hash = crypto.createHash("sha256").update(randomValue).digest("hex");
@@ -357,7 +356,7 @@ const generateRandomOrderNumber = () => {
   return orderNumber;
 };
 
-export const InitializeOrder = async (paymentMethod: string) => {
+export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:{paymentMethod: string,order:any}) => {
   try {
     await connectDB();
     const session: any = await getServerSession(authOptions);
@@ -366,32 +365,61 @@ export const InitializeOrder = async (paymentMethod: string) => {
     if (!user) {
       throw new Error("No User found");
     }
-    const cart:CartForServer = user.carts[0];
+    const cart: CartForServer = user.carts[0];
     if (!cart) {
       throw new Error("Cart not found");
     }
-    
-    if(paymentMethod === 'razorPay'){
-      const razorPayRequest = await fetch("/api/razorpay", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
-      });
-      const {
-        id: order_id,
-        status,
-        currency: order_currency,
-        amount: order_amount,
-      } = await razorPayRequest.json();
-      if(status === "captured"){
+
+    if (paymentMethod === "razorPay") {
+      // const razorPayRequest = await fetch("/api/razorpay", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
+      // });
+      // const {
+      //   id: order_id,
+      //   status,
+      //   currency: order_currency,
+      //   amount: order_amount,
+      // } = await razorPayRequest.json();
+      // console.log(razorPayRequest);
+      if (responseFromGateway.status === "captured") {
+        const order = new OrdersModel({
+          orderNumber: responseFromGateway.id,
+          customer: userId,
+          items: cart.items,
+          totalItems: cart.totalItems,
+          totalAmount:responseFromGateway.amount,
+          shippingPrice: cart.shippingPrice,
+          orderStatus: "pending",
+          shippingAddress: cart.shippingAddress,
+          paymentMethod: {
+            type: paymentMethod,
+          },
+          paymentStatus: "paid",
+          paidOn: Date.now(),
+        });
+        await order.save();
+        user.carts[0].paymentMethod = { type: paymentMethod };
+        user.carts[0].isPaid = true;
+        await user.save();
+
+        sendOrderConfirmationEmail(order, user.email, "You placed an order!");
+
+        return Response("Order created", 200, true, order?._id);
+      }else{
+        throw new Error("Payment failed")
+      }
+    }
+    if (paymentMethod === "payOnDelivery") {
       const order = new OrdersModel({
-        orderNumber: order_id,
+        orderNumber: generateRandomOrderNumber(),
         customer: userId,
         items: cart.items,
         totalItems: cart.totalItems,
-        totalAmount: cart.totalAmount + (parseInt(cart?.shippingPrice) || 0),
+        totalAmount: cart.totalAmount + (parseInt(cart?.shippingPrice!) || 0),
         shippingPrice: cart.shippingPrice,
         orderStatus: "pending",
         shippingAddress: cart.shippingAddress,
@@ -399,32 +427,15 @@ export const InitializeOrder = async (paymentMethod: string) => {
           type: paymentMethod,
         },
         paymentStatus: "pending",
-      });}
-
+      });
+      // console.log("order", order);
+      await order.save();
+      user.carts[0].paymentMethod = { type: paymentMethod };
+      user.carts[0].isPaid = true;
+      await user.save();
+      sendOrderConfirmationEmail(order, user.email, "You placed an order!");
+      return Response("Order created", 200, true, order?._id);
     }
-    const order = new OrdersModel({
-      orderNumber: generateRandomOrderNumber(),
-      customer: userId,
-      items: cart.items,
-      totalItems: cart.totalItems,
-      totalAmount: cart.totalAmount + cart?.shippingPrice,
-      shippingPrice: cart.shippingPrice,
-      orderStatus: "pending",
-      shippingAddress: cart.shippingAddress,
-      paymentMethod: {
-        type: paymentMethod,
-      },
-      paymentStatus: "pending",
-    });
-    // console.log("order", order);
-    await order.save();
-    user.carts[0].paymentMethod = { type: paymentMethod };
-    user.carts[0].isPaid = true;
-    await user.save();
-
-    sendOrderConfirmationEmail(order, user.email, "Order Confirmation");
-    //if payment on delivery send email for order initiated
-    return Response("Order created", 200, true, order?._id);
   } catch (error) {
     console.error("Error creating order", error);
     throw error;
@@ -454,7 +465,6 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
           data: OptimizedProduct;
         } = await FetchSingleProductByIdOptimized(item.productId!);
         if (product) {
-       
           // returnData.products = []
           returnData.products.push({
             product: product?.data,

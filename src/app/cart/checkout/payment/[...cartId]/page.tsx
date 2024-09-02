@@ -52,21 +52,21 @@ const Page = (props: Props) => {
     }
 
     // Call your API to create an order
-    // const result = await fetch("/api/razorpay", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ amount: 500, currency: "INR" }),
-    // });
-    server_InitializeOrder("razorPay");
+    const result = await fetch("/api/razorpay", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
+    });
+   
+const order = await result.json();
 
     const {
       id: order_id,
       currency: order_currency,
       amount: order_amount,
-    } = await result.json();
-
+    } = order
     const options = {
       key: process.env.RAZORPAY_KEY_ID,
       amount: order_amount.toString(),
@@ -76,14 +76,17 @@ const Page = (props: Props) => {
       image: "/morsache-clothing-logo.png",
       order_id,
       handler: async (response: any) => {
-        alert(
-          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+        toast({
+          title:`Payment successful!`,
+          description: <p>{`Payment ID: ${response.razorpay_payment_id}`}</p>
+        }
         );
         // add post payment logic
+         server_InitializeOrder({paymentMethod:"razorPay",order});
       },
       prefill: {
-        name: "John Doe",
-        email: "johndoe@example.com",
+        name: "test user",
+        email: "testuser@example.com",
         contact: "9999999999",
       },
       notes: {
@@ -101,7 +104,7 @@ const Page = (props: Props) => {
 
   const handlePayOnDelivery = () => {
     // add pay on delivery logic
-    server_InitializeOrder("payOnDelivery");
+    server_InitializeOrder({paymentMethod:"payOnDelivery",order:null});
   };
 
   useEffect(() => {
@@ -133,7 +136,7 @@ const Page = (props: Props) => {
               className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
               onClick={handlePayOnDelivery}
             >
-              <IoCardOutline /> <p className="font-medium">Pay on delivery</p>
+              <IoCardOutline size={30} /> <p className="font-medium">Pay on delivery</p>
             </button>
             <button
               className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"

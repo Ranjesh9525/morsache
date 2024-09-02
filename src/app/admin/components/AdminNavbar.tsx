@@ -166,7 +166,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Store</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {storeComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -183,7 +183,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Offers</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {offersComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -265,7 +265,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     Orders
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {ordersComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -294,7 +294,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {categoriesComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -313,7 +313,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     Products
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {productsComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -332,7 +332,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     <h1>Pages</h1>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                       {pagesComponents.map((component) => (
                         <ListItem
                           key={component.title}

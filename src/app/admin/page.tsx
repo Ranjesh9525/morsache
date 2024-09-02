@@ -16,7 +16,7 @@ const page = (props: Props) => {
         <p className="text-gray-500 text-[14px] "> Here&#39;s how morsache store has been doing</p>
       </div>
       <Separator />
-      <div id="page-content" className="grid grid-cols-7 gap-4 mt-4">
+      <div id="page-content" className="lg:grid lg:grid-cols-7 flex flex-col gap-4 mt-4">
         <div className="col-span-5 w-full space-y-4">
           <UsersChart />
           <OrdersChart />
