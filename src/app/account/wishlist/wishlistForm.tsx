@@ -79,7 +79,7 @@ const WishlistForm = (props: Props) => {
         ))
        }
     </section> ) : (
-<p className="text-center">You've no items in your wishlist </p>
+<p className="text-center">You&apos;ve no items in your wishlist </p>
 )}
 </>
   );
