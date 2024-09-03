@@ -373,6 +373,7 @@ export const AdminData = async () => {
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
       // throw new Error("Couldnt retrieve admin data");
+      await AdminModel.create({defaultConfirmOrders : true})
 
     }
 
@@ -382,3 +383,14 @@ export const AdminData = async () => {
     throw Error;
   }
 };
+
+export const AdminDeleteProduct = async(id:string)=>{
+  try{
+      await connectDB()
+      await ProductsModel.findByIdAndDelete(id)
+      return Response("Product deleted", 200, true);
+  }catch(Error){
+    console.log("An error occured deleting product" ,Error)
+    throw Error
+  }
+}

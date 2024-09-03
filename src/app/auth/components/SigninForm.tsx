@@ -42,7 +42,7 @@ const SigninForm = ({ setEmail }: Props) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     let email = values.email;
     const response = await signIn("email", {
-      email,
+      email:email.toLowerCase(),
       redirect: false,
       registered: false,
     });

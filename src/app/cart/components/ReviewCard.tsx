@@ -206,7 +206,7 @@ if(!orderNo){
       ) : order ? (
         <div className="md:max-w-[80vw] w-full">
           <section id="products" className="rounded-t-md">
-            <section className="bg-[#545454]/60 p-3 rounded-t-md">
+            <section className="bg-primary-dark p-3 rounded-t-md">
               <h1 className="font-medium text-lg text-white">Products</h1>
             </section>
             {order?.products.map((item, index) => {
@@ -280,7 +280,7 @@ if(!orderNo){
             })}
           </section>
           <section id="order_details">
-            <section className="bg-[#545454]/60 p-4">
+            <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">Details</h1>
             </section>
             <section className="grid border-x px-4">
@@ -314,7 +314,7 @@ if(!orderNo){
             </section>
           </section>
           <section id="payment_details">
-            <section className="bg-[#545454]/60 p-4">
+            <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">
                 Payment Details
               </h1>
@@ -344,7 +344,7 @@ if(!orderNo){
             </section>
           </section>
           <section id="customer_details " className="border-b">
-          <section className="bg-[#545454]/60 p-4">
+          <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">
                 Customer Details
               </h1>

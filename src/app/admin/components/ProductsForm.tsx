@@ -30,19 +30,22 @@ import { MdOutlineDiscount } from "react-icons/md";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 // import ProductPreview from "../../components/ProductPreview";
+
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
-import { AdminGetAllOffers, AdminGetSingleProduct } from "@/serverlessActions/_adminActions";
+import { AdminDeleteProduct, AdminGetAllOffers, AdminGetSingleProduct } from "@/serverlessActions/_adminActions";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/@types/products";
+import ConfirmationDialog from "@/components/general/ConfirmationDialog";
 type Props = {
     data:Product
 }
 
 const ProductsForm = ({data}: Props) => {
     const [dragging, setDragging] = React.useState(false);
+    // const [openDialog, setOpenDialog] = React.useState(false);
     const [imageDimensions, setImageDimensions] = React.useState<any[]>([]);
     const { toast } = useToast();
     const {isPending,isError,data:offers} = useQuery({
@@ -224,8 +227,23 @@ const ProductsForm = ({data}: Props) => {
       "plaid",
     ];
     const sizes = ["xxl", "xl", "l", "m", "sm", "xs"];
+    
+    async function DeleteProduct(){
+    
+        await AdminDeleteProduct(data.id).then((res)=> toast({
+          variant:"success",
+          title:"Product deleted successfully"
+        })).catch((err)=>{
+          console.log(err)
+
+        })
+        console.log(data.id)
+      
+    }
 
   return (
+    <>
+     <ConfirmationDialog openDialog={openDialog} setOpenDialog={setOpenDialog}  dialogTitle= {" Are you sure you want to delete this Product?"} onClick={DeleteProduct} />
     <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -849,6 +867,8 @@ const ProductsForm = ({data}: Props) => {
                 />
               </div>
               <div className="space-y-2 mx-auto w-fit">
+                <section className="flex max-sm:flex-col">
+
                 <Button
                   disabled={
                     form.formState.isValidating ||
@@ -857,19 +877,39 @@ const ProductsForm = ({data}: Props) => {
                   }
                   type="submit"
                   className="w-full max-w-[400px] text-center py-5 h-none"
-                >
+                  >
                   {form.formState.isSubmitting ? (
                     <ClipLoader size={22} color="white" />
-                  ) : (
-                    "Preview Product"
-                  )}
+                    ) : (
+                      "Preview Product"
+                      )}
                 </Button>
+               {data &&  <Button
+                  // disabled={
+                  //   form.formState.isValidating ||
+                  //   form.formState.isSubmitting ||
+                  //   !form.formState.isValid
+                  // }
+              onClick={() => setOpenDialog(false)}
+
+                  variant = {'destructive'}
+                  type="button"
+                  className="w-full max-w-[400px] text-center py-5 h-none"
+                  >
+                  {form.formState.isSubmitting ? (
+                    <ClipLoader size={22} color="white" />
+                    ) : (
+                      "Delete Product"
+                      )}
+                </Button>}
+                      </section>
                 <p className="text-[12.5px] capitalize text-center">
                   preview it on the next page before upload
                 </p>
               </div>
             </form>
           </Form>
+          </>
   )
 }
 
