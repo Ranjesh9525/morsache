@@ -60,13 +60,13 @@ const Page = (props: Props) => {
       body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
     });
    
-//const order = await result.json();
+const order = await result.json();
 
     const {
       id: order_id,
       currency: order_currency,
       amount: order_amount,
-    } = await result.json();
+    } = order
     const options = {
       key: process.env.RAZORPAY_KEY_ID,
       amount: order_amount.toString(),
@@ -82,7 +82,7 @@ const Page = (props: Props) => {
         }
         );
         // add post payment logic
-        //  server_InitializeOrder({paymentMethod:"razorPay",order});
+          server_InitializeOrder({paymentMethod:"razorPay",order});
       },
       prefill: {
         name: "test user",

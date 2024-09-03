@@ -54,12 +54,14 @@ const WishlistForm = (props: Props) => {
     }
   }, [isError, error]);
   return (
-    <section
-      id="products"
+       
+       <>  {isPending ? <p className="text-center w-full"> <ClipLoader /></p> : wishLists && wishLists?.length > 0 ? ( 
+       <section
+      id="wishlist-items-container"
       className={`grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-7`}
     >
-      {wishLists && wishLists?.length > 0 ? (
-        wishLists?.map((item: Product, index: number) => (
+     
+       { wishLists?.map((item: Product, index: number) => (
           <div key={index} className="flex flex-col gap-2">
            
             <ProductCard
@@ -75,10 +77,11 @@ const WishlistForm = (props: Props) => {
             </p>
           </div>
         ))
-      ) : (
-        <ClipLoader />
-      )}
-    </section>
+       }
+    </section> ) : (
+<p className="text-center">You've no items in your wishlist </p>
+)}
+</>
   );
 };
 

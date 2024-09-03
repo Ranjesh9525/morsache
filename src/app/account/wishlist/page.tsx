@@ -1,14 +1,13 @@
 import { Separator } from "@/components/ui/separator"
 import WishlistForm  from "./wishlistForm"
 
-export default function SettingsDisplayPage() {
+export default function WishlistPage() {
   return (
-    <div className="space-y-6">
+    <div id="wishlist-container" className="space-y-6">
       <div>
       <h3 className="text-lg font-medium">Wishlist</h3>
         <p className="text-sm text-muted-foreground">
-          Customize the appearance of the app. Automatically switch between day
-          and night themes.
+          {"Add products you like to your wishlist so you dont miss them, come back and get them when you're ready"}
         </p>
       </div>
       <Separator />

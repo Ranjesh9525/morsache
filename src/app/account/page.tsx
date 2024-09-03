@@ -11,6 +11,7 @@ export default function SettingsProfilePage() {
       window.location.reload();
     }
   }, [status]);
+  //image,firstname,lastname
   return (
     <div className="space-y-6">
       <div>

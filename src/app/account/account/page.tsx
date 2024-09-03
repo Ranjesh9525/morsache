@@ -1,7 +1,8 @@
 import { Separator } from "@/components/ui/separator"
 import { AccountForm } from "./account-form"
 
-export default function SettingsAccountPage() {
+export default function AccountPage() {
+//email,password,shippinginfo,phone number
   return (
     <div className="space-y-6">
       <div>
