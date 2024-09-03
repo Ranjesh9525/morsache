@@ -377,7 +377,7 @@ if(!orderNo){
           </section>
           <section id="recommendations"></section>
         </div>
-      ) : <p className="text-center font-semibold text-base">Nothing to display here<br /> {error? <p className="capitalize font-light text-[14px]"> {error?.message}</p>: "This order was not found. Either it has been deleted or removed by admin"}</p>}
+      ) : <p className="text-center font-semibold mt-3 text-xl">Nothing to display here<br /> {error? <p className="capitalize font-light text-center text-[14px]"> {error?.message}</p>: <p className="font-light text-center ">This order was not found. Either it has been deleted or removed by admin</p>}</p>}
     </div>
   );
 };

@@ -61,3 +61,11 @@ interface OrderReviewData {
       phoneNumber: string | undefined;
     };
   }
+
+  interface OptimizedOrder {
+    createdAt: string;
+    orderStatus: string;
+    orderNumber: string;
+    totalItems: number;
+    totalAmount: number;
+}

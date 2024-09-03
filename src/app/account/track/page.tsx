@@ -1,5 +1,5 @@
-import { Separator } from "@/components/ui/separator"
-// import { TrackOrderForm } from "./TrackOrder-form"
+import { Separator } from "@/components/ui/separator";
+import TrackOrder from "./TrackOrder";
 
 export default function SettingsTrackOrderPage() {
   return (
@@ -7,11 +7,11 @@ export default function SettingsTrackOrderPage() {
       <div>
         <h3 className="text-lg font-medium">Track Order</h3>
         <p className="text-sm text-muted-foreground">
-          Track All Your Active Orders
+        Ensure this order was made by you otherwise tracking will fail
         </p>
       </div>
       <Separator />
-      {/* <TrackOrderForm /> */}
+      <TrackOrder />
     </div>
-  )
+  );
 }

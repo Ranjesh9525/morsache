@@ -32,7 +32,7 @@ const sidebarNavItems = [
   },
   {
     title: "Track Order",
-    href: "/account/trackOrder",
+    href: "/account/track",
   },
   // {
   //   title: "Display",
@@ -78,7 +78,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
           </aside>
         <Separator className="my-2 md:hidden" />
 
-          <div className="flex-1 lg:max-w-2xl">{children}</div>
+          <div className="flex-1 ">{children}</div>
         </div>
       </div>
     </HomeLayout>

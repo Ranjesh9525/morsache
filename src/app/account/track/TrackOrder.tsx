@@ -1,222 +1,369 @@
-"use client"
+// "use client"
 
-import Link from "next/link"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+// import Link from "next/link"
+// import { zodResolver } from "@hookform/resolvers/zod"
+// import { useForm } from "react-hook-form"
+// import { z } from "zod"
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "@/components/ui/use-toast"
+// import { Button } from "@/components/ui/button"
+// import { Checkbox } from "@/components/ui/checkbox"
+// import {
+//   Form,
+//   FormControl,
+//   FormDescription,
+//   FormField,
+//   FormItem,
+//   FormLabel,
+//   FormMessage,
+// } from "@/components/ui/form"
+// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+// import { Switch } from "@/components/ui/switch"
+// import { toast } from "@/components/ui/use-toast"
 
-const notificationsFormSchema = z.object({
-  type: z.enum(["all", "mentions", "none"], {
-    required_error: "You need to select a notification type.",
-  }),
-  mobile: z.boolean().default(false).optional(),
-  communication_emails: z.boolean().default(false).optional(),
-  social_emails: z.boolean().default(false).optional(),
-  marketing_emails: z.boolean().default(false).optional(),
-  security_emails: z.boolean(),
-})
+// const notificationsFormSchema = z.object({
+//   type: z.enum(["all", "mentions", "none"], {
+//     required_error: "You need to select a notification type.",
+//   }),
+//   mobile: z.boolean().default(false).optional(),
+//   communication_emails: z.boolean().default(false).optional(),
+//   social_emails: z.boolean().default(false).optional(),
+//   marketing_emails: z.boolean().default(false).optional(),
+//   security_emails: z.boolean(),
+// })
 
-type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
+// type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<NotificationsFormValues> = {
-  communication_emails: false,
-  marketing_emails: false,
-  social_emails: true,
-  security_emails: true,
-}
+// // This can come from your database or API.
+// const defaultValues: Partial<NotificationsFormValues> = {
+//   communication_emails: false,
+//   marketing_emails: false,
+//   social_emails: true,
+//   security_emails: true,
+// }
 
-export function TrackOrder() {
-  const form = useForm<NotificationsFormValues>({
-    resolver: zodResolver(notificationsFormSchema),
-    defaultValues,
-  })
+// export function TrackOrder() {
+//   const form = useForm<NotificationsFormValues>({
+//     resolver: zodResolver(notificationsFormSchema),
+//     defaultValues,
+//   })
 
-  function onSubmit(data: NotificationsFormValues) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+//   function onSubmit(data: NotificationsFormValues) {
+//     toast({
+//       title: "You submitted the following values:",
+//       description: (
+//         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+//           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+//         </pre>
+//       ),
+//     })
+//   }
+
+//   return (
+//     <Form {...form}>
+//       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+//         <FormField
+//           control={form.control}
+//           name="type"
+//           render={({ field }) => (
+//             <FormItem className="space-y-3">
+//               <FormLabel>Notify me about...</FormLabel>
+//               <FormControl>
+//                 <RadioGroup
+//                   onValueChange={field.onChange}
+//                   defaultValue={field.value}
+//                   className="flex flex-col space-y-1"
+//                 >
+//                   <FormItem className="flex items-center space-x-3 space-y-0">
+//                     <FormControl>
+//                       <RadioGroupItem value="all" />
+//                     </FormControl>
+//                     <FormLabel className="font-normal">
+//                       All new messages
+//                     </FormLabel>
+//                   </FormItem>
+//                   <FormItem className="flex items-center space-x-3 space-y-0">
+//                     <FormControl>
+//                       <RadioGroupItem value="mentions" />
+//                     </FormControl>
+//                     <FormLabel className="font-normal">
+//                       Direct messages and mentions
+//                     </FormLabel>
+//                   </FormItem>
+//                   <FormItem className="flex items-center space-x-3 space-y-0">
+//                     <FormControl>
+//                       <RadioGroupItem value="none" />
+//                     </FormControl>
+//                     <FormLabel className="font-normal">Nothing</FormLabel>
+//                   </FormItem>
+//                 </RadioGroup>
+//               </FormControl>
+//               <FormMessage />
+//             </FormItem>
+//           )}
+//         />
+//         <div>
+//           <h3 className="mb-4 text-lg font-medium">Email Notifications</h3>
+//           <div className="space-y-4">
+//             <FormField
+//               control={form.control}
+//               name="communication_emails"
+//               render={({ field }) => (
+//                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+//                   <div className="space-y-0.5">
+//                     <FormLabel className="text-base">
+//                       Communication emails
+//                     </FormLabel>
+//                     <FormDescription>
+//                       Receive emails about your account activity.
+//                     </FormDescription>
+//                   </div>
+//                   <FormControl>
+//                     <Switch
+//                       checked={field.value}
+//                       onCheckedChange={field.onChange}
+//                     />
+//                   </FormControl>
+//                 </FormItem>
+//               )}
+//             />
+//             <FormField
+//               control={form.control}
+//               name="marketing_emails"
+//               render={({ field }) => (
+//                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+//                   <div className="space-y-0.5">
+//                     <FormLabel className="text-base">
+//                       Marketing emails
+//                     </FormLabel>
+//                     <FormDescription>
+//                       Receive emails about new products, features, and more.
+//                     </FormDescription>
+//                   </div>
+//                   <FormControl>
+//                     <Switch
+//                       checked={field.value}
+//                       onCheckedChange={field.onChange}
+//                     />
+//                   </FormControl>
+//                 </FormItem>
+//               )}
+//             />
+//             <FormField
+//               control={form.control}
+//               name="social_emails"
+//               render={({ field }) => (
+//                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+//                   <div className="space-y-0.5">
+//                     <FormLabel className="text-base">Social emails</FormLabel>
+//                     <FormDescription>
+//                       Receive emails for friend requests, follows, and more.
+//                     </FormDescription>
+//                   </div>
+//                   <FormControl>
+//                     <Switch
+//                       checked={field.value}
+//                       onCheckedChange={field.onChange}
+//                     />
+//                   </FormControl>
+//                 </FormItem>
+//               )}
+//             />
+//             <FormField
+//               control={form.control}
+//               name="security_emails"
+//               render={({ field }) => (
+//                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+//                   <div className="space-y-0.5">
+//                     <FormLabel className="text-base">Security emails</FormLabel>
+//                     <FormDescription>
+//                       Receive emails about your account activity and security.
+//                     </FormDescription>
+//                   </div>
+//                   <FormControl>
+//                     <Switch
+//                       checked={field.value}
+//                       onCheckedChange={field.onChange}
+//                       disabled
+//                       aria-readonly
+//                     />
+//                   </FormControl>
+//                 </FormItem>
+//               )}
+//             />
+//           </div>
+//         </div>
+//         <FormField
+//           control={form.control}
+//           name="mobile"
+//           render={({ field }) => (
+//             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+//               <FormControl>
+//                 <Checkbox
+//                   checked={field.value}
+//                   onCheckedChange={field.onChange}
+//                 />
+//               </FormControl>
+//               <div className="space-y-1 leading-none">
+//                 <FormLabel>
+//                   Use different settings for my mobile devices
+//                 </FormLabel>
+//                 <FormDescription>
+//                   You can manage your mobile notifications in the{" "}
+//                   <Link href="/examples/forms">mobile settings</Link> page.
+//                 </FormDescription>
+//               </div>
+//             </FormItem>
+//           )}
+//         />
+//         <Button type="submit">Update notifications</Button>
+//       </form>
+//     </Form>
+//   )
+// }
+
+"use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
+import { UserTrackOrder } from "@/serverlessActions/_userActions";
+import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { ClipLoader } from "react-spinners";
+
+type Props = {};
+const TrackOrder = (props: Props) => {
+  const [order, setOrder] = useState<any>(null);
+  const [inputValue, setInputValue] = useState<string>("");
+  const orderSample = {
+    orderNo: "2994349j2f4f",
+    packageSize: ["small", "large", "very Large"],
+    expectedDeliveryDate: Date.now(),
+    expectedPickupDate: Date.now()+334946,
+    methodOfCollection: "delivery",
+    orderPlacedOn: Date.now()+123456789,
+    status: [
+      pending: { title: "pending", description: "awaiting confirmation" },
+      confirmed: {
+        title: "confirmed",
+        description: "your order is being processed and packaged",
+      },
+      shipped: {
+        delivery_title: "shipped",
+        delivery_description:
+          "your package is ready to be delivered and would be out for delivery soon",
+        pickup_title: "Ready",
+        pickup_description:
+          " your package is ready to be collected at our store",
+      },
+      delivered: {
+        delivery_title: "delivered",
+        delivery_description: "your package has been delivered!",
+        pickup_title: "collected",
+        pickup_description: "your package has been collected!",
+      },
+    ],
+    cancelled:{ message:"yikes! this order didnt follow through",cancelled:false}
+  };
+
+  const {
+    isPending,
+    data: response,
+    mutate: server_trackorder,
+  } = useMutation({
+    mutationFn: UserTrackOrder,
+    onSuccess: (res) => {
+      console.log(res);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+  useEffect(() => {}, []);
+
+  function onSubmit() {
+    // server_trackorder(inputValue);
+    setOrder(orderSample)
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Notify me about...</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="all" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      All new messages
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="mentions" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      Direct messages and mentions
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="none" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Nothing</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div>
-          <h3 className="mb-4 text-lg font-medium">Email Notifications</h3>
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="communication_emails"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Communication emails
-                    </FormLabel>
-                    <FormDescription>
-                      Receive emails about your account activity.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
+    <>
+      {!order ? (
+        <div className="space-y-4 w-2/5  mx-auto">
+          <h1 className="my-3 text-sm capitalize text-center text-primary-dark text-[15px]">
+            Fill in the order number to track the order
+          </h1>
+          <span className="mx-auto w-fit">
+            <Input type="text" placeholder="Order number"
+            value={inputValue}
+            onChange={(e)=>setInputValue(e?.target?.value)}
             />
-            <FormField
-              control={form.control}
-              name="marketing_emails"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">
-                      Marketing emails
-                    </FormLabel>
-                    <FormDescription>
-                      Receive emails about new products, features, and more.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="social_emails"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Social emails</FormLabel>
-                    <FormDescription>
-                      Receive emails for friend requests, follows, and more.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="security_emails"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel className="text-base">Security emails</FormLabel>
-                    <FormDescription>
-                      Receive emails about your account activity and security.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled
-                      aria-readonly
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </div>
+            <p className="text-center my-3 text-[13px]">
+              To locate the order number check for the order in your{" "}
+              <Link href="/account/orders" className="underline cursor-pointer">
+                orders page
+              </Link>{" "}
+              and copy the order number
+            </p>
+          </span>
+          <Button type="button" onClick={onSubmit} disabled={isPending} className="w-full">
+            {isPending ? (
+              <span className="w-full text-center">
+                <ClipLoader color="#ffffff" size={20} />
+              </span>
+            ) : (
+              "Track"
+            )}
+          </Button>
         </div>
-        <FormField
-          control={form.control}
-          name="mobile"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>
-                  Use different settings for my mobile devices
-                </FormLabel>
-                <FormDescription>
-                  You can manage your mobile notifications in the{" "}
-                  <Link href="/examples/forms">mobile settings</Link> page.
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Update notifications</Button>
-      </form>
-    </Form>
-  )
-}
+      ) : (
+        <div className="bg-gradient-to-r from-[#E9C120] via-[#550808] to-[#1E2D66] rounded-xl p-4">
+          <h1 className="text-2xl font-semibold">Order {order.orderNumber}</h1>
+          <span>Package size {order.packageSize[0]}</span>
+          <span>Expected Delivery Date {order.expectedDeliveryDate}</span>
+          <span>Method of collection{order.methodOfCollection}</span>
+          <span>order Placed On {order.orderPlacedOn}</span>
+          <span>{order[5]}{order.orderNumber}</span>
+          <section>
+            <span>
+              
+            </span>
+          </section>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default TrackOrder;
+
+const orderSample = {
+  orderNo: "2994349j2f4f",
+  packageSize: ["small", "large", "very Large"],
+  expectedDeliveryDate: Date.now(),
+  expectedPickupDate: Date.now()+334946,
+  methodOfCollection: "delivery",
+  orderPlacedOn: Date.now()+123456789,
+  status: {
+    pending: { title: "pending", description: "awaiting confirmation" },
+    confirmed: {
+      title: "confirmed",
+      description: "your order is being processed and packaged",
+    },
+    shipped: {
+      delivery_title: "shipped",
+      delivery_description:
+        "your package is ready to be delivered and would be out for delivery soon",
+      pickup_title: "Ready",
+      pickup_description:
+        " your package is ready to be collected at our store",
+    },
+    delivered: {
+      delivery_title: "delivered",
+      delivery_description: "your package has been delivered!",
+      pickup_title: "collected",
+      pickup_description: "your package has been collected!",
+      cancelled: "yikes! this order didnt follow through",
+    },
+  },
+};

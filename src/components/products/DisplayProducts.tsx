@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+
 import { Product } from "@/@types/products.d";
 import ProductCard from "../general/ProductCard";
 import { ChevronDown, RectangleVertical } from "lucide-react";

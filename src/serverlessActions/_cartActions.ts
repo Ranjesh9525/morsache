@@ -404,6 +404,10 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
         await order.save();
         user.carts[0].paymentMethod = { type: paymentMethod };
         user.carts[0].isPaid = true;
+        user.orders.push({
+          orderId:order._id,
+          status:order?.orderStatus
+        })
         await user.save();
 
         sendOrderConfirmationEmail(order, user.email, "You placed an order!");
@@ -413,6 +417,7 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
         throw new Error("Payment failed")
       }
     }
+   
     if (paymentMethod === "payOnDelivery") {
       const order = new OrdersModel({
         orderNumber: generateRandomOrderNumber(),
@@ -432,6 +437,10 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
       await order.save();
       user.carts[0].paymentMethod = { type: paymentMethod };
       user.carts[0].isPaid = true;
+      user.orders.push({
+        orderId:order._id,
+        status:order?.orderStatus
+      })
       await user.save();
       sendOrderConfirmationEmail(order, user.email, "You placed an order!");
       return Response("Order created", 200, true, order?.orderNumber);

@@ -116,7 +116,7 @@ const order = await result.json();
         description: "Thanks for shopping with us!",
       });
       dispatch({type:"CLEAR_CART"})
-      router.push(`/cart/checkout/review/${data?.data}`);
+      router.push(`/review/${data?.data}`);
     }
     if (isError) {
       toast({

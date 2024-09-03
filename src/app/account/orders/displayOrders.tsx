@@ -164,22 +164,29 @@
 //   )
 // }
 "use client";
+import { OptimizedOrder } from "@/@types/order";
+import { formatDate } from "@/app/review/ReviewCard";
+import { format } from "@/components/products/ProductInfo";
 import { UserGetAllOrders } from "@/serverlessActions/_userActions";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { ClipLoader } from "react-spinners";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 type Props = {};
 
 const DisplayOrders = (props: Props) => {
-  const [orders, setOrders] = React.useState<any>([{
-    createdAt: '2024-08-22T03:01:37.135Z',
-    orderStatus: 'pending',
-    orderNumber: '6d37b6c2e4fe3a5fc16c9e6b',
-    totalItems: 1,
-    totalAmount: 30000
-  }]);
+  const [orders, setOrders] = React.useState<OptimizedOrder[] | null>(null);
   const {
     isPending,
     data: response,
@@ -195,19 +202,89 @@ const DisplayOrders = (props: Props) => {
     },
   });
   useEffect(() => {
-     server_userGetAllOrders();
+    server_userGetAllOrders();
   }, []);
   return (
     <>
-    {isPending?  <p className="text-center">
-        <ClipLoader />
-      </p>: orders && <div>{
-        orders.map((order,index)=>{
-<Link href={`/cart/checkout/review/${order.orderNumber}`} key={index}>
-  <h1 className="text-xl font-semibold ">Order:{order.orderNumber}</h1>
-  </Link>
-        })
-        }</div>}
+      {isPending ? (
+        <p className="text-center">
+          <ClipLoader />
+        </p>
+      ) : (
+        orders && (
+          <div className="w-full md:p-5 p-2 md:pt-0 pt-0 grid gap-3">
+            <section>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <span className="md:w-44 cursor-pointer border p-3 py-[0.40rem] md:py-[0.65rem] rounded-sm text-[12px] md:text-[13px] border-gray-300 justify-between gap-6 inline-flex items-center ">
+                    Sort <ChevronDown size={18} />
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>Sort</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuCheckboxItem
+                  // checked={showStatusBar}
+                  // onCheckedChange={setShowStatusBar}
+                  >
+                    Pending
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                  // checked={showActivityBar}
+                  // onCheckedChange={setShowActivityBar}
+                  >
+                    Confirmed
+                  </DropdownMenuCheckboxItem>
+                  {/* </DropdownMenuCheckboxItem> */}
+                  <DropdownMenuCheckboxItem
+                  // checked={showActivityBar}
+                  // onCheckedChange={setShowActivityBar}
+                  >
+                    Cancelled
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                  // checked={showActivityBar}
+                  // onCheckedChange={setShowActivityBar}
+                  >
+                    Shipped
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                  // checked={showActivityBar}
+                  // onCheckedChange={setShowActivityBar}
+                  >
+                    Delivered
+                  </DropdownMenuCheckboxItem>
+                  {/* <DropdownMenuCheckboxItem
+      checked={showPanel}
+      onCheckedChange={setShowPanel}
+    >
+      
+    </DropdownMenuCheckboxItem> */}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </section>
+            {orders.map((order: OptimizedOrder, index: number) => {
+              return (
+                <Link
+                  href={`/review/${order.orderNumber}`}
+                  key={index}
+                  className="border rounded-lg p-4 space-y-3 max-sm:space-y-2 cursor-pointer hover:scale-[102%] transition-all w-full"
+                >
+                  <h1 className="text-xl font-semibold w-full">
+                    Order:{order.orderNumber}
+                  </h1>
+                  <section className="w-full justify-between flex">
+                    <p className="uppercase">{order.orderStatus}</p>
+                    <p>Placed on :{formatDate(order.createdAt)}</p>
+                    <p>{order.totalItems} items</p>
+                    <p>{format(order.totalAmount)}</p>
+                  </section>
+                </Link>
+              );
+            })}
+          </div>
+        )
+      )}
     </>
   );
 };

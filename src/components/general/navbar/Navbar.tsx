@@ -107,7 +107,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
           >
             {session?.user ? (
               <Link scroll={true} href={"/account"}>
-                <AiOutlineUser className="bg-gray-200 md:p-[0.35rem] p-[0.2rem] md:h-[30px] md:w-[30px] h-[20px] w-[20px] rounded-[50%]" />{" "}
+                <AiOutlineUser color="#545454" className="bg-gray-200 md:p-[0.35rem] p-[0.2rem] md:h-[30px] md:w-[30px] h-[20px] w-[20px] rounded-[50%]" />{" "}
               </Link>
             ) : (
               <Link href={"/auth/login"}>

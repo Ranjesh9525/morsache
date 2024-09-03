@@ -222,3 +222,18 @@ export const UserGetAllOrders = async () => {
     throw error;
   }
 };
+
+export const UserTrackOrder = async(orderId:string)=>{
+  try{
+    await connectDB();
+    const user = await authAction();
+      const isUserOrder = user.orders.some((i:{orderId:string,status:string})=>i.orderId === orderId)
+      if(!isUserOrder && user.role !== "admin"){
+        throw new Error('Unauthorized access')
+      }
+
+  }catch(error){
+    console.log("Error Tracking order", error);
+    throw error;
+  }
+}

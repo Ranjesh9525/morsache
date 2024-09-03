@@ -32,9 +32,9 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           className={cn(
             buttonVariants({ variant: "ghost" }),
             pathname === item.href
-              ? "bg-muted hover:bg-muted"
-              : "hover:bg-transparent hover:underline",
-            "justify-start"
+              ? "bg-[#545454c7] text-white hover:bg-[#545454c7] w-full hover:text-white"
+              : "hover:bg-transparent hover:underline ",
+            "justify-start "
           )}
         >
           {item.title}
@@ -44,7 +44,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
         href="/"
         className={cn(
           buttonVariants({ variant: "ghost" }),
-          "hover:bg-transparent hover:underline",
+          "hover:bg-transparent hover:underline hover:text-red-500",
           "justify-start text-red-500"
         )}
         onClick={() =>  signOut({ redirect: false, callbackUrl: "/" })}

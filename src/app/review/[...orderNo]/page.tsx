@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import ReviewCard from "../../../components/ReviewCard";
+import ReviewCard from "../ReviewCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import HomeLayout from "@/components/layouts/HomeLayout";
@@ -19,10 +19,10 @@ const page = (props: Props) => {
         <div id="header" className="  pb-5">
           <section className="flex md:flex-row flex-col gap-3 justify-between items-center ">
             <span className="flex-[6]">
-              <h1 className="text-3xl w-full md:w-fit mb-3 md:mb-0 font-bold tracking-tight capitalize">
+              <h1 className="text-3xl w-full md:w-fit mb-3 md:mb-0 font-bold tracking-tight max-sm:text-xl">
                 Review Order {props.params.orderNo}
               </h1>{" "}
-              <p className="text-gray-500 text-[14px] my-1">
+              <p className="text-gray-500 text-[14px] my-1 max-sm:text-[12.5px]">
                 {" "}
                 Regarding any complaints or problems with your order information
                 please contact support to cancel or assit with your order. Note
