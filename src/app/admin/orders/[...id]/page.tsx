@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import React from "react";
 import OrderReviewCard from "../../components/OrderReviewCard";
 import PageHeadingText from "../../components/PageHeadingText";
@@ -16,6 +17,7 @@ const Page = (props: Props) => {
         description="Approve,confirm,cancel orders and so on"
       />
       <div className="container mx-auto min-h-[70vh] py-10 ">
+        
         <OrderReviewCard  orderNo={props.params.id} />
       </div>
     </>

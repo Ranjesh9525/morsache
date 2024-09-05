@@ -239,7 +239,7 @@ const Page = (props: Props) => {
                     data-mce-className="font-weight: 400;"
                   >
                     If you have received an SMS or EMAIL of order delivered
-                    status and if it's not received by you, please contact us
+                    status and if it&apos;s not received by you, please contact us
                     within 24 hours.
                     <br />
                     <span data-mce-fragment="1">

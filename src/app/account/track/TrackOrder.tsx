@@ -296,7 +296,7 @@ const TrackOrder = (props: Props) => {
   return (
     <>
       {!order ? (
-        <div className="space-y-4 w-2/5  mx-auto">
+        <div className="space-y-4 lg:w-2/5 md:w-3/4 max-sm:w-full max-sm:px-5 mx-auto">
           <h1 className="my-3 text-sm capitalize text-center text-primary-dark text-[15px]">
             Fill in the order number to track the order
           </h1>
@@ -332,14 +332,16 @@ const TrackOrder = (props: Props) => {
         </div>
       ) : (
         <div className="bg-gradient-to-b text-white from-[#292727] to-[#465e48] rounded-xl space-y-4 p-6 py-12">
-          <h1 className="text-2xl font-semibold px-6 mb-4">Order {order.orderNumber}</h1>
-          
+          <h1 className="text-2xl font-semibold px-6 mb-4">
+            Order {order.orderNumber}
+          </h1>
+
           <section className="flex w-full items-start my-4">
             {status.map((i: any, index: number) => {
               const active = status.findIndex(
-                (stat:any) =>
+                (stat: any) =>
                   stat.title === order.status ||
-                  stat?.[order.methodOfCollection+"_title"] === order.status
+                  stat?.[order.methodOfCollection + "_title"] === order.status
               );
               return (
                 <section key={index} className=" w-full">
@@ -347,32 +349,41 @@ const TrackOrder = (props: Props) => {
                     {" "}
                     <span
                       className={cn(
-                        " flex flex-col items-center border border-dashed justify-center rounded-[50%] p-4  h-[120px] w-[120px]",
+                        " flex flex-col items-center border border-dashed justify-center rounded-[50%] p-4  h-[120px] w-[120px] max-sm:h-[40px] max-sm:w-[40px]",
                         index <= active &&
                           "border rounded-[50%] bg-[#3553329d]  border-[#34a33f] ",
-                          ((i.title === order.status || i?.[order.methodOfCollection+"_title"] === order.status) && "border-solid border-[#34a33f]  border-[3px] ")
+                        (i.title === order.status ||
+                          i?.[order.methodOfCollection + "_title"] ===
+                            order.status) &&
+                          "border-solid border-[#34a33f]  border-[3px] "
                       )}
                     >
-                      <p className="capitalize">
-                        {i.title || i?.[order.methodOfCollection+"_title"]}
+                      <p className="capitalize max-sm:text-[11px]">
+                        {i.title || i?.[order.methodOfCollection + "_title"]}
                       </p>
                     </span>
                     {index !== status.length - 1 && (
                       <span
                         className={cn(
-                          "w-[50%]  h-2 bg-gray-400 ",
-                          index <= (active-1) && "bg-[#34a33f]"
+                          "w-[50%]  h-2 max-sm:h-1 bg-gray-400 ",
+                          index <= active - 1 && "bg-[#34a33f]"
                         )}
                       ></span>
                     )}{" "}
                   </span>
-                 { (i.title === order.status || i?.[order.methodOfCollection+"_title"] === order.status) && <p className="text-left max-w-40 my-2 text-[12px]">
-                    {i.description || i?.[`${order.methodOfCollection}_description`]}
-                  </p>}
+                  {(i.title === order.status ||
+                    i?.[order.methodOfCollection + "_title"] ===
+                      order.status) && (
+                    <p className="text-left max-w-40 my-2 max-sm:text-[10px] text-[12px]">
+                      {i.description ||
+                        i?.[`${order.methodOfCollection}_description`]}
+                    </p>
+                  )}
                 </section>
               );
             })}
-          </section><section className="grid  w-full my-4 gap-y-2 px-6">
+          </section>
+          <section className="grid  w-full my-4 gap-y-2 px-6">
             {" "}
             <span>Package size : {order.packageSize[0]}</span>
             <span className="">

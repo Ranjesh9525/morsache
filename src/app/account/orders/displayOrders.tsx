@@ -270,11 +270,11 @@ const DisplayOrders = (props: Props) => {
                   key={index}
                   className="border rounded-lg p-4 space-y-3 max-sm:space-y-2 cursor-pointer hover:scale-[102%] transition-all w-full"
                 >
-                  <h1 className="text-xl font-semibold w-full">
+                  <h1 className="text-xl font-semibold w-full max-sm:text-base">
                     Order:{order.orderNumber}
                   </h1>
-                  <section className="w-full justify-between flex">
-                    <p className="uppercase">{order.orderStatus}</p>
+                  <section className="w-full justify-between md:flex max-sm:text-[13px] max-sm:grid max-sm:grid-cols2-2 gap-2">
+                    <p className="font-semibold">{order.orderStatus}</p>
                     <p>Placed on :{formatDate(order.createdAt)}</p>
                     <p>{order.totalItems} items</p>
                     <p>{format(order.totalAmount)}</p>

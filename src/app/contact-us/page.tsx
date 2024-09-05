@@ -14,7 +14,7 @@ const Page = (props: Props) => {
           <div className="theme-block text-center ">
             <div className="space-y-3">
               <p>
-                We're here to help and would love to hear from you. Whether you
+                We&apos;re here to help and would love to hear from you. Whether you
                 have a question about our products, need assistance with an
                 order, or just want to share your feedback, our team is ready to
                 assist.
@@ -52,7 +52,7 @@ const Page = (props: Props) => {
               </p>
               <p>
                 <br />
-                Thank you for choosing <strong>morsache</strong>. We're looking
+                Thank you for choosing <strong>morsache</strong>. We&apos;re looking
                 forward to assisting you!
               </p>
             </div>

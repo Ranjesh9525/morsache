@@ -12,158 +12,11 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 
-const sample = {
-  _id: "66c6ac500648f244825ea837",
-  orderNumber: "d606cee574b49c26d5934896",
-  customer: "66bcbe6770fcbe0f1e539a36",
-  items: [
-    {
-      productId: "66b8bbde503976c2e7b0c836",
-      offersData: [
-        {
-          code: "",
-          productId: "66b8bbde503976c2e7b0c836",
-          quantity: "1",
-          _id: "66c6a9dc0648f244825ea65a",
-        },
-      ],
-      quantity: "1",
-      size: "sm",
-      variant: "evce cve",
-      totalPrice: "30000",
-      _id: "66c6a9dc0648f244825ea659",
-    },
-  ],
-  totalItems: "1",
-  totalAmount: "30000",
-  orderStatus: "pending",
-  shippingAddress: {
-    street: "mairman stresst",
-    city: "mauripol",
-    state: "bangalore",
-    postalCode: "2389284",
-    country: "india",
-  },
-  paymentMethod: { type: "payOnDelivery" },
-  paymentStatus: "pending",
-  createdAt: "1724296272693",
-  updatedAt: "1724296272693",
-  __v: "0",
-};
-
-// Sample OptimizedProduct objects based on the type definition
-const sampleProduct1: OptimizedProduct = {
-  _id: "66b8bbde503976c2e7b0c836",
-  name: "Sample Product 1",
-  slug: "Sample-Product-1",
-  price: 100,
-  images: [
-    "https://picsum.photos/800/1200?random=8",
-    "https://picsum.photos/800/1200?random=7",
-  ],
-  SKU: "SKU123",
-  salePrice: 80,
-};
-
-const sampleProduct2: OptimizedProduct = {
-  _id: "66c6a9dc0648f244825ea659",
-  name: "Sample Product 2",
-  slug: "Sample-Product-2",
-  price: 50,
-  images: [
-    "https://picsum.photos/800/1200?random=1",
-    "https://picsum.photos/800/1200?random=2",
-  ],
-  SKU: "SKU456",
-  salePrice: null,
-};
-
-const sampleProduct3: OptimizedProduct = {
-  _id: "66c6a9dc0648f244825ea65a",
-  name: "Sample Product 3",
-  slug: "Sample-Product-3",
-  price: 75,
-  images: [
-    "https://picsum.photos/800/1200?random=3",
-    "https://picsum.photos/800/1200?random=4",
-  ],
-  SKU: "SKU789",
-  salePrice: 60,
-};
-
-const sampleProduct4: OptimizedProduct = {
-  _id: "66c6ac500648f244825ea837",
-  name: "Sample Product 4",
-  slug: "Sample-Product-4",
-  price: 120,
-  images: [
-    "https://picsum.photos/800/1200?random=5",
-    "https://picsum.photos/800/1200?random=6",
-  ],
-  SKU: "SKU101",
-  salePrice: 100,
-};
-
-const returnData: OrderReviewData = {
-  products: [
-    {
-      product: sampleProduct1,
-      quantity: 1,
-      size: "sm",
-      variant: "evce cve",
-      totalPrice: 30000,
-    },
-    {
-      product: sampleProduct2,
-      quantity: 1,
-      size: "md",
-      variant: "xyz",
-      totalPrice: 25000,
-    },
-    {
-      product: sampleProduct3,
-      quantity: 2,
-      size: "lg",
-      variant: "abc",
-      totalPrice: 150000,
-    },
-    {
-      product: sampleProduct4,
-      quantity: 3,
-      size: "xl",
-      variant: "def",
-      totalPrice: 450000,
-    },
-  ],
-  paymentDetails: {
-    totalAmount: 100000,
-    paidOn: new Date(),
-    paymentMethod: {
-      type: "payOnDelivery",
-    },
-    paymentStatus: "pending",
-  },
-
-  orderDetails: {
-    totalAmount: 100000,
-    createdAt: new Date(),
-    totalItems: 7,
-    orderStatus: "pending",
-    orderNumber: "786r7ftfuygv68e57",
-  },
-  customerDetails: {
-    shippingAddress: "mairman stresst, mauripol, bangalore, india. 2389284",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "1234567890",
-  },
-};
 type Props = {
   orderNo:string
 };
 const OrderReviewCard = ({orderNo}: Props) => {
-  const [order, setOrder] = useState<OrderReviewData | null>(returnData);
+  const [order, setOrder] = useState<OrderReviewData | null>(null);
   const {
     isSuccess,
     isPending,
@@ -191,13 +44,46 @@ const OrderReviewCard = ({orderNo}: Props) => {
   //fetch customer details from server
   //payment details comes from server
   //validate it is the customer viewin this page
-  //fetch random recommendations
+  //fetch random recommendations <FormField
+//           control={form.control}
+//           name="font"
+//           render={({ field }) => (
+//             <FormItem>
+//               <FormLabel>Font</FormLabel>
+//               <div className="relative w-max">
+//                 <FormControl>
+//                   <select
+//                     className={cn(
+//                       buttonVariants({ variant: "outline" }),
+//                       "w-[200px] appearance-none font-normal"
+//                     )}
+//                     {...field}
+//                   >
+//                     <option value="inter">Inter</option>
+//                     <option value="manrope">Manrope</option>
+//                     <option value="system">System</option>
+//                   </select>
+//                 </FormControl>
+//                 <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 opacity-50" />
+//               </div>
+//               <FormDescription>
+//                 Set the font you want to use in the dashboard.
+//               </FormDescription>
+//               <FormMessage />
+//             </FormItem>
+//           )}
+//         />
 
   return (
     <div>
       {isPending ? (
        <div className="flex justify-center items-center h-[50%]"> <ClipLoader size={30} /></div>
       ) : order ? (
+        <>
+        <div className="flex items-center justify-end w-full">
+          <Button>Save changes</Button>
+          <Button variant="destructive">Delete</Button>
+        </div>
         <div className="max-w-[80vw] w-full">
           <section id="products" className="rounded-t-md">
             <section className="bg-primary-dark p-3 rounded-t-md">
@@ -371,6 +257,7 @@ const OrderReviewCard = ({orderNo}: Props) => {
           </section>
           <section id="recommendations"></section>
         </div>
+      </>
       ): <p>Nothing to display here,<br /> either an error occured or order has been deleted</p>}
     </div>
   );
