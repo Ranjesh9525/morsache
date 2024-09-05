@@ -11,6 +11,7 @@ export const GlobalContext = React.createContext<{
   setScrolling: React.Dispatch<React.SetStateAction<boolean>>;
   userDataLoading: boolean;
   userData: any;
+  fetchUserData: () => void
 } | null>(null);
 
 const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -50,7 +51,7 @@ const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <GlobalContext.Provider
-      value={{ scrolling, setScrolling, userDataLoading, userData }}
+      value={{ scrolling, setScrolling, userDataLoading, userData ,fetchUserData}}
     >
       {children}
     </GlobalContext.Provider>

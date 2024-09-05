@@ -28,6 +28,13 @@ import { UserDocument } from "@/@types/user";
 import { FaPlus } from "react-icons/fa6";
 import PrevAndNextBtn from "./PrevAndNextBtn";
 
+  export const shippingSchema = z.object({
+    street: z.string(),
+    city: z.string(),
+    state: z.string(),
+    postalCode: z.string(),
+    country: z.string(),
+  });
 const DetailsInformation = ({cartId}:{cartId:any}) => {
   const [userData, setUserData] = useState<UserDocument | null>(null);
   const [addShippingAddress, setaddShippingAddress] = useState<boolean>(false);
@@ -90,13 +97,7 @@ const router = useRouter()
       });
     }
   }, [isError, isSuccess]);
-  const shippingSchema = z.object({
-    street: z.string(),
-    city: z.string(),
-    state: z.string(),
-    postalCode: z.string(),
-    country: z.string(),
-  });
+
 
   const form = useForm<z.infer<typeof shippingSchema>>({
     resolver: zodResolver(shippingSchema),

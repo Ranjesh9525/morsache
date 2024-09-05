@@ -7,7 +7,7 @@ export default function SettingsTrackOrderPage() {
       <div>
         <h3 className="text-lg font-medium">Track Order</h3>
         <p className="text-sm text-muted-foreground">
-        Ensure this order was made by you otherwise tracking will fail
+        Tracking shows realtime updated infomation about your order that may not yet be reflected on other views . <br/> Ensure this order was made by you otherwise tracking will fail
         </p>
       </div>
       <Separator />

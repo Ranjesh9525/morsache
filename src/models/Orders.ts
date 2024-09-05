@@ -52,11 +52,20 @@ const orderSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+   confirmedOn: {
+      type: Date,
+      default: null,
+    },
     paymentStatus: {
       type: String,
       enum: ["pending", "paid"],
       default: "pending",
     },
+    collectionMethod:{
+      type: String,
+      enum: ["pickup", "delivery"],
+      required:true
+    }
   },
   { timestamps: true }
 );

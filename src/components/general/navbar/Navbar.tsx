@@ -52,6 +52,9 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
   // console.log(session);
   // console.log("session from client",session)
   return (
+    <>
+    {scrolling && <div className="h-[36px]"></div>}
+   
     <div className="min-h-[36px]">
       <motion.div
         variants={navbarScrollVariants}
@@ -136,7 +139,7 @@ const Navbar = ({ scrolling, setSideNav }: Props) => {
           </span>
         </div>
       </motion.div>
-    </div>
+    </div> </>
   );
 };
 

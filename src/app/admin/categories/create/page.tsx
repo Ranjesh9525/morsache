@@ -383,11 +383,11 @@ const Page = (props: Props) => {
                   />
                 </div>
                 <motion.div
-                  initial="hidden" // Set initial animation state
-                  animate="visible" // Set animation state when component mounts
+                  initial="hidden" 
+                  animate="visible"
                   variants={{
                     hidden: { opacity: 0 },
-                    visible: { opacity: 1, transition: { duration: 0.5 } }, // Add transition for smooth animation
+                    visible: { opacity: 1, transition: { duration: 0.5 } }, 
                   }}
                   className="col-span-4 grid grid-cols-2 gap-3 items-center"
                 >

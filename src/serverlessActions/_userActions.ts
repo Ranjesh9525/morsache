@@ -206,7 +206,7 @@ export const UserGetAllOrders = async () => {
     // const orders = user?.orders
     const orders = await OrdersModel.find({ customer: user?._id });
     // console.log(orders)
-    const optimizedOrders = orders?.map((i:any) => {
+    const optimizedOrders = orders?.map((i: any) => {
       return {
         createdAt: i.createdAt,
         orderStatus: i.orderStatus,
@@ -216,24 +216,57 @@ export const UserGetAllOrders = async () => {
       };
     });
 
-    return Response("fetched all orders successfully",200,true,optimizedOrders)
+    return Response(
+      "fetched all orders successfully",
+      200,
+      true,
+      optimizedOrders
+    );
   } catch (error) {
     console.log("Error getting all user orders", error);
     throw error;
   }
 };
 
-export const UserTrackOrder = async(orderId:string)=>{
-  try{
+export const UserTrackOrder = async (orderId: string) => {
+  try {
     await connectDB();
     const user = await authAction();
-      const isUserOrder = user.orders.some((i:{orderId:string,status:string})=>i.orderId === orderId)
-      if(!isUserOrder && user.role !== "admin"){
-        throw new Error('Unauthorized access')
-      }
-
-  }catch(error){
+    const order = await OrdersModel.findById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+    const isUserOrder = user.orders.some(
+      (i: { orderId: string; status: string }) => i.orderId === orderId
+    );
+    if (!isUserOrder && user.role !== "admin") {
+      throw new Error("Unauthorized access");
+    }
+    //pickup between 4-7 days , delivery between 7-12 days
+    const ReturnData = {
+      orderNumber: order.orderNumber,
+      packageSize:
+        order.totalItems >= 5
+          ? order.totalItems >= 10
+            ? "Very large"
+            : "large"
+          : "Small",
+      orderPlacedOn: order.createdAt,
+      cancelled: {
+        message: "yikes! this order didnt follow through",
+        cancelled: order.orderStatus === "cancelled" ? true : false,
+      },
+      status: order.orderStatus,
+      methodOfCollection: order.collectionMethod || "delivery",
+      expectedDeliveryDate1: order.confirmedOn || order.createdAt + 133456789,
+      expectedDeliveryDate2: order.confirmedOn || order.createdAt + 143456789,
+      expectedPickupDate1: order.confirmedOn || order.createdAt + 113456789,
+      expectedPickupDate2: order.confirmedOn || order.createdAt + 123456789,
+    };
+    console.log(ReturnData);
+    // return Response("order tracking results",200,true ReturnData)
+  } catch (error) {
     console.log("Error Tracking order", error);
     throw error;
   }
-}
+};

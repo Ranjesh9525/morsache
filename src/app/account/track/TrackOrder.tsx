@@ -222,9 +222,11 @@
 // }
 
 "use client";
+import { formatDate } from "@/app/review/ReviewCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 import { UserTrackOrder } from "@/serverlessActions/_userActions";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
@@ -236,35 +238,39 @@ const TrackOrder = (props: Props) => {
   const [order, setOrder] = useState<any>(null);
   const [inputValue, setInputValue] = useState<string>("");
   const orderSample = {
-    orderNo: "2994349j2f4f",
+    orderNumber: "2994349j2f4f",
     packageSize: ["small", "large", "very Large"],
-    expectedDeliveryDate: Date.now(),
-    expectedPickupDate: Date.now()+334946,
+    expectedDeliveryDate: Date.now() + 123456789,
+    expectedPickupDate: Date.now() + 334946,
     methodOfCollection: "delivery",
-    orderPlacedOn: Date.now()+123456789,
-    status: [
-      pending: { title: "pending", description: "awaiting confirmation" },
-      confirmed: {
-        title: "confirmed",
-        description: "your order is being processed and packaged",
-      },
-      shipped: {
-        delivery_title: "shipped",
-        delivery_description:
-          "your package is ready to be delivered and would be out for delivery soon",
-        pickup_title: "Ready",
-        pickup_description:
-          " your package is ready to be collected at our store",
-      },
-      delivered: {
-        delivery_title: "delivered",
-        delivery_description: "your package has been delivered!",
-        pickup_title: "collected",
-        pickup_description: "your package has been collected!",
-      },
-    ],
-    cancelled:{ message:"yikes! this order didnt follow through",cancelled:false}
+    orderPlacedOn: Date.now() - 123456789,
+    status: "delivered",
+    cancelled: {
+      message: "yikes! this order didnt follow through",
+      cancelled: false,
+    },
   };
+
+  const status = [
+    { title: "pending", description: "awaiting confirmation" },
+    {
+      title: "confirmed",
+      description: "your order is being processed and packaged",
+    },
+    {
+      delivery_title: "shipped",
+      delivery_description:
+        "your package is ready to be delivered and would be out for delivery soon",
+      pickup_title: "ready",
+      pickup_description: " your package is ready to be collected at our store",
+    },
+    {
+      delivery_title: "delivered",
+      delivery_description: "your package has been delivered!",
+      pickup_title: "collected",
+      pickup_description: "your package has been collected!",
+    },
+  ];
 
   const {
     isPending,
@@ -283,7 +289,7 @@ const TrackOrder = (props: Props) => {
 
   function onSubmit() {
     // server_trackorder(inputValue);
-    setOrder(orderSample)
+    setOrder(orderSample);
   }
 
   return (
@@ -294,9 +300,11 @@ const TrackOrder = (props: Props) => {
             Fill in the order number to track the order
           </h1>
           <span className="mx-auto w-fit">
-            <Input type="text" placeholder="Order number"
-            value={inputValue}
-            onChange={(e)=>setInputValue(e?.target?.value)}
+            <Input
+              type="text"
+              placeholder="Order number"
+              value={inputValue}
+              onChange={(e) => setInputValue(e?.target?.value)}
             />
             <p className="text-center my-3 text-[13px]">
               To locate the order number check for the order in your{" "}
@@ -306,7 +314,12 @@ const TrackOrder = (props: Props) => {
               and copy the order number
             </p>
           </span>
-          <Button type="button" onClick={onSubmit} disabled={isPending} className="w-full">
+          <Button
+            type="button"
+            onClick={onSubmit}
+            disabled={isPending}
+            className="w-full"
+          >
             {isPending ? (
               <span className="w-full text-center">
                 <ClipLoader color="#ffffff" size={20} />
@@ -317,17 +330,61 @@ const TrackOrder = (props: Props) => {
           </Button>
         </div>
       ) : (
-        <div className="bg-gradient-to-r from-[#E9C120] via-[#550808] to-[#1E2D66] rounded-xl p-4">
-          <h1 className="text-2xl font-semibold">Order {order.orderNumber}</h1>
-          <span>Package size {order.packageSize[0]}</span>
-          <span>Expected Delivery Date {order.expectedDeliveryDate}</span>
-          <span>Method of collection{order.methodOfCollection}</span>
-          <span>order Placed On {order.orderPlacedOn}</span>
-          <span>{order[5]}{order.orderNumber}</span>
-          <section>
-            <span>
-              
+        <div className="bg-gradient-to-b text-white from-[#292727] to-[#465e48] rounded-xl space-y-4 p-6 py-12">
+          <h1 className="text-2xl font-semibold px-6 mb-4">Order {order.orderNumber}</h1>
+          
+          <section className="flex w-full items-start my-4">
+            {status.map((i: any, index: number) => {
+              const active = status.findIndex(
+                (stat:any) =>
+                  stat.title === order.status ||
+                  stat?.[order.methodOfCollection+"_title"] === order.status
+              );
+              return (
+                <section key={index} className=" w-full">
+                  <span className="flex items-center">
+                    {" "}
+                    <span
+                      className={cn(
+                        " flex flex-col items-center border border-dashed justify-center rounded-[50%] p-4  h-[120px] w-[120px]",
+                        index <= active &&
+                          "border rounded-[50%] bg-[#3553329d]  border-[#34a33f] ",
+                          ((i.title === order.status || i?.[order.methodOfCollection+"_title"] === order.status) && "border-solid border-[#34a33f]  border-[3px] ")
+                      )}
+                    >
+                      <p className="capitalize">
+                        {i.title || i?.[order.methodOfCollection+"_title"]}
+                      </p>
+                    </span>
+                    {index !== status.length - 1 && (
+                      <span
+                        className={cn(
+                          "w-[50%]  h-2 bg-gray-400 ",
+                          index <= (active-1) && "bg-[#34a33f]"
+                        )}
+                      ></span>
+                    )}{" "}
+                  </span>
+                 { (i.title === order.status || i?.[order.methodOfCollection+"_title"] === order.status) && <p className="text-left max-w-40 my-2 text-[12px]">
+                    {i.description || i?.[`${order.methodOfCollection}_description`]}
+                  </p>}
+                </section>
+              );
+            })}
+          </section><section className="grid  w-full my-4 gap-y-2 px-6">
+            {" "}
+            <span>Package size : {order.packageSize[0]}</span>
+            <span className="">
+              Order placed on : {formatDate(order.orderPlacedOn)}
             </span>
+            <span>Method of collection : {order.methodOfCollection}</span>
+            <span className="">
+              Expected Delivery Date : {formatDate(order.expectedDeliveryDate)}
+            </span>
+            {/* <span>
+            {order[5]}
+            {order.orderNumber}
+          </span> */}
           </section>
         </div>
       )}
@@ -341,9 +398,9 @@ const orderSample = {
   orderNo: "2994349j2f4f",
   packageSize: ["small", "large", "very Large"],
   expectedDeliveryDate: Date.now(),
-  expectedPickupDate: Date.now()+334946,
+  expectedPickupDate: Date.now() + 334946,
   methodOfCollection: "delivery",
-  orderPlacedOn: Date.now()+123456789,
+  orderPlacedOn: Date.now() + 123456789,
   status: {
     pending: { title: "pending", description: "awaiting confirmation" },
     confirmed: {
@@ -355,8 +412,7 @@ const orderSample = {
       delivery_description:
         "your package is ready to be delivered and would be out for delivery soon",
       pickup_title: "Ready",
-      pickup_description:
-        " your package is ready to be collected at our store",
+      pickup_description: " your package is ready to be collected at our store",
     },
     delivered: {
       delivery_title: "delivered",
