@@ -121,7 +121,7 @@ const OTPVerification = ({ email, setEmail }: Props) => {
 toast({
 
   title:'Need help signing in?',
-  description:<p>Contact support <Link href="/support" className="underline text-blue-400">support</Link></p>
+  description:<p>Contact support <Link href="/contact-us" className="underline text-blue-400">support</Link></p>
 })
     }
   },[])

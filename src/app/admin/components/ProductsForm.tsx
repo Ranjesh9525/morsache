@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
-import { format } from "@/components/products/ProductInfo";
+import { format } from "@/utilities/global";
 import { cn } from "@/lib/utils";
 import { MdOutlineDiscount } from "react-icons/md";
 import { Textarea } from "@/components/ui/textarea";

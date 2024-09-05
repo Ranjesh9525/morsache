@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { Cart, CartForServer, CartItem } from "@/@types/cart.d";
 import { Product } from "@/@types/products.d";
 import { Separator } from "@/components/ui/separator";
-import { format } from "@/components/products/ProductInfo";
+import { format, formatDate } from "@/utilities/global";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { redirect, usePathname, useRouter } from "next/navigation";
@@ -52,15 +52,15 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   );
 };
 
-const CheckoutCard = ({cart, cartId }: Props) => {
+const CheckoutCard = ({ cart, cartId }: Props) => {
   const [code, setCode] = useState<string>("");
   // const { cart } = useContext(CartContext)!;
-  const shippingRef:any = useRef(null)
+  const shippingRef: any = useRef(null);
   const [userCartWithDiscount, setUserCartWithDiscount] = useState<Cart | null>(
     !cart ? null : cart
   );
-  const pathname = usePathname()
-  
+  const pathname = usePathname();
+
   const { Shipping, dispatch } = React.useContext<any>(ShippingContext)!;
   const [totalDiscount, setTotalDiscount] = useState<number>(0);
   const [allOfferData, setAllOfferData] = useState<
@@ -108,30 +108,36 @@ const CheckoutCard = ({cart, cartId }: Props) => {
     }
   }, []);
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   function uploadCartSubmit() {
-    if (!session?.user ) {
-      router.push(`/auth/login?callbackUrl=${encodeURIComponent("/cart")}`);
-    }else{
-    const modifiedCart: CartForServer =  { ...cart! };
-    for (let i = 0; i < modifiedCart.items.length; i++) {
-      const item = modifiedCart.items[i];
-      item.productId = item!.product!.id ? item!.product!.id : item!.product!._id;
-    
-      item.offersData = item!.product!.offers!.map((offer) => {
-        return {
-          code: offer.code || "",
-          productId: item.productId,
-          quantity: item.quantity,
-        };
-      });
-    
-      delete item.product;
+    if (!session?.user) {
+      if (status === "loading") {
+        return;
+      } else {
+        router.push(`/auth/login?callbackUrl=${encodeURIComponent("/cart")}`);
+      }
+    } else {
+      const modifiedCart: CartForServer = { ...cart! };
+      for (let i = 0; i < modifiedCart.items.length; i++) {
+        const item = modifiedCart.items[i];
+        item.productId = item!.product!.id
+          ? item!.product!.id
+          : item!.product!._id;
+
+        item.offersData = item!.product!.offers!.map((offer) => {
+          return {
+            code: offer.code || "",
+            productId: item.productId,
+            quantity: item.quantity,
+          };
+        });
+
+        delete item.product;
+      }
+      // console.log(modifiedCart)
+      server_CreateCartMutate(modifiedCart);
     }
-    // console.log(modifiedCart)
-    server_CreateCartMutate(modifiedCart);
-  }
   }
 
   useEffect(() => {
@@ -188,11 +194,14 @@ const CheckoutCard = ({cart, cartId }: Props) => {
     }
   }, [uploadCartIsSuccess, uploadCartData, uploadCartIsError]);
 
-  // useEffect(()=>{
-  //   if(!findCartData?.data){
-  //   setUserCartWithDiscount(cart)
-  //   }
-  // },[cart])
+  useEffect(() => {
+    if (!findCartData?.data) {
+      if (cart) {
+        // console.log(cart);
+        setUserCartWithDiscount(cart!);
+      }
+    }
+  }, [cart]);
 
   useEffect(() => {
     if (offersData && userCartWithDiscount) {
@@ -236,16 +245,16 @@ const CheckoutCard = ({cart, cartId }: Props) => {
     enabled: false,
   });
   useEffect(() => {
-    if (Shipping.choice ==="delivery") {
+    if (Shipping.choice === "delivery") {
       refetch();
-    }else{
-      shippingRef.current?.innerHTML === 0
+    } else {
+      shippingRef.current?.innerHTML === 0;
     }
   }, [Shipping]);
   useEffect(() => {
     if (shippingDataIsError) {
       console.log(shippingDataError);
-      router.push('/serverError')
+      router.push("/serverError");
     }
     if (shippingDataResponse) {
       console.log(shippingDataResponse, userCartWithDiscount);
@@ -361,7 +370,7 @@ const CheckoutCard = ({cart, cartId }: Props) => {
             </span>
           </section>
 
-          {(cart && pathname === "/cart") && (
+          {cart && pathname === "/cart" && (
             <>
               {" "}
               <Separator />

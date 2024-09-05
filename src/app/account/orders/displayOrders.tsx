@@ -165,8 +165,7 @@
 // }
 "use client";
 import { OptimizedOrder } from "@/@types/order";
-import { formatDate } from "@/app/review/ReviewCard";
-import { format } from "@/components/products/ProductInfo";
+
 import { UserGetAllOrders } from "@/serverlessActions/_userActions";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
@@ -182,6 +181,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { format, formatDate } from "@/utilities/global";
 
 type Props = {};
 

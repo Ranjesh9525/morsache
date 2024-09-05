@@ -204,7 +204,9 @@ export const UserGetAllOrders = async () => {
     await connectDB();
     const user = await authAction();
     // const orders = user?.orders
-    const orders = await OrdersModel.find({ customer: user?._id });
+    const orders = await OrdersModel.find({ customer: user?._id }).sort({
+      createdAt: -1,
+    });
     // console.log(orders)
     const optimizedOrders = orders?.map((i: any) => {
       return {

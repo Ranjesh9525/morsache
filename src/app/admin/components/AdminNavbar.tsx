@@ -104,7 +104,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
     localStorage.removeItem("product-draft");
     setSavedProduct(false);
     router.push("/admin/products/create");
-    router.refresh()
+    router.refresh();
   };
   const pathname = usePathname();
   const isPreview = useSearchParams()?.get("preview");
@@ -121,10 +121,10 @@ const AdminNavbar = ({ scrolling }: Props) => {
     if (isError) {
       console.log(error);
       toast({
-        variant:"destructive",
-        title:"Upload failed",
-        description:<p>{error?.message}</p>
-      })
+        variant: "destructive",
+        title: "Upload failed",
+        description: <p>{error?.message}</p>,
+      });
     }
     if (data) {
       console.log(data);
@@ -237,7 +237,13 @@ const AdminNavbar = ({ scrolling }: Props) => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span onClick={() => signOut({redirect:false,callbackUrl:"/"})}>Log out</span>
+                    <span
+                      onClick={() =>
+                        signOut({ redirect: false, callbackUrl: "/" })
+                      }
+                    >
+                      Log out
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -425,7 +431,7 @@ const offersComponents: { title: string; href: string; description: string }[] =
     },
     {
       title: "Edit sliding offers",
-      href: "/admin/store/offer",
+      href: "/admin/store/sliding-offers",
       description:
         "Edit the sliding offers that appear at the top of the pages or deactivate it",
     },

@@ -58,13 +58,13 @@ const Sidebar = ({ sideNav, setSideNav }: Props) => {
 
         {
           name: "place a return / Exchange request",
-          path: "/return",
+          path: "/return-exchange-policy",
           showIfNotLoggedIn: true,
           exact: true,
         },
         {
           name: "customer support",
-          path: "/support",
+          path: "/contact-us",
           showIfNotLoggedIn: false,
           exact: true,
         },

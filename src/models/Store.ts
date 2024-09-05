@@ -4,18 +4,23 @@ const StoreSchema = new mongoose.Schema({
   carouselImages: [String],
   featuredCategories: [
     {
-      type: { type: String, enum: ["categoriesWithProducts", "multipleCategories"], required: true },
+      type: {
+        type: String,
+        enum: ["categoriesWithProducts", "multipleCategories"],
+        required: true,
+      },
       name: String,
       section: String,
       categories: [{ type: String }],
       categoriesId: [{ type: String }],
-    }
+    },
   ],
   offerImage: String,
   slidingOffers: [
     {
-      title: String,
+      offerTitle: String,
       link: String,
+      linkTitle: String,
     },
   ],
   footerData: {

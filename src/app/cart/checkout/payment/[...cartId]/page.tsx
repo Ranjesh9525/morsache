@@ -10,6 +10,8 @@ import { InitializeOrder } from "@/serverlessActions/_cartActions";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { CartContext } from "@/context/cartContext";
+import { ClipLoader } from "react-spinners";
+import { GlobalContext } from "@/context/globalContext";
 
 type Props = {
   params: {
@@ -18,7 +20,8 @@ type Props = {
 };
 
 const Page = (props: Props) => {
-  const {cart,dispatch}= useContext(CartContext)!
+  const { cart, dispatch } = useContext(CartContext)!;
+  const { userData, userDataLoading } = useContext(GlobalContext)!;
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const {
@@ -59,14 +62,14 @@ const Page = (props: Props) => {
       },
       body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
     });
-   
-const order = await result.json();
+
+    const order = await result.json();
 
     const {
       id: order_id,
       currency: order_currency,
       amount: order_amount,
-    } = order
+    } = order;
     const options = {
       key: process.env.RAZORPAY_KEY_ID,
       amount: order_amount.toString(),
@@ -77,17 +80,19 @@ const order = await result.json();
       order_id,
       handler: async (response: any) => {
         toast({
-          title:`Payment successful!`,
-          description: <p>{`Payment ID: ${response.razorpay_payment_id}`}</p>
-        }
-        );
+          title: `Payment successful!`,
+          description: <p>{`Payment ID: ${response.razorpay_payment_id}`}</p>,
+        });
         // add post payment logic
-          server_InitializeOrder({paymentMethod:"razorPay",order});
+        server_InitializeOrder({ paymentMethod: "razorPay", order });
       },
       prefill: {
-        name: "test user",
-        email: "testuser@example.com",
-        contact: "9999999999",
+        name:
+          userData?.firstName && userData?.lastName
+            ? userData?.firstName + " " + userData?.lastName
+            : userData?.firstName || "test user",
+        email: userData?.email || "testuser@example.com",
+        contact: userData?.phoneNumber || "9999999999",
       },
       notes: {
         address: "Morsache Clothing HQ",
@@ -103,8 +108,9 @@ const order = await result.json();
   };
 
   const handlePayOnDelivery = () => {
-    // add pay on delivery logic
-    server_InitializeOrder({paymentMethod:"payOnDelivery",order:null});
+    if (!isPending) {
+      server_InitializeOrder({ paymentMethod: "payOnDelivery", order: null });
+    }
   };
 
   useEffect(() => {
@@ -115,13 +121,13 @@ const order = await result.json();
         title: "order placed",
         description: "Thanks for shopping with us!",
       });
-      dispatch({type:"CLEAR_CART"})
+      dispatch({ type: "CLEAR_CART" });
       router.push(`/review/${data?.data}`);
     }
     if (isError) {
       toast({
         variant: "destructive",
-        title: "Something went wrong",
+        title: "Couldn't place order",
         description: error.message,
       });
     }
@@ -131,36 +137,55 @@ const order = await result.json();
     <CheckoutLayout title="Payment - Morsache Clothing">
       <div className="w-full container lg:grid lg:grid-cols-9 flex flex-col-reverse mb-9 mt-4 gap-9">
         <div className="col-span-6 flex flex-col h-full">
-          <div className="flex-1 flex flex-col items-start gap-4">
-            <button
-              className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
-              onClick={handlePayOnDelivery}
-            >
-              <IoCardOutline size={30} /> <p className="font-medium">Pay on delivery</p>
-            </button>
-            <button
-              className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
-              onClick={handleRazorPay}
-              disabled={isLoading}
-            >
-              <Image
-                src="/razorpay.png"
-                alt="razorPay"
-                width={100}
-                height={50}
-              />{" "}
-              <p className="font-medium">
-                {isLoading ? "Processing..." : "Pay With Razor Pay"}
-              </p>
-            </button>
-            <button
-              className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
-              disabled={true}
-            >
-              <Image src="/stripe.png" alt="razorPay" width={80} height={50} />{" "}
-              <p className="font-medium">Pay with stripe</p>
-            </button>
-          </div>
+          {userDataLoading ? (
+            <p className="text-center">
+              <ClipLoader />
+            </p>
+          ) : (
+            <div className="flex-1 flex flex-col items-start gap-4">
+              <button
+                className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+                onClick={handlePayOnDelivery}
+              >
+                <IoCardOutline size={30} />
+                {isPending ? (
+                  <ClipLoader />
+                ) : (
+                  <>
+                    {" "}
+                    <p className="font-medium">Pay on delivery</p>
+                  </>
+                )}
+              </button>
+              <button
+                className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+                onClick={handleRazorPay}
+                disabled={isLoading}
+              >
+                <Image
+                  src="/razorpay.png"
+                  alt="razorPay"
+                  width={100}
+                  height={50}
+                />{" "}
+                <p className="font-medium">
+                  {isLoading ? "Processing..." : "Pay With Razor Pay"}
+                </p>
+              </button>
+              <button
+                className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+                disabled={true}
+              >
+                <Image
+                  src="/stripe.png"
+                  alt="razorPay"
+                  width={80}
+                  height={50}
+                />{" "}
+                <p className="font-medium">Pay with stripe</p>
+              </button>
+            </div>
+          )}
           <div className="mt-auto">
             <PrevAndNextBtn
               showNext={false}

@@ -1,7 +1,7 @@
 "use server";
 import { connectDB } from "@/utilities/DB";
 import { UserSearch } from "lucide-react";
-import { cloudinaryUpload } from "@/utilities/config";
+import { cloudinaryDelete, cloudinaryUpload } from "@/utilities/config";
 import UserModel from "../models/User";
 import ProductsModel from "../models/Products";
 import AdminModel from "../models/Admin";
@@ -34,7 +34,7 @@ export const AdminGetAllUsers = async () => {
     await connectDB();
     const users = await UserModel.find().sort({ createdAt: -1 });
     // console.log(users);
-    return JSON.parse(JSON.stringify(users));
+    return Response("fetched all users", 200, true, users);
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
@@ -43,12 +43,12 @@ export const AdminGetAllUsers = async () => {
 export const AdminGetSingleUsers = async (id: string) => {
   try {
     await connectDB();
-    const user = await UserModel.find({ _id: id });
+    const user = await UserModel.findOne({ _id: id }).select("-password");
     if (!user) {
-      return null;
+      throw new Error("user not found");
     }
     // console.log(user);
-    return JSON.parse(JSON.stringify(user));
+    return Response("fetched user", 200, true, user);
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
@@ -359,6 +359,35 @@ export const AdminUpdateStoreData = async (data: any) => {
       fetchedData[0].featuredCategories = featuredCategories;
       await fetchedData[0].save();
     }
+    if (offerImage) {
+      if (offerImage === "delete") {
+        if (
+          storeData.offerImage &&
+          storeData.offerImage.includes("cloudinary")
+        ) {
+          const publicId = storeData.offerImage.split("/").pop().split(".")[0];
+
+          await cloudinaryDelete(publicId);
+          storeData.offerImage = "";
+          await storeData.save();
+          return Response("offer image deleted", 200, true);
+        }
+      }
+      if (!offerImage.includes("cloudinary")) {
+        const cloudPhoto = await cloudinaryUpload(offerImage, {
+          folder: "store/offer-image",
+        });
+        storeData.offerImage = cloudPhoto.secure_url;
+        await storeData.save();
+      } else {
+        storeData.offerImage = offerImage;
+        await storeData.save();
+      }
+    }
+    if (slidingOffers) {
+      storeData.slidingOffers = slidingOffers;
+      await storeData.save();
+    }
     return Response("Store data updated successfully", 200, true);
   } catch (error) {
     console.error("Error updating store data", error);
@@ -373,8 +402,7 @@ export const AdminData = async () => {
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
       // throw new Error("Couldnt retrieve admin data");
-      await AdminModel.create({defaultConfirmOrders : true})
-
+      await AdminModel.create({ defaultConfirmOrders: true });
     }
 
     return Response("Store data updated successfully", 200, true, adminData);
@@ -384,13 +412,13 @@ export const AdminData = async () => {
   }
 };
 
-export const AdminDeleteProduct = async(id:string)=>{
-  try{
-      await connectDB()
-      await ProductsModel.findByIdAndDelete(id)
-      return Response("Product deleted", 200, true);
-  }catch(Error){
-    console.log("An error occured deleting product" ,Error)
-    throw Error
+export const AdminDeleteProduct = async (id: string) => {
+  try {
+    await connectDB();
+    await ProductsModel.findByIdAndDelete(id);
+    return Response("Product deleted", 200, true);
+  } catch (Error) {
+    console.log("An error occured deleting product", Error);
+    throw Error;
   }
-}
+};

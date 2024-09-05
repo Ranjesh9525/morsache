@@ -22,16 +22,11 @@ import { useMutation } from "@tanstack/react-query";
 import { UserAddToWishList } from "@/serverlessActions/_userActions";
 import { toast } from "../ui/use-toast";
 import { ClipLoader } from "react-spinners";
+import { format} from "@/utilities/global";
 type Props = {
   product: Product;
 };
 
-export function format(value: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-  }).format(value);
-}
 
 const ProductInfo = ({ product }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
@@ -103,7 +98,7 @@ const ProductInfo = ({ product }: Props) => {
 
   useEffect(() => {
     if (selectedProduct) {
-      console.log("selectedProduct", selectedProduct);
+      // console.log("selectedProduct", selectedProduct);
       dispatch({ type: "ADD_TO_CART", payload: selectedProduct });
       toast({
         variant: "default",

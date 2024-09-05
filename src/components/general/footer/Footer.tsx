@@ -19,7 +19,7 @@ const Footer = (props: Props) => {
       <div className="p-9">
         <section className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 py-4">
           <span>
-            <h1 className="text-[14px] uppercase underline tracking-wider mb-4">
+            <h1 className="text-[14px] uppercase  tracking-wider mb-4">
               Offline Store
             </h1>
             <ul className="text-[12px] tracking-wide">
@@ -29,12 +29,12 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] underline uppercase tracking-wider mb-4">
+            <h1 className="text-[14px]  uppercase tracking-wider mb-4">
               Get to know us
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
-                <Link href="/support">Contact Us</Link>
+                <Link href="/contact-us">Contact Us</Link>
               </li>
               <li className="mb-2">
                 <Link href="#">FAQ&#39;s</Link>
@@ -48,7 +48,7 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] underline uppercase tracking-wider mb-4">
+            <h1 className="text-[14px]  uppercase tracking-wider mb-4">
               TRACK OR RETURN/EXCHANGE ORDER
             </h1>
             <ul className="text-[12px] tracking-wide">
@@ -64,7 +64,7 @@ const Footer = (props: Props) => {
             </ul>
           </span>
           <span>
-            <h1 className="text-[14px] underline uppercase tracking-wider mb-4">
+            <h1 className="text-[14px]  uppercase tracking-wider mb-4">
               CUSTOMER CARE
             </h1>
             <ul className="text-[12px] tracking-wide">

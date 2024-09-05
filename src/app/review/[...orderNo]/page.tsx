@@ -33,7 +33,7 @@ const page = (props: Props) => {
               <Link href="/search" className="cursor-pointer">
                 <Button className="">Back to shopping</Button>
               </Link>
-              <Link href="/support" className="cursor-pointer">
+              <Link href="/contact-us" className="cursor-pointer">
                 <Button variant="outline" className="">Contact support</Button>
               </Link>
             </span>

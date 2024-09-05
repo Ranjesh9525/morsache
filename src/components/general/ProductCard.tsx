@@ -3,7 +3,8 @@ import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
-import { format } from "../products/ProductInfo";
+import { format } from "@/utilities/global";
+
 
 type Props = {
   item: any;

@@ -1,11 +1,12 @@
 "use client"
 import { OrderReviewData } from "@/@types/order";
 import { OptimizedProduct } from "@/@types/products";
-import { format } from "@/components/products/ProductInfo";
+
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { FetchOrderByOrderNo } from "@/serverlessActions/_cartActions";
+import { formatDate,format } from "@/utilities/global";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -384,14 +385,3 @@ if(!orderNo){
 
 export default ReviewCard;
 
-export function formatDate(timeStamp: string | number | Date) {
-  const formattedDate = new Date(timeStamp).toLocaleString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-  return formattedDate;
-}

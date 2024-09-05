@@ -222,7 +222,8 @@
 // }
 
 "use client";
-import { formatDate } from "@/app/review/ReviewCard";
+import { format, formatDate } from "@/utilities/global";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";

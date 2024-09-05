@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useContext } from "react";
 import { Minus, Plus } from "lucide-react";
-import { format } from "@/components/products/ProductInfo";
+import { format} from "@/utilities/global";
+
 import { MdOutlineCancel } from "react-icons/md";
 import { CartContext } from "@/context/cartContext";
 import { cn } from "@/lib/utils";

@@ -1,11 +1,12 @@
 import { Document, Schema, model } from "mongoose";
+import { Cart, CartForServer } from "./cart";
 
-// Define an interface for the User document
-export interface UserDocument extends Document {
+interface UserDocument extends Document {
   _id?: Schema.Types.ObjectId;
   firstName?: string;
   lastName?: string;
   email: string;
+  carts?: Cart[];
   image?: string;
   emailVerified?: Date;
   address?: {

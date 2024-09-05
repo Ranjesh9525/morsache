@@ -18,6 +18,7 @@ import { sendOrderConfirmationEmail } from "./sendMail";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import { Order, OrderReviewData } from "@/@types/order";
 import { OptimizedProduct } from "@/@types/products";
+import authAction from "./middlewares";
 // import UserModel from "../models/User";
 
 interface Shipping extends Document {
@@ -265,9 +266,7 @@ export const findUserCart = async (cartId: string) => {
 export const FetchUserCartShippingData = async () => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UserModel.findOne({ _id: userId });
+    const user = await authAction();
     if (!user) {
       throw new Error("No User found");
     }
@@ -333,9 +332,7 @@ export const FetchUserCartShippingData = async () => {
 export const UpdateCartOrderRecieveBy = async (choice: string) => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UserModel.findOne({ _id: userId });
+    const user = await authAction();
     if (!user) {
       throw new Error("No User found");
     }
@@ -356,12 +353,16 @@ const generateRandomOrderNumber = () => {
   return orderNumber;
 };
 
-export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:{paymentMethod: string,order:any}) => {
+export const InitializeOrder = async ({
+  paymentMethod,
+  order: responseFromGateway,
+}: {
+  paymentMethod: string;
+  order: any;
+}) => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UserModel.findOne({ _id: userId });
+    const user = await authAction();
     if (!user) {
       throw new Error("No User found");
     }
@@ -369,7 +370,31 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
     if (!cart) {
       throw new Error("Cart not found");
     }
+    if (
+      !cart.items ||
+      !cart.totalItems ||
+      !cart.shippingAddress ||
+      !cart.shippingPrice ||
+      !cart.receiveBy
+    ) {
 
+      throw new Error(
+        "Failed to place order. Order process is incomplete. Try again"
+      );
+    }
+    let allProductsAcceptPayOnDelivery = true;
+    const productsNotAcceptingPayOnDelivery = [];
+
+    for (const cartItem of cart.items) {
+      const product = await ProductsModel.findOne({ _id: cartItem.productId });
+      if (!product || !product.payOnDelivery) {
+        allProductsAcceptPayOnDelivery = false;
+        productsNotAcceptingPayOnDelivery.push(product?.name || "A product");
+      }
+    }
+    if (!allProductsAcceptPayOnDelivery) {
+      throw new Error("Pay on delivery is not avaliable for this order");
+    }
     if (paymentMethod === "razorPay") {
       // const razorPayRequest = await fetch("/api/razorpay", {
       //   method: "POST",
@@ -388,12 +413,13 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
       if (responseFromGateway.status === "captured") {
         const order = new OrdersModel({
           orderNumber: responseFromGateway.id,
-          customer: userId,
+          customer: user?._id,
           items: cart.items,
           totalItems: cart.totalItems,
-          totalAmount:responseFromGateway.amount,
+          totalAmount: responseFromGateway.amount,
           shippingPrice: cart.shippingPrice,
           orderStatus: "pending",
+          collectionMethod: cart.receiveBy,
           shippingAddress: cart.shippingAddress,
           paymentMethod: {
             type: paymentMethod,
@@ -405,23 +431,23 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
         user.carts[0].paymentMethod = { type: paymentMethod };
         user.carts[0].isPaid = true;
         user.orders.push({
-          orderId:order._id,
-          status:order?.orderStatus
-        })
+          orderId: order._id,
+          status: order?.orderStatus,
+        });
         await user.save();
 
         sendOrderConfirmationEmail(order, user.email, "You placed an order!");
 
         return Response("Order created", 200, true, order?._id);
-      }else{
-        throw new Error("Payment failed")
+      } else {
+        throw new Error("Payment failed");
       }
     }
-   
+
     if (paymentMethod === "payOnDelivery") {
       const order = new OrdersModel({
         orderNumber: generateRandomOrderNumber(),
-        customer: userId,
+        customer: user?._id,
         items: cart.items,
         totalItems: cart.totalItems,
         totalAmount: cart.totalAmount + (parseInt(cart?.shippingPrice!) || 0),
@@ -431,6 +457,7 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
         paymentMethod: {
           type: paymentMethod,
         },
+        collectionMethod: cart.receiveBy,
         paymentStatus: "pending",
       });
       // console.log("order", order);
@@ -438,9 +465,9 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
       user.carts[0].paymentMethod = { type: paymentMethod };
       user.carts[0].isPaid = true;
       user.orders.push({
-        orderId:order._id,
-        status:order?.orderStatus
-      })
+        orderId: order._id,
+        status: order?.orderStatus,
+      });
       await user.save();
       sendOrderConfirmationEmail(order, user.email, "You placed an order!");
       return Response("Order created", 200, true, order?.orderNumber);
@@ -451,13 +478,46 @@ export const InitializeOrder = async ({paymentMethod,order:responseFromGateway}:
   }
 };
 
+export const CartCheckPayOnDelivery = async () => {
+  try {
+    await connectDB();
+    const user = await authAction();
+    if (!user) {
+      throw new Error("No User found");
+    }
+    const cart: CartForServer = user.carts[0];
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+
+    let allProductsAcceptPayOnDelivery = true;
+    const productsNotAcceptingPayOnDelivery = [];
+
+    for (const cartItem of cart.items) {
+      const product = await ProductsModel.findOne({ _id: cartItem.productId });
+      if (!product || !product.payOnDelivery) {
+        allProductsAcceptPayOnDelivery = false;
+        productsNotAcceptingPayOnDelivery.push(product?.name || "A product");
+      }
+    }
+
+    const returnData = {
+      payOnDelivery: allProductsAcceptPayOnDelivery,
+      productsNotAcceptingPayOnDelivery,
+    };
+
+    return Response("validated products payment method", 200, true, returnData);
+  } catch (error) {
+    console.error("Error checking payment methods", error);
+    throw new Error("Error checking payment methods");
+  }
+};
+
 export const FetchOrderByOrderNo = async (orderNo: string) => {
   try {
-    await connectDB()
+    await connectDB();
     // console.log(orderNo)
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UserModel.findOne({ _id: userId });
+    const user = await authAction();
     const order: Order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
       throw new Error("Order not found");

@@ -18,18 +18,19 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { formatDate } from "@/utilities/global";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  route:string
-  rowKey?:string
+  route: string;
+  rowKey?: string;
 }
 //id,firstname,totalorders,datejoined,role,email
 export function DataTable<TData, TValue>({
   columns,
   data,
   route,
-  rowKey
+  rowKey,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const table = useReactTable({
@@ -79,16 +80,24 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell: any) => {
-                    // console.log(cell)
+                    //  console.log(cell.column);
                     return (
                       <TableCell key={cell.id} className="cursor-pointer">
-                        {cell.getContext().getValue() &&
-                        typeof cell?.getContext()?.getValue()[0] ===
-                          "object" ? (
+                        {cell.column.id === "orders" ? (
+                          // <p className="font-italic text-gray-500 text-sm text-center">
+                          cell?.getContext()?.getValue()?.length
+                        ) : cell.getContext().getValue() &&
+                          typeof cell?.getContext()?.getValue()[0] ===
+                            "object" ? (
                           <p className="font-italic text-gray-500 text-sm text-center">
                             {"Array,click to view"}
-                          </p> // Return the first property value if it's an array
+                          </p>
+                        ) : cell.column.id === "createdAt" ? (
+                          <p className="font-italic text-gray-500 text-sm text-center">
+                            {formatDate(cell.getContext()?.getValue())}
+                          </p>
                         ) : (
+                          // </p>
                           flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

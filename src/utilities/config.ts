@@ -7,3 +7,5 @@ cloudinary.config({
 });
 
 export const cloudinaryUpload = cloudinary.uploader.upload;
+
+export const cloudinaryDelete = cloudinary.uploader.destroy
