@@ -4,9 +4,9 @@ import { getToken } from 'next-auth/jwt';
 
 const protectedRoutes = [
   '/admin',
-  '/profile',
+  '/account',
 ];
-const unprotectedRoutes = ['/', '/login'];
+const unprotectedRoutes = [ '/auth/login'];
 
 // import { auth } from './services/auth';
 
@@ -21,8 +21,15 @@ export default async function middleware(request: NextRequest) {
     const absoluteURL = new URL('/', request.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }
+  //   if ((request.nextUrl.pathname == "/auth/login" ) && session?.user) {
+  //   const homeUrl = new URL("/", request.nextUrl.origin);
+  //   // homeUrl.searchParams.append("error", "You are already logedin");
+  //   // return NextResponse.redirect(homeUrl.toString());
+  //   return NextResponse.redirect(absoluteURL.toString());
+
+  // }
   if (session && unprotectedRoutes.includes(request.nextUrl.pathname)) {
-    const absoluteURL = new URL('/admin', request.nextUrl.origin);
+    const absoluteURL = new URL('/account', request.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }
 }
