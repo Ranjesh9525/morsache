@@ -57,6 +57,7 @@ import { AdminUploadProduct } from "@/serverlessActions/_adminActions";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { useToast } from "@/components/ui/use-toast";
+import { Product } from "@/@types/products";
 
 type Props = {
   scrolling: boolean;
@@ -83,7 +84,7 @@ const scrollingVariants = {
 
 const AdminNavbar = ({ scrolling }: Props) => {
   const { data: Session } = useSession() as any;
-  const [savedProduct, setSavedProduct] = useState(false);
+  const [savedProduct, setSavedProduct] = useState<Product | null>(null);
   const router = useRouter();
   const {
     isPending,
@@ -102,11 +103,12 @@ const AdminNavbar = ({ scrolling }: Props) => {
       title: `Product discarded`,
     });
     localStorage.removeItem("product-draft");
-    setSavedProduct(false);
+    setSavedProduct(null);
     router.push("/admin/products/create");
     router.refresh();
   };
   const pathname = usePathname();
+  const lastPartPathName = pathname?.split("/").pop();
   const isPreview = useSearchParams()?.get("preview");
   useEffect(() => {
     if (isSuccess) {
@@ -115,7 +117,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
         title: `Product uploaded`,
       });
       localStorage.removeItem("product-draft");
-      setSavedProduct(false);
+      setSavedProduct(null);
       router.push("/admin/products/create");
     }
     if (isError) {
@@ -354,34 +356,36 @@ const AdminNavbar = ({ scrolling }: Props) => {
               </NavigationMenuList>
             </NavigationMenu>{" "}
           </div>
-          {pathname === "/admin/products/create" && savedProduct && (
-            <div id="action-btns">
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={isPending}
-                onClick={() => discardProduct()}
-                className="mr-8 gap-4 border border-[#665a47] text-black tracking-wider hover:bg-[#e6e6e6]"
-              >
-                Discard
-                <FaTimes color="red" />
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={isPending}
-                onClick={() => uploadProduct(savedProduct)}
-                className="mr-8 gap-4 bg-[#665a47] text-white tracking-wider hover:bg-[#665000a9] "
-              >
-                Upload Product
-                {!isPending ? (
-                  <FaUpload color="#fff" />
-                ) : (
-                  <ClipLoader color="#fff" />
-                )}
-              </Button>
-            </div>
-          )}
+          {(pathname === "/admin/products/create" ||
+            `/admin/products/${lastPartPathName}`) &&
+            savedProduct && (
+              <div id="action-btns">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isPending}
+                  onClick={() => discardProduct()}
+                  className="mr-8 gap-4 border border-[#665a47] text-black tracking-wider hover:bg-[#e6e6e6]"
+                >
+                  Discard
+                  <FaTimes color="red" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isPending}
+                  onClick={() => uploadProduct(savedProduct)}
+                  className="mr-8 gap-4 bg-primary-dark text-white tracking-wider hover:bg-primary "
+                >
+                  Upload Product
+                  {!isPending ? (
+                    <FaUpload color="#fff" />
+                  ) : (
+                    <ClipLoader color="#fff" />
+                  )}
+                </Button>
+              </div>
+            )}
         </div>
       </nav>
     </motion.div>

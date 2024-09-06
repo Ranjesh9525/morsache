@@ -18,7 +18,7 @@ import { sendOrderConfirmationEmail } from "./sendMail";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import { Order, OrderReviewData } from "@/@types/order";
 import { OptimizedProduct } from "@/@types/products";
-import authAction from "./middlewares";
+import { authAction } from "./middlewares";
 import { AdminFindCart, AdminGetOrderById } from "./_adminActions";
 // import UserModel from "../models/User";
 
@@ -194,20 +194,11 @@ export const createCart = async (data: CartForServer) => {
   try {
     await connectDB();
 
-    const session: any = await getServerSession(authOptions);
-
-    if (session) {
-      const userId = session?.user?._id;
-      const user = await UserModel.findOne({ _id: userId });
-      if (!user) {
-        throw new Error("No User found");
-      }
-      //save cart to user.cart array, but clear out any cart saved there first
-      // Clear out any existing cart saved in user.cart array
+    const user = await authAction();
+    //save cart to user.cart array, but clear out any cart saved there first
+    if (user) {
       user.carts = [];
       //   const newArray = [{ _id: cartId ,data}]
-      //   // Save new cart data into user.cart array
-      //   user.cart = newArray
       // Generate a random _id for the cart
       const cartId = new ObjectId();
       data._id = cartId;
@@ -224,8 +215,7 @@ export const createCart = async (data: CartForServer) => {
       // console.log(user);
       return Response("Cart initialized", 200, true, cartIdFromCart);
     } else {
-      // Handle the case where there is no active session
-      console.log("No active session found. Unable to create cart.");
+      throw new Error("No active session found. Unable to create cart.");
     }
   } catch (error) {
     console.log(`Error creating cart: ${error}`);
@@ -248,15 +238,18 @@ export const findUserCart = async (cartId: string) => {
       } else {
         throw new Error("failed to fetch cart");
       }
-    }else{
-    const cart = user.carts.find((cart: any) => cart._id.toString() === cartId);
-    if (!cart) {
-      throw new Error("Cart not found");
+    } else {
+      const cart = user.carts.find(
+        (cart: any) => cart._id.toString() === cartId
+      );
+      if (!cart) {
+        throw new Error("Cart not found");
+      }
+      if (cart.isPaid) {
+        throw new Error("Cart closed");
+      }
+      return Response("Cart found", 200, true, cart);
     }
-    if (cart.isPaid) {
-      throw new Error("Cart closed");
-    }
-    return Response("Cart found", 200, true, cart);}
   } catch (error) {
     console.log(`Error finding cart: ${error}`);
     throw error;
@@ -435,7 +428,12 @@ export const InitializeOrder = async ({
         });
         await user.save();
 
-        sendOrderConfirmationEmail(order, user.email, "You placed an order!",`Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`);
+        sendOrderConfirmationEmail(
+          order,
+          user.email,
+          "You placed an order!",
+          `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
+        );
 
         return Response("Order created", 200, true, order?._id);
       } else {
@@ -468,7 +466,12 @@ export const InitializeOrder = async ({
         status: order?.orderStatus,
       });
       await user.save();
-      sendOrderConfirmationEmail(order, user.email, "You placed an order!",`Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`);
+      sendOrderConfirmationEmail(
+        order,
+        user.email,
+        "You placed an order!",
+        `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
+      );
       return Response("Order created", 200, true, order?.orderNumber);
     }
   } catch (error) {
@@ -558,7 +561,7 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       orderNumber,
       shippingAddress,
       expectedDeliveryOrPickupDate1,
-      expectedDeliveryOrPickupDate2
+      expectedDeliveryOrPickupDate2,
     } = order;
     returnData.paymentDetails = {
       totalAmount,
@@ -573,7 +576,7 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       orderStatus,
       orderNumber,
       expectedDeliveryOrPickupDate1,
-      expectedDeliveryOrPickupDate2
+      expectedDeliveryOrPickupDate2,
     };
     const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
     returnData.customerDetails = {

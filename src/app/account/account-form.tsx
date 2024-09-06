@@ -223,7 +223,10 @@
 
 // //email,password,shippinginfo,phone number
 "use client";
-import { UserUpdateShippingAddress } from "@/serverlessActions/_userActions";
+import {
+  UserUpdateAccountProfile,
+  UserUpdateShippingAddress,
+} from "@/serverlessActions/_userActions";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { ShippingAddress } from "@/@types/cart";
@@ -247,6 +250,7 @@ import {
 import React, { useContext, useEffect } from "react";
 import { shippingSchema } from "../cart/components/DetailsInformation";
 import { GlobalContext } from "@/context/globalContext";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
@@ -264,15 +268,14 @@ const AccountForm = (props: Props) => {
     mutationFn: UserUpdateShippingAddress,
   });
 
-  
   const emailOrPhoneSchema = z.object({
     email: z
-        .string({
-          required_error: "Please select an email to display.",
-        })
-        .email()
+      .string({
+        required_error: "Please select an email to display.",
+      })
+      .email()
       .optional(),
-    phone: z
+    phoneNumber: z
       .string()
       .min(9, {
         message: "phone number must be at least 9 characters.",
@@ -285,44 +288,53 @@ const AccountForm = (props: Props) => {
 
   type EmailOrPhoneValues = z.infer<typeof emailOrPhoneSchema>;
 
-  // // This can come from your database or API.
   const defaultValues: Partial<EmailOrPhoneValues> = {
-    email: "",
-    phone: "",
+    email: userData?.email || "",
+    phoneNumber: userData?.phoneNumber || "",
   };
 
   const emailOrPhoneForm = useForm<EmailOrPhoneValues>({
     resolver: zodResolver(emailOrPhoneSchema),
     defaultValues,
-    mode: "onChange",
   });
-
-  function onEmailOrPhoneSubmit(data: EmailOrPhoneValues) {
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // })
-  }
 
   const form = useForm<z.infer<typeof shippingSchema>>({
     resolver: zodResolver(shippingSchema),
-    defaultValues:{
-      country:"india"
-    }
+    defaultValues: {
+      country: "india",
+    },
   });
   // useEffect(() => {
-    // if (!userData && !userDataLoading) {
-    //   fetchUserData
-    // }
+  // if (!userData && !userDataLoading) {
+  //   fetchUserData
+  // }
   //   console.log(userData)
   // }, [userDataLoading, userData]);
-
+  const router = useRouter();
+  const { isPending: isUpdating, mutate: server_userUpdateAccountProfile } =
+    useMutation({
+      mutationFn: UserUpdateAccountProfile,
+      onSuccess: (res) => {
+        // console.log(res);
+        fetchUserData();
+        toast({
+          title: "Profile updated",
+        });
+        router.refresh();
+      },
+      onError: (err) => {
+        console.log(err);
+        toast({
+          variant: "destructive",
+          title: "Failed to update user profile",
+          description: <p>{err?.message}</p>,
+        });
+      },
+    });
+  function onEmailOrPhoneSubmit(data: EmailOrPhoneValues) {
+    server_userUpdateAccountProfile(data);
+  }
   function onSubmit(values: z.infer<typeof shippingSchema>) {
-    // Perform any necessary actions with the form values
     const body = {
       userId: userData!._id!,
       address: {
@@ -355,54 +367,58 @@ const AccountForm = (props: Props) => {
   }, [isError, isSuccess]);
   return (
     <div>
-        <Form {...emailOrPhoneForm}>
-      <form onSubmit={emailOrPhoneForm.handleSubmit(onEmailOrPhoneSubmit)} className="space-y-8">
-     
-        <FormField
-          control={emailOrPhoneForm.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <h1 className="capitalize font-medium tracking-tight text-lg">
-                Email
-              </h1>
-              <FormControl>
-                <Input placeholder="email" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name. you would be addressed by
-                this. It can be your real name or a pseudonym.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={emailOrPhoneForm.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <h1 className="capitalize font-medium tracking-tight text-lg">
-                Phone number
-              </h1>
-              <FormControl>
-                <Input placeholder="phone number" {...field} />
-              </FormControl>
-              <FormDescription>
-                Your last name makes up your full name to be included in your
-                orders , not this would not be visible when you leave a review
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Update Account</Button>
-      </form>
-    </Form>
+      <Form {...emailOrPhoneForm}>
+        <form
+          onSubmit={emailOrPhoneForm.handleSubmit(onEmailOrPhoneSubmit)}
+          className="space-y-8"
+        >
+          <FormField
+            control={emailOrPhoneForm.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <h1 className="capitalize font-medium tracking-tight text-lg">
+                  Email
+                </h1>
+                <FormControl>
+                  <Input disabled placeholder="email" {...field} />
+                </FormControl>
+                <FormDescription></FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={emailOrPhoneForm.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <h1 className="capitalize font-medium tracking-tight text-lg">
+                  Phone number
+                </h1>
+                <FormControl>
+                  <Input placeholder="phone number" {...field} />
+                </FormControl>
+                <FormDescription></FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button disabled={isUpdating} type="submit">
+            {isUpdating ? (
+              <ClipLoader size={21} color="#fff" />
+            ) : (
+              "Update profile"
+            )}
+          </Button>
+        </form>
+      </Form>
       {!userDataLoading ? (
         userData && (
           <div className="space-y-8">
-            <h1 className="w-full text-sm mb-4">Saved Shipping Addresses:</h1>
+            <h1 className="w-full text-lg  my-4 mt-8">
+              Saved Shipping Addresses
+            </h1>
             <div className="w-full grid md:grid-cols-4 gap-6">
               {userData!.address!.map((a: ShippingAddress, a_index: number) => {
                 if (!a.city || !a.state || !a.country || !a.street) return null;
@@ -442,13 +458,13 @@ const AccountForm = (props: Props) => {
           </div>
         )
       ) : (
-        <span className="text-center">
+        <p className="text-center w-full my-8">
           <ClipLoader />
-        </span>
+        </p>
       )}
 
       <section className=" my-8">
-        <h1 className="mb-3">Add shipping address</h1>
+        <h1 className="mb-3 text-lg ">Add shipping address</h1>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -525,7 +541,11 @@ const AccountForm = (props: Props) => {
                     </h1>
                     <FormMessage />
                     <FormControl>
-                    <Input readOnly placeholder="Enter your country" {...field} />
+                      <Input
+                        readOnly
+                        placeholder="Enter your country"
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}

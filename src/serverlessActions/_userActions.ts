@@ -10,9 +10,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import bcrypt from "bcryptjs";
 import { Response } from "./responseClass";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
-import authAction from "./middlewares";
+import { authAction } from "./middlewares";
 import { Order } from "@/@types/order";
-import { cloudinaryUpload } from "@/utilities/config";
+import { cloudinaryDelete, cloudinaryUpload } from "@/utilities/config";
 
 export const UserAddToWishList = async ({
   productId,
@@ -25,9 +25,7 @@ export const UserAddToWishList = async ({
     if (!product) {
       throw new Error("Product not found");
     }
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UsersModel.findOne({ _id: userId });
+       const user = await authAction();
     if (!user) {
       throw new Error("User not found");
     }
@@ -55,9 +53,7 @@ export const UserAddToWishList = async ({
 export const UserGetWishlists = async () => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UsersModel.findOne({ _id: userId });
+       const user = await authAction();
     if (!user) {
       throw new Error("User not found");
     }
@@ -139,9 +135,7 @@ export const UserUpdateShippingAddress = async ({
 export const UserIsNewUser = async () => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UsersModel.findOne({ _id: userId });
+       const user = await authAction();
     if (!user) {
       throw new Error("User not found");
     }
@@ -170,9 +164,7 @@ export const Account = async ({
 }) => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    const userId = session!?.user!?._id;
-    const user = await UsersModel.findOne({ _id: userId });
+       const user = await authAction();
     const hashedPassword = await bcrypt.hash(password, 12);
     // console.log("here", userId,
     // firstName,
@@ -246,7 +238,9 @@ export const UserTrackOrder = async (orderNo: string) => {
       throw new Error("Unauthorized access");
     }
     //pickup between 4-7 days , delivery between 7-12 days
-    const confirmedDate = order.confirmedOn ? new Date(order.confirmedOn) : new Date(order.createdAt);
+    const confirmedDate = order.confirmedOn
+      ? new Date(order.confirmedOn)
+      : new Date(order.createdAt);
     const ReturnData = {
       orderNumber: order.orderNumber,
       packageSize:
@@ -262,9 +256,12 @@ export const UserTrackOrder = async (orderNo: string) => {
       },
       status: order.orderStatus,
       methodOfCollection: order.collectionMethod || "delivery",
-      expectedCollectionDate1:  order.expectedDeliveryDate1 ? new Date(order.expectedDeliveryOrPickupDate1) : new Date(confirmedDate.getTime() + 7 * 24 * 60 * 60 * 1000),
-      expectedCollectionDate2:  order.expectedDeliveryDate2 ? new Date(order.expectedDeliveryOrPickupDate2) : new Date(confirmedDate.getTime() + 12* 24 * 60 * 60 * 1000)
-
+      expectedCollectionDate1: order.expectedDeliveryDate1
+        ? new Date(order.expectedDeliveryOrPickupDate1)
+        : new Date(confirmedDate.getTime() + 7 * 24 * 60 * 60 * 1000),
+      expectedCollectionDate2: order.expectedDeliveryDate2
+        ? new Date(order.expectedDeliveryOrPickupDate2)
+        : new Date(confirmedDate.getTime() + 12 * 24 * 60 * 60 * 1000),
     };
     console.log(ReturnData);
     return Response("order tracking results", 200, true, ReturnData);
@@ -274,15 +271,18 @@ export const UserTrackOrder = async (orderNo: string) => {
   }
 };
 
-export const UserUpdateAccountProfile = async(data:any)=>{
-  try{
+export const UserUpdateAccountProfile = async (data: any) => {
+  try {
     await connectDB();
+
     const user = await authAction();
     if (data.image) {
+      if (user?.image) {
+        const publicId = user.image.split("/").pop().split(".")[0];
+        await cloudinaryDelete(publicId);
+      }
       const cloudPhoto = await cloudinaryUpload(data.image, {
         folder: `profilePhotos/${user.email}`,
-        public_id: data.name,
-        // width: 150,
       });
       data.image = cloudPhoto.secure_url;
     }
@@ -293,10 +293,10 @@ export const UserUpdateAccountProfile = async(data:any)=>{
       },
       { new: true }
     );
-console.log(updatedUser)
-return Response("updated user", 200, true);
-  }catch(err){
+    // console.log(updatedUser)
+    return Response("updated user", 200, true);
+  } catch (err) {
     console.log("Error Updating user profile", err);
     throw err;
   }
-}
+};

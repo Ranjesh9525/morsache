@@ -174,7 +174,7 @@
 // }
 
 "use client";
-import React,{useContext} from "react";
+import React, { useContext } from "react";
 
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -198,11 +198,13 @@ import { useMutation } from "@tanstack/react-query";
 import { UserUpdateAccountProfile } from "@/serverlessActions/_userActions";
 import { GlobalContext } from "@/context/globalContext";
 import { toast } from "@/components/ui/use-toast";
+import { ClipLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
 
 type Props = {};
 
 const ProfileForm = (props: Props) => {
-    const {userData} = useContext(GlobalContext)!
+  const { userData, fetchUserData } = useContext(GlobalContext)!;
 
   const [dragging, setDragging] = React.useState(false);
 
@@ -230,7 +232,6 @@ const ProfileForm = (props: Props) => {
 
   type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
- 
   const defaultValues: Partial<ProfileFormValues> = {
     firstName: userData?.firstName || "",
     lastName: userData?.lastName || "",
@@ -242,35 +243,29 @@ const ProfileForm = (props: Props) => {
     defaultValues,
   });
 
-  const {isPending,mutate:server_userUpdateAccountProfile}=useMutation({
+  const router = useRouter();
+  const { isPending, mutate: server_userUpdateAccountProfile } = useMutation({
     mutationFn: UserUpdateAccountProfile,
-    onSuccess:(res)=>{
-      console.log(res)
+    onSuccess: (res) => {
+      // console.log(res);
+      fetchUserData();
       toast({
-        title:"Profile updated"
-      })
+        title: "Profile updated",
+      });
+      router.refresh();
     },
-    onError:(err)=>{
-      console.log(err)
+    onError: (err) => {
+      console.log(err);
       toast({
-        variant:"destructive",
-        title:"Failed to update user profile",
-        description:<p>{err?.message}</p>
-      })
-    }
-  })
+        variant: "destructive",
+        title: "Failed to update user profile",
+        description: <p>{err?.message}</p>,
+      });
+    },
+  });
 
   function onSubmit(data: ProfileFormValues) {
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // })
-    console.log(data)
-    server_userUpdateAccountProfile(data)
+    server_userUpdateAccountProfile(data);
   }
   const handleFileChange = (e: any, field: string) => {
     const file = e.target.files?.[0];
@@ -354,10 +349,9 @@ const ProfileForm = (props: Props) => {
                       </span>
                     </label>
                   ) : (
-                    <div className="text-[12px] text-center">
+                    <div className="text-[12px] ">
                       Click on the image to remove it
                       <div className="">
-                        {/* /    <p className="text-[12px] mb-1">{`Image  - ${imageDimensions.width} x ${imageDimensions.height}`}</p> */}
                         <Image
                           src={form.getValues("image")!}
                           alt="image"
@@ -367,7 +361,7 @@ const ProfileForm = (props: Props) => {
                             form.setValue("image", "");
                           }}
                           // onLoad={(e) => handleImageLoad(e)}
-                          className="max-h-full w-full object-cover"
+                          className="w-[180px] h-[180px] object-cover"
                         />
                       </div>
                     </div>
@@ -417,7 +411,9 @@ const ProfileForm = (props: Props) => {
             </FormItem>
           )}
         />
-        <Button type="submit">Update profile</Button>
+        <Button disabled={isPending} type="submit">
+          {isPending ? <ClipLoader size={21} color="#fff" /> : "Update profile"}
+        </Button>
       </form>
     </Form>
   );

@@ -43,6 +43,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/@types/products";
 import ConfirmationDialog from "@/components/general/ConfirmationDialog";
+import ProductPreview from "./ProductPreview";
 type Props = {
   data: Product;
 };
@@ -62,18 +63,19 @@ const ProductsForm = ({ data }: Props) => {
   });
 
   const productSchema = z.object({
+    _id:z.string(),
     name: z.string(),
     description: z.string(),
     category: z.array(z.string()).nonempty(),
-    price: z.string(),
+    price: z.union([z.string(), z.number()]),
     slug: z.string(),
     exchangeAndReturnPolicy: z.string().optional(),
-    salePrice: z.string().optional(),
+    salePrice: z.union([z.string(), z.number()]).optional(),
     sizes: z.array(z.string()).nonempty(),
     tags: z.array(z.string()).nonempty(),
     variants: z
       .array(z.object({ variant: z.string(), image: z.string() }))
-      .nonempty(),
+      .optional(),
     offers: z
       .array(
         z.object({
@@ -85,13 +87,15 @@ const ProductsForm = ({ data }: Props) => {
       )
       .optional(),
     images: z.array(z.string()).nonempty(),
-    stock: z.string(),
+    stock: z.union([z.string(), z.number()]),
     payOnDelivery: z.boolean(),
     moreInformation: z.string().optional(),
   });
   const router = useRouter();
   const variantInput = React.useRef<HTMLInputElement>(null);
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [deleting, setdeleting] = React.useState(false);
   const [preview, setPreview] = React.useState(false);
   const [dialogInput, setDialogInput] = React.useState("");
 
@@ -119,14 +123,15 @@ const ProductsForm = ({ data }: Props) => {
   };
   function onSubmit(values: z.infer<typeof productSchema>) {
     //save as draft to local storage
-    // localStorage.setItem("product-draft", JSON.stringify(values));
-    // setPreview(true);
+    localStorage.setItem("product-draft", JSON.stringify(values));
+    setPreview(true);
     console.log("submitted");
   }
 
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
+      _id:data?._id!?.toString()  || "",
       category: data?.category || [],
       sizes: data?.sizes || [],
       variants: data?.variants || [],
@@ -236,15 +241,18 @@ const ProductsForm = ({ data }: Props) => {
   const sizes = ["xxl", "xl", "l", "m", "sm", "xs"];
 
   async function DeleteProduct() {
+    setdeleting(true);
     await AdminDeleteProduct(data.id)
-      .then((res) =>
+      .then((res) => {
+        setdeleting(false);
         toast({
           variant: "success",
           title: "Product deleted successfully",
-        })
-      )
+        });
+      })
       .catch((err) => {
         console.log(err);
+        setdeleting(false);
         toast({
           variant: "destructive",
           title: "Couldnt delete product",
@@ -253,14 +261,17 @@ const ProductsForm = ({ data }: Props) => {
       });
     console.log(data.id);
   }
-
+  if (preview) {
+    return <ProductPreview preview={preview} setPreview={setPreview} />;
+  }
   return (
     <>
       <ConfirmationDialog
-        openDialog={openDialog}
-        setOpenDialog={setOpenDialog}
+        openDialog={openDeleteDialog}
+        setOpenDialog={setOpenDeleteDialog}
         dialogTitle={" Are you sure you want to delete this Product?"}
         onClick={DeleteProduct}
+        loading={deleting}
       />
       <Form {...form}>
         <form
@@ -490,7 +501,7 @@ const ProductsForm = ({ data }: Props) => {
                               reader.onload = (e: any) => {
                                 if (reader.readyState === 2) {
                                   form.setValue("variants", [
-                                    ...form.getValues("variants"),
+                                    ...form?.getValues("variants")!,
                                     {
                                       variant: variantInput!.current!.value,
                                       image: reader.result as string,
@@ -515,16 +526,16 @@ const ProductsForm = ({ data }: Props) => {
                   <div className="max-w-full mx-auto  overflow-hidden hover:overflow-x-auto whitespace-nowrap">
                     {field.value.map((item: any, index: number) => (
                       <div
-                        onClick={() =>
+                        onClick={() => {
                           form.setValue(
                             "variants",
                             form
                               .getValues("variants")
-                              .filter(
+                              ?.filter(
                                 (i: any) => i.variant !== item.variant
-                              ) as any
-                          )
-                        }
+                              ) ?? []
+                          );
+                        }}
                         className="cursor-pointer inline-block w-[4.3rem] h-[4.5rem] mr-4"
                         key={index}
                       >
@@ -872,21 +883,20 @@ const ProductsForm = ({ data }: Props) => {
               )}
             />
           </div>
-          <div className="space-y-2 mx-auto w-fit">
-            <section className="flex max-sm:flex-col">
+          <div className="space-y-2 mx-auto ">
+            <section className="flex max-sm:flex-col items-center justify-center gap-4">
               <Button
                 disabled={
-                  form.formState.isValidating ||
-                  form.formState.isSubmitting ||
-                  !form.formState.isValid
+                  form.formState.isValidating || form.formState.isSubmitting
                 }
+                // onClick={() => console.log(form.formState)}
                 type="submit"
                 className="w-full max-w-[400px] text-center py-5 h-none"
               >
                 {form.formState.isSubmitting ? (
                   <ClipLoader size={22} color="white" />
                 ) : (
-                  "Preview Product"
+                  "Save changes"
                 )}
               </Button>
               {data && (
@@ -896,7 +906,7 @@ const ProductsForm = ({ data }: Props) => {
                   //   form.formState.isSubmitting ||
                   //   !form.formState.isValid
                   // }
-                  onClick={() => setOpenDialog(false)}
+                  onClick={() => setOpenDeleteDialog(true)}
                   variant={"destructive"}
                   type="button"
                   className="w-full max-w-[400px] text-center py-5 h-none"
@@ -910,7 +920,7 @@ const ProductsForm = ({ data }: Props) => {
               )}
             </section>
             <p className="text-[12.5px] capitalize text-center">
-              preview it on the next page before upload
+              This actions are irreversible
             </p>
           </div>
         </form>

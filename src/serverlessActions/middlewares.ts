@@ -4,7 +4,7 @@ import { connectDB } from "@/utilities/DB";
 import { getServerSession } from "next-auth";
 import UsersModel from "../models/User";
 
-const authAction = async () => {
+export const authAction = async () => {
   try {
     await connectDB();
     const session: any = await getServerSession(authOptions);
@@ -25,7 +25,36 @@ const authAction = async () => {
     return user;
   } catch (error) {
     console.error('Error in auth action:', error);
-    throw new Error('Error in auth action');
+    throw error
+  }
+};
+
+
+export const adminAction = async () => {
+  try {
+    await connectDB();
+    const session: any = await getServerSession(authOptions);
+    const userId = session?.user?._id;
+
+    if (!userId) {
+      throw new Error('User not logged in');
+    }
+
+    let user = await UsersModel.findOne({ _id: userId });
+
+    if (!user) {
+
+    throw new Error('User not found'); 
+    }
+    if (user.role !== "admin") {
+
+    throw new Error('Unauthorized access'); 
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error in admin authorization', error);
+    throw error
   }
 };
 

@@ -30,7 +30,7 @@ const RecentlyViewed = (props: Props) => {
       <h1 className="text-center w-ful text-2xl font-semibold uppercase my-6">
         Recently Viewed
       </h1>
-      <div id="tab-content" className="w-full overflow-x-auto mb-8">
+      <div id="tab-content" className="w-full overflow-x-auto mb-8 hideScroll">
         <div
           className=" gap-x-4 items-start flex whitespace-nowrap ml-[17px] lg:ml-0"
           style={{ scrollSnapType: "x mandatory" }}

@@ -26,19 +26,23 @@ const Page = (props: Props) => {
               <p>
                 <strong>Whatsapp Support</strong>:{" "}
                 <a
-                  href="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
+                  href="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
                   target="_blank"
-                  title="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
+                  title="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
                 >
                   Click Here
                 </a>
               </p>
               <p>
-                <a href="tel:+91%206364430800" title="tel:+91 6364430800">
+                <a href="tel:+91%207491922495" title="tel:+91 7491922495">
                   <br />
                 </a>
                 <strong>Operating Hours</strong>: Monday to Saturday, 10:00 AM -
                 7:00 PM
+              </p>
+              <p>
+              
+                <strong>Address</strong>Dwarka sector 7,New Delhi 110077
               </p>
               <p>
                 <strong>Returns and Exchanges</strong>

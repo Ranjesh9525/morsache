@@ -8,63 +8,6 @@ import { Response } from "./responseClass";
 import { getSession } from "next-auth/react";
 import { Product } from "@/@types/products";
 
-// Import the Product model
-
-//Sample product data
-const sampleProducts = [
-  {
-    id: "1",
-    name: "Product 1",
-    description: "Description for Product 1",
-    category: "Category 1",
-    price: 50,
-    slug: "product-1",
-    sizes: ["S", "M", "L"],
-    colors: ["Red", "Blue"],
-    images: [
-      "/items/elementary-magenta-plain-pure-linen-shirt1.webp",
-      "/items/elementary-magenta-plain-pure-linen-shirt2.webp",
-    ],
-    rating: 4.5,
-    stock: 100,
-    isFeatured: true,
-  },
-  {
-    id: "2",
-    name: "Product 2",
-    description: "Description for Product 2",
-    category: "Category 2",
-    price: 75,
-    slug: "product-2",
-    sizes: ["M", "L"],
-    colors: ["Green", "Yellow"],
-    images: [
-      "/items/Matteo-Grey-Checks-Shirt-1.webp",
-      "/items/matteo-grey-checks-shirt2.webp",
-    ],
-    rating: 4.0,
-    stock: 80,
-    isFeatured: true,
-  },
-  // Add more sample products as needed
-];
-
-// Function to insert sample products into the database
-export const insertSampleProducts = async () => {
-  try {
-    console.log("starting");
-    await connectDB();
-    await ProductsModel.insertMany(sampleProducts);
-    console.log("Sample products inserted successfully");
-    const products = await ProductsModel.find();
-    JSON.parse(JSON.stringify("yourData"));
-    return products;
-  } catch (error) {
-    console.error("Error inserting sample products:", error);
-    throw error;
-  }
-};
-
 export const getProducts = async () => {
   try {
     await connectDB();
@@ -78,7 +21,9 @@ export const getProducts = async () => {
 export const GetProductsByCategory = async (category: string) => {
   try {
     await connectDB();
-    const products = await ProductsModel.find({ category: category }).sort({createdAt: -1});;
+    const products = await ProductsModel.find({ category: category }).sort({
+      createdAt: -1,
+    });
     return Response("products", 200, true, products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -142,24 +87,22 @@ export const FetchProductsFromFilterData = async (
   data: { tag: string; values: string[] }[] | []
 ) => {
   try {
-    await connectDB(); 
+    await connectDB();
 
-    let query: { [key: string]: any } = {}; 
+    let query: { [key: string]: any } = {};
 
     // Check if data array is empty, return all products
     if (data?.length === 0) {
-      const allProducts = await ProductsModel.find().sort({createdAt: -1});;
+      const allProducts = await ProductsModel.find().sort({ createdAt: -1 });
       return Response("All products", 200, true, allProducts);
     }
 
-   
     for (const { tag, values } of data) {
       if (Array.isArray(values) && values.length > 0) {
         query[tag] = { $in: values };
       }
     }
 
- 
     const products = await ProductsModel.find(query);
 
     return Response("searched products", 200, true, products);
@@ -249,18 +192,20 @@ export const FetchCategoriesById = async ({
       }
       const products = await ProductsModel.find({
         category: { $elemMatch: { $eq: category.name } },
-    }).select("name slug salePrice price tags sizes images")
-    .sort({createdAt: -1});
-      const data = { category: category?.name, items:products };
+      })
+        .select("name slug salePrice price tags sizes images")
+        .sort({ createdAt: -1 });
+      const data = { category: category?.name, items: products };
       // console.log(data)
       return Response("category", 200, true, data);
     }
     if (type === "section") {
       const category = await CategoryModel.findById(id)
         .select("name")
-        .select("image").lean();
+        .select("image")
+        .lean();
       if (!category) {
-        console.log("category not found")
+        console.log("category not found");
         return Response("category not found", 404, false, null);
       }
       // console.log(category)

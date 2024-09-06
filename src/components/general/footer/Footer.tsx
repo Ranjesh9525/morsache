@@ -56,10 +56,10 @@ const Footer = (props: Props) => {
                 <Link href="/account/trackOrder"> TRACK ORDER</Link>
               </li>
               <li className="mb-2">
-                <Link href="#"> PLACE RETURN/EXCHANGE REQUEST</Link>
+                <Link href="/return-exchange-policy"> PLACE RETURN/EXCHANGE REQUEST</Link>
               </li>
               <li className="mb-2">
-                <Link href="/policy"> RETURNS/EXCHANGE POLICY</Link>
+                <Link href="/return-exchange-policy"> RETURNS/EXCHANGE POLICY</Link>
               </li>
             </ul>
           </span>
@@ -70,9 +70,9 @@ const Footer = (props: Props) => {
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">Timings: 10 AM - 7 PM (Mon - Sat)</li>
               <li className="mb-2">
-                Whatsapp :<Link href="#"> +91 6364430801</Link>
+                Whatsapp :<Link href="#"> +91 7491922495</Link>
               </li>
-              <li className="mb-2">Instagram: @snitch.co.in</li>
+              <li className="mb-2">Instagram: @morsache</li>
             </ul>
           </span>
         </section>

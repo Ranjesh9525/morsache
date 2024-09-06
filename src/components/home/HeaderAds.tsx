@@ -65,7 +65,7 @@ const HeaderAds = (props: Props) => {
                     <Link
                       href={item?.link || "/"}
                       className="underline ml-2 cursor-pointer"
-                      target={"_blank"}
+                 
                     >
                       {item?.linkTitle || ""}
                     </Link>

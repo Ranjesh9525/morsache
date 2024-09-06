@@ -19,6 +19,7 @@ import Admin from "@/models/Admin";
 import { CartItemForServer } from "@/@types/cart";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import { sendOrderConfirmationEmail } from "./sendMail";
+import { adminAction } from "./middlewares";
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -35,6 +36,7 @@ async function SKUgenerator(amount: number, characters: string) {
 export const AdminGetAllUsers = async () => {
   try {
     await connectDB();
+    await adminAction();
     const users = await UserModel.find().sort({ createdAt: -1 });
     // console.log(users);
     return Response("fetched all users", 200, true, users);
@@ -46,6 +48,7 @@ export const AdminGetAllUsers = async () => {
 export const AdminGetSingleUsers = async (id: string) => {
   try {
     await connectDB();
+    await adminAction();
     const user = await UserModel.findOne({ _id: id }).select("-password");
     if (!user) {
       throw new Error("user not found");
@@ -68,43 +71,100 @@ export const AdminGetSingleUsers = async (id: string) => {
 //     url: cloudPhoto.secure_url,
 //   };
 // } else {
-export const AdminUploadProduct = async (data: any) => {
+export const AdminUploadProduct = async (data: Product) => {
   try {
     await connectDB();
-    if (data.images && Array.isArray(data.images)) {
-      const imageUrls = [];
-      for (let i = 0; i < data.images.length; i++) {
-        const base64Image = data.images[i];
-        const publicId = `${data.slug || data.name}-${i}`;
-        const uploadedImage = await cloudinaryUpload(base64Image, {
-          folder: `products/${data.slug || "unknown"}`,
-          public_id: publicId,
-        });
-        imageUrls.push(uploadedImage.secure_url);
+    await adminAction();
+    console.log(data);
+    if (data._id) {
+      if (data.images && Array.isArray(data.images)) {
+        const imageUrls = [];
+        for (let i = 0; i < data.images.length; i++) {
+          const base64Image = data.images[i];
+          if (!base64Image.includes("cloudinary")) {
+            const publicId = `${data.slug || data.name}-${i}`;
+            const uploadedImage = await cloudinaryUpload(base64Image, {
+              folder: `products/${data.slug || "unknown"}`,
+              public_id: publicId,
+            });
+            imageUrls.push(uploadedImage.secure_url);
+          } else {
+            imageUrls.push(base64Image);
+          }
+        }
+        data.images = imageUrls;
       }
-      data.images = imageUrls;
-    }
-    if (data.variants && Array.isArray(data.variants)) {
-      const varaintsModified: { variant: string; image: string }[] = [];
-      data.variants.forEach(async (variant: any) => {
-        const publicId = `${data.slug || data.name}-${variant.variant}`;
-        const uploadedImage = await cloudinaryUpload(variant.image, {
-          folder: `products/${data.slug || "unknown"}/variants`,
-          public_id: publicId,
+      if (data.variants && Array.isArray(data.variants)) {
+        const varaintsModified: { variant: string; image: string }[] = [];
+        data.variants.forEach(async (variant: any) => {
+          if (!variant.image.includes("cloudinary")) {
+            const publicId = `${data.slug || data.name}-${variant.variant}`;
+            const uploadedImage = await cloudinaryUpload(variant.image, {
+              folder: `products/${data.slug || "unknown"}/variants`,
+              public_id: publicId,
+            });
+            varaintsModified.push({
+              variant: variant.variant,
+              image: uploadedImage.secure_url,
+            });
+          } else {
+            varaintsModified.push({
+              variant: variant.variant,
+              image: variant.image,
+            });
+          }
         });
-        varaintsModified.push({
-          variant: variant.variant,
-          image: uploadedImage.secure_url,
+        data.variants = varaintsModified;
+      }
+      const updatedProduct = await ProductsModel.findByIdAndUpdate(
+        data._id,
+        {
+          $set: data,
+        },
+        { new: true }
+      );
+      return Response(
+        "Product updated successfully",
+        200,
+        true,
+        updatedProduct
+      );
+    } else {
+      if (data.images && Array.isArray(data.images)) {
+        const imageUrls = [];
+        for (let i = 0; i < data.images.length; i++) {
+          const base64Image = data.images[i];
+          const publicId = `${data.slug || data.name}-${i}`;
+          const uploadedImage = await cloudinaryUpload(base64Image, {
+            folder: `products/${data.slug || "unknown"}`,
+            public_id: publicId,
+          });
+          imageUrls.push(uploadedImage.secure_url);
+        }
+        data.images = imageUrls;
+      }
+      if (data.variants && Array.isArray(data.variants)) {
+        const varaintsModified: { variant: string; image: string }[] = [];
+        data.variants.forEach(async (variant: any) => {
+          const publicId = `${data.slug || data.name}-${variant.variant}`;
+          const uploadedImage = await cloudinaryUpload(variant.image, {
+            folder: `products/${data.slug || "unknown"}/variants`,
+            public_id: publicId,
+          });
+          varaintsModified.push({
+            variant: variant.variant,
+            image: uploadedImage.secure_url,
+          });
         });
-      });
-      data.variants = varaintsModified;
-    }
-    const SKU = await SKUgenerator(9, data.name);
-    data.SKU = SKU.toUpperCase();
-    const product = new ProductsModel(data);
-    await product.save();
+        data.variants = varaintsModified;
+      }
+      const SKU = await SKUgenerator(9, data.name);
+      data.SKU = SKU.toUpperCase();
+      const product = new ProductsModel(data);
+      await product.save();
 
-    return Response("Product uploaded successfully", 200, true, product);
+      return Response("Product uploaded successfully", 200, true, product);
+    }
   } catch (error) {
     console.error("Error uploading product:", error);
     throw error;
@@ -114,6 +174,7 @@ export const AdminUploadProduct = async (data: any) => {
 export const AdminGetAllProducts = async () => {
   try {
     await connectDB();
+    await adminAction();
     const products: Product[] = await ProductsModel.find().sort({
       createdAt: -1,
     });
@@ -126,6 +187,7 @@ export const AdminGetAllProducts = async () => {
 export const AdminGetSingleProduct = async (id: string) => {
   try {
     await connectDB();
+    await adminAction();
     const product: Product = await ProductsModel.findOne({ _id: id });
     if (!product) {
       throw new Error("Product not found");
@@ -138,11 +200,10 @@ export const AdminGetSingleProduct = async (id: string) => {
 };
 export const AdminCreateOffer = async (data: Offer) => {
   try {
-    // Add your validation logic based on the offer properties
     if (parseInt(data.discount) <= 0) {
       throw new Error("Invalid discount value");
     }
-    // Additional validation based on the effect type
+
     if (
       data.effect === "percentage" &&
       (parseInt(data.discount) <= 0 || parseInt(data.discount) > 100)
@@ -156,6 +217,7 @@ export const AdminCreateOffer = async (data: Offer) => {
     }
     console.log("creating offer...");
     await connectDB();
+    await adminAction();
     const offer = new OffersModel(data);
     await offer.save();
     return Response("Offer created successfully", 200, true, offer);
@@ -168,6 +230,7 @@ export const AdminCreateOffer = async (data: Offer) => {
 export const AdminGetAllOffers = async () => {
   try {
     await connectDB();
+    await adminAction();
     const offers: Offer[] = await OffersModel.find().sort({ createdAt: -1 });
     return Response("Offers fetched successfully", 200, true, offers);
   } catch (error) {
@@ -179,6 +242,7 @@ export const AdminGetAllOffers = async () => {
 export const AdminCreateCategory = async (data: category) => {
   try {
     await connectDB();
+    await adminAction();
     // console.log(data)
     if (!data.tags || data.tags.length < 1) {
       throw new Error("Tags cannot be empty");
@@ -208,6 +272,7 @@ export const AdminCreateCategory = async (data: category) => {
 export const AdminGetAllCategories = async () => {
   try {
     await connectDB();
+    await adminAction();
     const categories: category[] = await CategoryModel.find().sort({
       createdAt: -1,
     });
@@ -221,6 +286,7 @@ export const AdminGetAllCategories = async () => {
 export const AdminDeleteCategory = async (id: string) => {
   try {
     await connectDB();
+    await adminAction();
     const category = await CategoryModel.findByIdAndDelete(id);
     return null;
   } catch (error) {
@@ -236,6 +302,7 @@ export const AdminAddShippingData = async (data: {
 }) => {
   try {
     await connectDB();
+    await adminAction();
     data.price = parseInt(data?.price as string);
     const Shipping = new ShippingModel(data);
     console.log(Shipping);
@@ -249,6 +316,7 @@ export const AdminAddShippingData = async (data: {
 export const AdminAddTeam = async ({ email }: { email: string }) => {
   try {
     await connectDB();
+    await adminAction();
     const user = await UserModel.findOne({ email });
 
     if (!user) {
@@ -274,6 +342,7 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
 export const AdminGetAllTeam = async () => {
   try {
     await connectDB();
+    await adminAction();
     const Team = await UserModel.find({ role: "admin" }).sort({ email: 1 });
     return Response("Team fetched successfully", 200, true, Team);
   } catch (error) {
@@ -284,6 +353,7 @@ export const AdminGetAllTeam = async () => {
 export const AdminGetAllShippingData = async () => {
   try {
     await connectDB();
+    await adminAction();
     const ShippingData = await ShippingModel.find({}).sort({ name: 1 });
     return Response("Shipping data fetched", 200, true, ShippingData);
   } catch (error) {
@@ -294,6 +364,7 @@ export const AdminGetAllShippingData = async () => {
 export const AdminGetAllOrders = async () => {
   try {
     await connectDB();
+    await adminAction();
     const orders: Order[] = await OrdersModel.find().sort({ createdAt: -1 });
     return Response("Orders fetched successfully", 200, true, orders);
   } catch (error) {
@@ -304,6 +375,7 @@ export const AdminGetAllOrders = async () => {
 export const AdminUpdateOrder = async (orderNo: string) => {
   try {
     await connectDB();
+    await adminAction();
     const order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
       throw new Error("Order not found");
@@ -320,6 +392,7 @@ export const AdminUpdateOrder = async (orderNo: string) => {
 export const AdminUpdateStoreData = async (data: any) => {
   try {
     await connectDB();
+    await adminAction();
     const fetchedData: any = await StoreModel.find({});
     const storeData = fetchedData[0];
 
@@ -401,6 +474,7 @@ export const AdminUpdateStoreData = async (data: any) => {
 export const AdminData = async (data: any) => {
   try {
     await connectDB();
+    await adminAction();
     const adminData = await AdminModel.find({});
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
@@ -422,6 +496,7 @@ export const AdminData = async (data: any) => {
 export const AdminDeleteProduct = async (id: string) => {
   try {
     await connectDB();
+    await adminAction();
     await ProductsModel.findByIdAndDelete(id);
     return Response("Product deleted", 200, true);
   } catch (Error) {
@@ -433,6 +508,7 @@ export const AdminDeleteProduct = async (id: string) => {
 export const AdminFindCart = async (cartId: string) => {
   try {
     await connectDB();
+    await adminAction();
     const allUsers = await UserModel.find({});
     const cart = allUsers.find(
       (user: any) => user.carts[0]?._id.toString() === cartId
@@ -451,6 +527,7 @@ export const AdminFindCart = async (cartId: string) => {
 export const AdminGetOrderById = async (orderId: string) => {
   try {
     await connectDB();
+    await adminAction();
     // console.log(orderNo)
     // const user = await authAction();
     const order: Order = await OrdersModel.findById(orderId);
@@ -532,6 +609,7 @@ export const AdminGetOrderById = async (orderId: string) => {
 export const AdminDeleteOrder = async (orderId: string) => {
   try {
     await connectDB();
+    await adminAction();
     await OrdersModel.findByIdAndDelete(orderId);
     return Response("order Deleted successfully", 200, true);
   } catch (err) {
@@ -549,6 +627,7 @@ export const AdminEditOrder = async ({
 }) => {
   try {
     await connectDB();
+    await adminAction();
     console.log(updatedOrderData);
     if (updatedOrderData.orderStatus === "confirmed")
       updatedOrderData.confirmedOn = new Date(Date.now());

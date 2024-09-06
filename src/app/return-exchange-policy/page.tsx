@@ -75,8 +75,8 @@ const Page = (props: Props) => {
                       <span className="color: #2a2828;">
                         <a
                           className="color: #2a2828;"
-                          title="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
-                          href="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
+                          title="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
+                          href="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
                           target="_blank"
                         >
                           Click here
@@ -170,9 +170,7 @@ const Page = (props: Props) => {
                     className="font-weight: 400;"
                     data-mce-className="font-weight: 400;"
                   >
-                    NO.43, Sri Balaji &amp; Hemanna Layout, 4, Anjaneya Swami
-                    Temple Rd, B.C Gundappa Layout, Balaji Gardens Layout,
-                    Kattigenahalli, Bengaluru, Karnataka 560064
+                   Dwarka sector 7, New Delhi, 110077
                   </span>
                 </li>
                 <li
@@ -245,15 +243,17 @@ const Page = (props: Props) => {
                     <span data-mce-fragment="1">
                       Instagram: @morsache.co.in
                       <br />
+                      Email: morsache.clothing@gmail.com
+                      <br />
                       Whatsapp :&nbsp;
                       <a
-                        title="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
-                        href="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
+                        title="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
+                        href="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
                         data-mce-fragment="1"
-                        data-mce-href="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
+                        data-mce-href="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
                         target="_blank"
                       >
-                        +91 6364430801
+                        +91 7491922495
                       </a>
                     </span>{" "}
                   </span>
@@ -296,8 +296,8 @@ const Page = (props: Props) => {
                       Instagram: @morsache.co.in or on Whatsapp:&nbsp;
                       <strong>
                         <a
-                          title="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
-                          href="https://api.whatsapp.com/send?phone=916364430801&amp;text=Hello!"
+                          title="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
+                          href="https://api.whatsapp.com/send?phone=917491922495&amp;text=Hello!"
                         >
                           <span className="color: #1f1a1a;">Click here</span>
                         </a>
