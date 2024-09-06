@@ -3,10 +3,9 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 const protectedRoutes = [
-  '/admin',
-  '/account',
+  
 ];
-const unprotectedRoutes = [ '/auth/login'];
+const unprotectedRoutes = [ ];
 
 // import { auth } from './services/auth';
 
