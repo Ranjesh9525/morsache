@@ -230,21 +230,22 @@ export const UserGetAllOrders = async () => {
   }
 };
 
-export const UserTrackOrder = async (orderId: string) => {
+export const UserTrackOrder = async (orderNo: string) => {
   try {
     await connectDB();
     const user = await authAction();
-    const order = await OrdersModel.findById(orderId);
+    const order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
       throw new Error("Order not found");
     }
     const isUserOrder = user.orders.some(
-      (i: { orderId: string; status: string }) => i.orderId === orderId
+      (i: { orderId: string; status: string }) => i.orderId === order?._id
     );
     if (!isUserOrder && user.role !== "admin") {
       throw new Error("Unauthorized access");
     }
     //pickup between 4-7 days , delivery between 7-12 days
+    const confirmedDate = order.confirmedOn ? new Date(order.confirmedOn) : new Date(order.createdAt);
     const ReturnData = {
       orderNumber: order.orderNumber,
       packageSize:
@@ -260,13 +261,12 @@ export const UserTrackOrder = async (orderId: string) => {
       },
       status: order.orderStatus,
       methodOfCollection: order.collectionMethod || "delivery",
-      expectedDeliveryDate1: order.confirmedOn || order.createdAt + 133456789,
-      expectedDeliveryDate2: order.confirmedOn || order.createdAt + 143456789,
-      expectedPickupDate1: order.confirmedOn || order.createdAt + 113456789,
-      expectedPickupDate2: order.confirmedOn || order.createdAt + 123456789,
+      expectedCollectionDate1:  order.expectedDeliveryDate1 ? new Date(order.expectedDeliveryOrPickupDate1) : new Date(confirmedDate.getTime() + 7 * 24 * 60 * 60 * 1000),
+      expectedCollectionDate2:  order.expectedDeliveryDate2 ? new Date(order.expectedDeliveryOrPickupDate2) : new Date(confirmedDate.getTime() + 12* 24 * 60 * 60 * 1000)
+
     };
     console.log(ReturnData);
-    // return Response("order tracking results",200,true ReturnData)
+    return Response("order tracking results", 200, true, ReturnData);
   } catch (error) {
     console.log("Error Tracking order", error);
     throw error;

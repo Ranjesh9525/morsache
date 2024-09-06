@@ -49,9 +49,11 @@ import ConfirmationDialog from "@/components/general/ConfirmationDialog";
 
 type Props = {
   order: Order | null;
+  setRefetch: React.Dispatch<React.SetStateAction<boolean>>;
+  refetch: boolean;
 };
 
-const OrderEditCard = ({ order }: Props) => {
+const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const {
     isSuccess: Updated,
@@ -60,12 +62,12 @@ const OrderEditCard = ({ order }: Props) => {
   } = useMutation({
     mutationFn: AdminEditOrder,
     onSuccess: (response) => {
+      setRefetch(!refetch);
       toast({
         variant: "success",
         title: "Order Updated",
       });
       setOpenDialog(false);
-      //   router.back();
     },
     onError: (error) => {
       console.log(error);
@@ -103,6 +105,8 @@ const OrderEditCard = ({ order }: Props) => {
         z.literal("payOnDelivery"),
       ]),
     }),
+    expectedDeliveryOrPickupDate1:z.date().optional(),
+    expectedDeliveryOrPickupDate2:z.date().optional(),
     paymentStatus: z.union([z.literal("pending"), z.literal("paid")]),
     collectionMethod: z.union([z.literal("delivery"), z.literal("pickup")]),
     paidOn: z.date().nullable(),
@@ -127,6 +131,8 @@ const OrderEditCard = ({ order }: Props) => {
       paymentMethod: {
         type: order?.paymentMethod.type || "payOnDelivery",
       },
+      expectedDeliveryOrPickupDate1:order?.expectedDeliveryOrPickupDate1,
+      expectedDeliveryOrPickupDate2:order?.expectedDeliveryOrPickupDate2,
       collectionMethod: order?.collectionMethod || "delivery",
       paymentStatus: order?.paymentStatus || "pending",
       paidOn: order?.paidOn || null,
@@ -134,8 +140,8 @@ const OrderEditCard = ({ order }: Props) => {
   });
 
   async function onSubmit(data: z.infer<typeof OrderSchema>) {
- console.log(data);
-    setOpenDialog(true)
+    console.log(data);
+    setOpenDialog(true);
   }
   return (
     <>
@@ -151,7 +157,7 @@ const OrderEditCard = ({ order }: Props) => {
         }}
         notDangerous
         onClickBtnTitle={"Save changes"}
-        loading={true}
+        loading={isUpdating}
       />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="my-12 px-9">
@@ -413,7 +419,8 @@ const OrderEditCard = ({ order }: Props) => {
                     </SelectContent>
                   </Select>
                   <FormDescription className="">
-                    Changing this will alter the order in &quot;to be delivered&quot; page
+                    Changing this will alter the order in &quot;to be
+                    delivered&quot; page
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -440,7 +447,8 @@ const OrderEditCard = ({ order }: Props) => {
                     </SelectContent>
                   </Select>
                   <FormDescription className="">
-                    Changing this will alter the order in &quot;to be delivered&quot; page
+                    Changing this will alter the order in &quot;to be
+                    delivered&quot; page
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -462,7 +470,7 @@ const OrderEditCard = ({ order }: Props) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Razor Pay">razor pay</SelectItem>
+                      <SelectItem value="razorPay">Razor pay</SelectItem>
                       <SelectItem value="payOnDelivery">
                         Pay on delivery
                       </SelectItem>
@@ -474,25 +482,158 @@ const OrderEditCard = ({ order }: Props) => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="expectedDeliveryOrPickupDate1"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Minimum expected delivery or pickup date</FormLabel>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            " pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field?.value ? (
+                            formatDateFns(field?.value!, "PPP")
+                          ) : (
+                            <span>No date selected</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value as Date}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    if no date manually selected default is 7 days after confirmation
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="expectedDeliveryOrPickupDate2"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Maximum expected delivery or pickup date</FormLabel>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            " pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field?.value ? (
+                            formatDateFns(field?.value!, "PPP")
+                          ) : (
+                            <span>No date, not yet paid</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value as Date}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    if no date is selected maximum is 12 days after confirmation
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="paidOn"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Paid on</FormLabel>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            " pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field?.value !== null ? (
+                            formatDateFns(field?.value, "PPP")
+                          ) : (
+                            <span>No date, not yet paid</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value as Date}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    This is the date the user paid for this order
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-          <div className="space-y-2 mx-auto w-fit">
+          <div className="space-y-2 mx-auto my-4 w-fit">
             <Button
               disabled={
-                form.formState.isValidating ||
-                form.formState.isSubmitting ||
-                !form.formState.isValid
+                isUpdating
               }
               type="submit"
               className="w-full max-w-[400px] text-center py-5 h-none"
             >
-              {form.formState.isSubmitting ? (
+              {form.formState.isSubmitting || isUpdating ? (
                 <ClipLoader size={22} color="white" />
               ) : (
-                "Preview Product"
+                "update order"
               )}
             </Button>
             <p className="text-[12.5px] capitalize text-center">
-              preview it on the next page before upload
+              Ensure youve selected correct values, this is a permanent change, no backup
             </p>
           </div>
         </form>

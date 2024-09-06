@@ -18,6 +18,8 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    expectedDeliveryOrPickupDate1:Date,
+    expectedDeliveryOrPickupDate2:Date,
     orderStatus: {
       type: String,
       enum: ["pending", "confirmed", "shipped", "delivered","cancelled"],

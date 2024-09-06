@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {};
 // Define the interface for the data type
-interface SlidingOffer {
+export interface SlidingOffer {
   offerTitle: string;
   link: string;
   linkTitle: string;

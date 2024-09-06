@@ -16,8 +16,9 @@ interface Store extends Document  {
   }[];
   offerImage: string;
   slidingOffers: {
-    title: string;
+    offerTitle: string;
     link: string;
+    linkTitle: string;
   }[];
   footerData: {
     openTime: string;

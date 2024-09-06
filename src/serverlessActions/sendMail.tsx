@@ -5,7 +5,8 @@ const sender = `"${senderName}" <${senderEmail}>`;
 export const sendOrderConfirmationEmail = (
   order: any,
   recipient: string,
-  subject: string
+  subject: string,
+  context:string
 ) => {
   const server = {
     host: process.env.SMTP_HOST,
@@ -26,7 +27,7 @@ export const sendOrderConfirmationEmail = (
     subject: subject,
     html: `
     <p style="font-family: Arial, sans-serif; font-size: 18px; color: #333;">Dear Customer,</p>
-    <p style="font-family: Arial, sans-serif; font-size: 16px; color: #555;">Your order with order number ${order.orderNumber} has been placed and is awaiting confirmation.</p>
+    <p style="font-family: Arial, sans-serif; font-size: 16px; color: #555;">} ${context}.</p>
     <p style="font-family: Arial, sans-serif; font-size: 16px; color: #555;">Order Details:</p>
     <ul>
         <li style="font-family: Arial, sans-serif; font-size: 14px; color: #777;">Total Items: ${order.totalItems}</li>

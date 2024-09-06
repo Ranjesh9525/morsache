@@ -106,61 +106,61 @@ const sampleProduct4: OptimizedProduct = {
   salePrice: 100,
 };
 
-const returnData: OrderReviewData = {
-  products: [
-    {
-      product: sampleProduct1,
-      quantity: 1,
-      size: "sm",
-      variant: "evce cve",
-      totalPrice: 30000,
-    },
-    {
-      product: sampleProduct2,
-      quantity: 1,
-      size: "md",
-      variant: "xyz",
-      totalPrice: 25000,
-    },
-    {
-      product: sampleProduct3,
-      quantity: 2,
-      size: "lg",
-      variant: "abc",
-      totalPrice: 150000,
-    },
-    {
-      product: sampleProduct4,
-      quantity: 3,
-      size: "xl",
-      variant: "def",
-      totalPrice: 450000,
-    },
-  ],
-  paymentDetails: {
-    totalAmount: 100000,
-    paidOn: new Date(),
-    paymentMethod: {
-      type: "payOnDelivery",
-    },
-    paymentStatus: "pending",
-  },
+// const returnData: OrderReviewData = {
+//   products: [
+//     {
+//       product: sampleProduct1,
+//       quantity: 1,
+//       size: "sm",
+//       variant: "evce cve",
+//       totalPrice: 30000,
+//     },
+//     {
+//       product: sampleProduct2,
+//       quantity: 1,
+//       size: "md",
+//       variant: "xyz",
+//       totalPrice: 25000,
+//     },
+//     {
+//       product: sampleProduct3,
+//       quantity: 2,
+//       size: "lg",
+//       variant: "abc",
+//       totalPrice: 150000,
+//     },
+//     {
+//       product: sampleProduct4,
+//       quantity: 3,
+//       size: "xl",
+//       variant: "def",
+//       totalPrice: 450000,
+//     },
+//   ],
+//   paymentDetails: {
+//     totalAmount: 100000,
+//     paidOn: new Date(),
+//     paymentMethod: {
+//       type: "payOnDelivery",
+//     },
+//     paymentStatus: "pending",
+//   },
 
-  orderDetails: {
-    totalAmount: 100000,
-    createdAt: new Date(),
-    totalItems: 7,
-    orderStatus: "pending",
-    orderNumber: "786r7ftfuygv68e57",
-  },
-  customerDetails: {
-    shippingAddress: "mairman stresst, mauripol, bangalore, india. 2389284",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "1234567890",
-  },
-};
+//   orderDetails: {
+//     totalAmount: 100000,
+//     createdAt: new Date(),
+//     totalItems: 7,
+//     orderStatus: "pending",
+//     orderNumber: "786r7ftfuygv68e57",
+//   },
+//   customerDetails: {
+//     shippingAddress: "mairman stresst, mauripol, bangalore, india. 2389284",
+//     firstName: "John",
+//     lastName: "Doe",
+//     email: "john.doe@example.com",
+//     phoneNumber: "1234567890",
+//   },
+// };
 type Props = {
   orderNo:string
 };
@@ -305,9 +305,18 @@ if(!orderNo){
                 {order?.orderDetails?.orderNumber}
               </span>
               <span className="w-full border-b py-4 px-2">
-                <p className="font-semibold text-black">Order status:</p>
-                {order?.orderDetails?.orderStatus}
-              </span>
+                  <p className="font-semibold text-black"> {order?.orderDetails?.collectionMethod === "delivery" ? "Expected delivery date" : "Expected pickup date"}</p>
+                  {order?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDate(order?.orderDetails?.expectedDeliveryOrPickupDate1) + " and " + formatDate(order?.orderDetails?.expectedDeliveryOrPickupDate2!)}</p> : "Would be set after order is confirmed"}
+                </span>
+            
+                <span className="w-full border-b py-4 px-2">
+                  <p className="font-semibold text-black">Order status:</p>
+                  {order?.orderDetails?.orderStatus}
+                </span>
+                <span className="w-full border-b py-4 px-2">
+                  <p className="font-semibold text-black">Collection Method</p>
+                  {order?.orderDetails?.collectionMethod}
+                </span>
               <span className="border-b py-4 px-2">
                 <p className="font-semibold text-black">Order placed on:</p>
                 {formatDate(order?.orderDetails?.createdAt!)}

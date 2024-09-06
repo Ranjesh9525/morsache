@@ -253,7 +253,7 @@ const TrackOrder = (props: Props) => {
   };
 
   const status = [
-    { title: "pending", description: "awaiting confirmation" },
+    { title: "pending", description: "Awaiting confirmation" },
     {
       title: "confirmed",
       description: "your order is being processed and packaged",
@@ -281,6 +281,7 @@ const TrackOrder = (props: Props) => {
     mutationFn: UserTrackOrder,
     onSuccess: (res) => {
       console.log(res);
+      setOrder(res?.data);
     },
     onError: (err) => {
       console.log(err);
@@ -289,8 +290,8 @@ const TrackOrder = (props: Props) => {
   useEffect(() => {}, []);
 
   function onSubmit() {
-    // server_trackorder(inputValue);
-    setOrder(orderSample);
+    server_trackorder(inputValue);
+    // setOrder(orderSample);52305989ad136c5420cfc729
   }
 
   return (
@@ -385,13 +386,15 @@ const TrackOrder = (props: Props) => {
           </section>
           <section className="grid  w-full my-4 gap-y-2 px-6">
             {" "}
-            <span>Package size : {order.packageSize[0]}</span>
+            <span>Package size : {order.packageSize}</span>
             <span className="">
               Order placed on : {formatDate(order.orderPlacedOn)}
             </span>
             <span>Method of collection : {order.methodOfCollection}</span>
             <span className="">
-              Expected Delivery Date : {formatDate(order.expectedDeliveryDate)}
+              Expected {order.methodOfCollection} Date : Between{" "}
+              {formatDate(order.expectedCollectionDate1)} and{" "}
+              {formatDate(order.expectedCollectionDate2)}
             </span>
             {/* <span>
             {order[5]}

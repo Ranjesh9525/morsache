@@ -6,6 +6,8 @@ interface Order extends Document {
   items: CartItem[];
   totalItems: number;
   totalAmount: number;
+  expectedDeliveryOrPickupDate1?:Date;
+  expectedDeliveryOrPickupDate2?:Date;
   orderStatus: "pending" | "confirmed" | "shipped" | "delivered";
   shippingAddress: {
     street: string;
@@ -14,6 +16,7 @@ interface Order extends Document {
     postalCode: string;
     country: string;
   };
+  confirmedOn?:Date
   shippingPrice?: number;
   paymentMethod: {
     type: "creditCard" | "razorPay" | "stripe" | "payOnDelivery";
@@ -52,7 +55,10 @@ interface OrderReviewData {
     createdAt?: Date;
     totalItems: number;
     orderStatus: "pending" | "confirmed" | "shipped" | "delivered";
+  collectionMethod: "delivery" | "pickup";
     orderNumber: string;
+    expectedDeliveryOrPickupDate1?:Date;
+    expectedDeliveryOrPickupDate2?:Date;
   };
   customerDetails: {
     shippingAddress: string;

@@ -435,7 +435,7 @@ export const InitializeOrder = async ({
         });
         await user.save();
 
-        sendOrderConfirmationEmail(order, user.email, "You placed an order!");
+        sendOrderConfirmationEmail(order, user.email, "You placed an order!",`Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`);
 
         return Response("Order created", 200, true, order?._id);
       } else {
@@ -468,7 +468,7 @@ export const InitializeOrder = async ({
         status: order?.orderStatus,
       });
       await user.save();
-      sendOrderConfirmationEmail(order, user.email, "You placed an order!");
+      sendOrderConfirmationEmail(order, user.email, "You placed an order!",`Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`);
       return Response("Order created", 200, true, order?.orderNumber);
     }
   } catch (error) {
@@ -557,6 +557,8 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       orderStatus,
       orderNumber,
       shippingAddress,
+      expectedDeliveryOrPickupDate1,
+      expectedDeliveryOrPickupDate2
     } = order;
     returnData.paymentDetails = {
       totalAmount,
@@ -570,6 +572,8 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       totalItems,
       orderStatus,
       orderNumber,
+      expectedDeliveryOrPickupDate1,
+      expectedDeliveryOrPickupDate2
     };
     const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
     returnData.customerDetails = {

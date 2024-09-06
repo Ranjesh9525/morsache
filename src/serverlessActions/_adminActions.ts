@@ -18,6 +18,7 @@ import { Store } from "@/@types/store";
 import Admin from "@/models/Admin";
 import { CartItemForServer } from "@/@types/cart";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
+import { sendOrderConfirmationEmail } from "./sendMail";
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -397,7 +398,7 @@ export const AdminUpdateStoreData = async (data: any) => {
   }
 };
 
-export const AdminData = async () => {
+export const AdminData = async (data: any) => {
   try {
     await connectDB();
     const adminData = await AdminModel.find({});
@@ -406,7 +407,11 @@ export const AdminData = async () => {
       // throw new Error("Couldnt retrieve admin data");
       await AdminModel.create({ defaultConfirmOrders: true });
     }
-
+    const { defaultConfirmOrder } = data;
+    if (defaultConfirmOrder) {
+      adminData[0].defaultConfirmOrder = defaultConfirmOrder;
+      await adminData[0].save();
+    }
     return Response("Store data updated successfully", 200, true, adminData);
   } catch (Error) {
     console.log("Error fetching admin data", Error);
@@ -485,6 +490,9 @@ export const AdminGetOrderById = async (orderId: string) => {
       orderStatus,
       orderNumber,
       shippingAddress,
+      expectedDeliveryOrPickupDate1,
+      expectedDeliveryOrPickupDate2,
+      collectionMethod,
     } = order;
     returnData.paymentDetails = {
       totalAmount,
@@ -498,6 +506,9 @@ export const AdminGetOrderById = async (orderId: string) => {
       totalItems,
       orderStatus,
       orderNumber,
+      expectedDeliveryOrPickupDate1,
+      expectedDeliveryOrPickupDate2,
+      collectionMethod,
     };
     const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
     returnData.customerDetails = {
@@ -538,7 +549,10 @@ export const AdminEditOrder = async ({
 }) => {
   try {
     await connectDB();
-console.log(updatedOrderData)
+    console.log(updatedOrderData);
+    if (updatedOrderData.orderStatus === "confirmed")
+      updatedOrderData.confirmedOn = new Date(Date.now());
+
     const updatedOrder = await OrdersModel.findByIdAndUpdate(
       orderId,
       {
@@ -546,6 +560,30 @@ console.log(updatedOrderData)
       },
       { new: true }
     );
+    const user = await UserModel.findById(updatedOrder?.customer);
+    if (updatedOrderData.orderStatus === updatedOrder.orderStatus) {
+      if (updatedOrder.orderStatus === "confirmed")
+        sendOrderConfirmationEmail(
+          updatedOrder,
+          user.email,
+          "Your order has been confirmed!",
+          `Your order with order no ${updatedOrder.orderNumber} has been Confirmed. please check the delivery date`
+        );
+      if (updatedOrder.orderStatus === "shipped")
+        sendOrderConfirmationEmail(
+          updatedOrder,
+          user.email,
+          "Your order has been shipped!",
+          `Your order with order no ${updatedOrder.orderNumber} has been Shipped and will be out for delivery soon. please check the delivery date`
+        );
+      if (updatedOrder.orderStatus === "delivered")
+        sendOrderConfirmationEmail(
+          updatedOrder,
+          user.email,
+          "Thanks for shopping with us",
+          `Your order has been delivered successfully. please leave a review on your item`
+        );
+    }
 
     console.log("Updated Order:", updatedOrder);
 

@@ -56,6 +56,7 @@ const OrderReviewCard = ({ orderId }: Props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [orderReview, setOrderReview] = useState<OrderReviewData | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
+  const [refetch, setRefetch] = useState<boolean>(false);
   const {
     isSuccess,
     isPending,
@@ -103,7 +104,7 @@ const OrderReviewCard = ({ orderId }: Props) => {
   });
   useEffect(() => {
     server_fetchOrderById(orderId.toString());
-  }, []);
+  }, [refetch]);
 
   return (
     <div>
@@ -235,8 +236,17 @@ const OrderReviewCard = ({ orderId }: Props) => {
                   {orderReview?.orderDetails?.orderNumber}
                 </span>
                 <span className="w-full border-b py-4 px-2">
+                  <p className="font-semibold text-black"> {orderReview?.orderDetails?.collectionMethod === "delivery" ? "Expected delivery date" : "Expected pickup date"}</p>
+                  {orderReview?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDate(orderReview?.orderDetails?.expectedDeliveryOrPickupDate1) + " and " + formatDate(orderReview?.orderDetails?.expectedDeliveryOrPickupDate2!)}</p> : "Would be set after order is confirmed"}
+                </span>
+            
+                <span className="w-full border-b py-4 px-2">
                   <p className="font-semibold text-black">Order status:</p>
                   {orderReview?.orderDetails?.orderStatus}
+                </span>
+                <span className="w-full border-b py-4 px-2">
+                  <p className="font-semibold text-black">Collection Method</p>
+                  {orderReview?.orderDetails?.collectionMethod}
                 </span>
                 <span className="border-b py-4 px-2">
                   <p className="font-semibold text-black">Order placed on:</p>
@@ -316,7 +326,11 @@ const OrderReviewCard = ({ orderId }: Props) => {
             </section>
           </div>
           <Separator className="mt-10" />
-          <OrderEditCard order={order} />
+          <OrderEditCard
+            order={order}
+            refetch={refetch}
+            setRefetch={setRefetch}
+          />
         </>
       ) : (
         <p className="text-center">

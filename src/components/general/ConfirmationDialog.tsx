@@ -50,7 +50,7 @@ const ConfirmationDialog = ({
           <Button
             type="button"
             variant={notDangerous ? "default" : "destructive"}
-            // onClick={handleDeleteImage}
+            disabled={loading}
             onClick={onClick}
           >
             {!loading ? (
