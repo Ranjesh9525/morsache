@@ -11,11 +11,13 @@ import StoreModel from "../models/Store";
 import OffersModel from "../models/Offers";
 import OrdersModel from "../models/Orders";
 import { Response } from "./responseClass";
-import { Offer, Product } from "@/@types/products";
+import { Offer, OptimizedProduct, Product } from "@/@types/products";
 import { category } from "@/@types/categories";
-import { Order } from "@/@types/order";
+import { Order, OrderReviewData } from "@/@types/order";
 import { Store } from "@/@types/store";
 import Admin from "@/models/Admin";
+import { CartItemForServer } from "@/@types/cart";
+import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -420,5 +422,136 @@ export const AdminDeleteProduct = async (id: string) => {
   } catch (Error) {
     console.log("An error occured deleting product", Error);
     throw Error;
+  }
+};
+
+export const AdminFindCart = async (cartId: string) => {
+  try {
+    await connectDB();
+    const allUsers = await UserModel.find({});
+    const cart = allUsers.find(
+      (user: any) => user.carts[0]?._id.toString() === cartId
+    );
+    console.log(cart);
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+    return Response("Cart found", 200, true, cart?.carts[0]);
+  } catch (error) {
+    console.log("An error occured finding cart", error);
+    throw error;
+  }
+};
+
+export const AdminGetOrderById = async (orderId: string) => {
+  try {
+    await connectDB();
+    // console.log(orderNo)
+    // const user = await authAction();
+    const order: Order = await OrdersModel.findById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+    const customer = await UserModel.findOne({ _id: order?.customer });
+
+    const returnData: OrderReviewData | any = { products: [] };
+    await Promise.all(
+      order.items.map(async (item: CartItemForServer) => {
+        const { quantity, size, variant, totalPrice } = item;
+        const product: {
+          success: string;
+          statusCode: number;
+          data: OptimizedProduct;
+        } = await FetchSingleProductByIdOptimized(item.productId!);
+        if (product) {
+          // returnData.products = []
+          returnData.products.push({
+            product: product?.data,
+            quantity,
+            size,
+            variant,
+            totalPrice,
+          });
+        }
+      })
+    );
+    const {
+      totalItems,
+      totalAmount,
+      createdAt,
+      paidOn,
+      paymentStatus,
+      paymentMethod,
+      orderStatus,
+      orderNumber,
+      shippingAddress,
+    } = order;
+    returnData.paymentDetails = {
+      totalAmount,
+      paidOn,
+      paymentMethod,
+      paymentStatus,
+    };
+    returnData.orderDetails = {
+      totalAmount,
+      createdAt,
+      totalItems,
+      orderStatus,
+      orderNumber,
+    };
+    const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
+    returnData.customerDetails = {
+      shippingAddress: formattedShippingAddress,
+      firstName: customer?.firstName,
+      lastName: customer?.lastName,
+      email: customer?.email,
+      phoneNumber: customer?.phoneNumber,
+    };
+
+    return Response("order information", 200, true, {
+      orderReview: returnData,
+      order,
+    });
+  } catch (err) {
+    console.log("error getting order by id", err);
+    throw err;
+  }
+};
+
+export const AdminDeleteOrder = async (orderId: string) => {
+  try {
+    await connectDB();
+    await OrdersModel.findByIdAndDelete(orderId);
+    return Response("order Deleted successfully", 200, true);
+  } catch (err) {
+    console.log("Error Deleting order", err);
+    throw err;
+  }
+};
+
+export const AdminEditOrder = async ({
+  orderId,
+  updatedOrderData,
+}: {
+  orderId: string;
+  updatedOrderData: Partial<Order>;
+}) => {
+  try {
+    await connectDB();
+console.log(updatedOrderData)
+    const updatedOrder = await OrdersModel.findByIdAndUpdate(
+      orderId,
+      {
+        $set: updatedOrderData,
+      },
+      { new: true }
+    );
+
+    console.log("Updated Order:", updatedOrder);
+
+    return Response("Order updated successfully", 200, true);
+  } catch (err) {
+    console.log("Error updating order", err);
+    throw err;
   }
 };

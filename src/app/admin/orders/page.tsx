@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
-import { Button } from "@/components/ui/button";
-import { format } from "@/components/products/ProductInfo";
+
 import { cn } from "@/lib/utils";
 import {
   Form,
@@ -102,10 +101,10 @@ const Page = (props: Props) => {
       {/**/}
 
       <div className="container mx-auto min-h-[70vh] py-10">
-        <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+        <div className="flex flex-row items-center justify-between rounded-lg border mb-10 p-4">
           <div className="space-y-0.5">
-            <h1 className="text-base">Auto confirm orders?</h1>
-            <p>
+            <h1 className="text-xl font-semibold">Auto confirm orders?</h1>
+            <p className="text-[14px] text-gray-500">
               Set all orders to be confirmed after they are placed, NOTE that by
               default every other would be approved and wouldnt need an admin to
               review them
@@ -120,7 +119,7 @@ const Page = (props: Props) => {
           </p>
         ) : orders && orders?.length > 0 ? (
           <DataTable
-            rowKey={"orderNumber"}
+            rowKey={"_id"}
             columns={orderColumns}
             route={"orders"}
             data={orders!}

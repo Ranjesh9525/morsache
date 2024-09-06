@@ -27,6 +27,7 @@ import { ObjectId } from "mongoose";
 type Props = {
   cart?: Cart;
   cartId?: string;
+  showProducts?: boolean;
 };
 type offerProps = {
   offer: {
@@ -52,7 +53,7 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   );
 };
 
-const CheckoutCard = ({ cart, cartId }: Props) => {
+const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
   const [code, setCode] = useState<string>("");
   // const { cart } = useContext(CartContext)!;
   const shippingRef: any = useRef(null);
@@ -171,10 +172,10 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
   useEffect(() => {
     if (findCartIsSuccess) {
       setUserCartWithDiscount(findCartData?.data);
-      if (findCartData?.data?.recieveBy) {
+      if (findCartData?.data?.receiveBy) {
         dispatch({
           type: "SET_SHIPPING_CHOICE",
-          payload: findCartData?.data?.recieveBy,
+          payload: findCartData?.data?.receiveBy,
         });
       }
       // console.log(findCartData?.data);
@@ -257,7 +258,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
       router.push("/serverError");
     }
     if (shippingDataResponse) {
-      console.log(shippingDataResponse, userCartWithDiscount);
+      // console.log(shippingDataResponse, userCartWithDiscount);
     }
   }, [shippingDataIsError, shippingDataResponse]);
   return (
@@ -273,7 +274,7 @@ const CheckoutCard = ({ cart, cartId }: Props) => {
         </div>
       ) : userCartWithDiscount !== null ? (
         <div className="flex flex-col gap-2 w-full">
-          {!cart && (
+          {showProducts && (
             <section className="h-[200px] overflow-y-auto">
               {userCartWithDiscount.items.map((product: any, ind: number) => {
                 return <CartCard key={ind} product={product} />;

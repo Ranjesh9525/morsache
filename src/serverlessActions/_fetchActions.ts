@@ -102,7 +102,7 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
   try {
     await connectDB();
     const product = await ProductsModel.findById(id);
-    console.log("product", product);
+    // console.log("product", product);
     if (!product) {
       return null;
     }
@@ -115,6 +115,7 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
       SKU: product.SKU,
       salePrice: product.salePrice || null,
     };
+    console.log("fetched optimized products")
     return Response("product", 200, true, optimizedProduct);
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -262,7 +263,7 @@ export const FetchCategoriesById = async ({
         console.log("category not found")
         return Response("category not found", 404, false, null);
       }
-      console.log(category)
+      // console.log(category)
       return Response("category", 200, true, category);
     }
   } catch (error) {

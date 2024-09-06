@@ -196,7 +196,7 @@ const Page = (props: Props) => {
         </div>
         <div className="col-span-3">
           <div className="sticky top-[34px]">
-            <CheckoutCard cartId={props.params.cartId.toString()} />
+            <CheckoutCard showProducts={true} cartId={props.params.cartId.toString()} />
           </div>
         </div>
       </div>

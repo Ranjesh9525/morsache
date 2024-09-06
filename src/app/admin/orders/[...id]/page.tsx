@@ -13,12 +13,11 @@ const Page = (props: Props) => {
   return (
     <>
       <PageHeadingText
-        pageHeading="Review Orders"
+        pageHeading="Review And Edit Order"
         description="Approve,confirm,cancel orders and so on"
       />
       <div className="container mx-auto min-h-[70vh] py-10 ">
-        
-        <OrderReviewCard  orderNo={props.params.id} />
+        <OrderReviewCard orderId={props.params.id} />
       </div>
     </>
   );

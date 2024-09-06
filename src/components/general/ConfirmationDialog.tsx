@@ -18,6 +18,7 @@ type Props = {
   onClick: () => void;
   onClickBtnTitle?: string;
   loading?: boolean;
+  notDangerous?: boolean;
 };
 
 const ConfirmationDialog = ({
@@ -28,6 +29,7 @@ const ConfirmationDialog = ({
   onClose,
   onClick,
   onClickBtnTitle,
+  notDangerous,
 }: Props) => {
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -47,7 +49,7 @@ const ConfirmationDialog = ({
           </Button>
           <Button
             type="button"
-            variant={"destructive"}
+            variant={notDangerous ? "default" : "destructive"}
             // onClick={handleDeleteImage}
             onClick={onClick}
           >

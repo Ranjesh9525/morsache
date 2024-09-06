@@ -18,7 +18,6 @@ type Props = {
 };
 
 const UserViewCard = ({ id }: Props) => {
-  const showCart = false;
   const [fetchedUser, setFetchedUser] = useState<UserDocument | null>(null);
   const { mutate: server_AdminGetSingleUsers, isPending } = useMutation({
     mutationFn: AdminGetSingleUsers,
@@ -157,8 +156,9 @@ const UserViewCard = ({ id }: Props) => {
               </section>
               <section className=" min-h-[40vh]">
                 <h1 className="text-lg mb-4">Carts</h1>
-                {fetchedUser?.carts && fetchedUser?.carts[0] && showCart ? (
+                {fetchedUser?.carts && fetchedUser?.carts[0] ? (
                   <CheckoutCard
+                    showProducts={true}
                     cart={fetchedUser!?.carts[0]!}
                     cartId={fetchedUser!?.carts[0]?._id!}
                   />

@@ -19,6 +19,7 @@ import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import { Order, OrderReviewData } from "@/@types/order";
 import { OptimizedProduct } from "@/@types/products";
 import authAction from "./middlewares";
+import { AdminFindCart, AdminGetOrderById } from "./_adminActions";
 // import UserModel from "../models/User";
 
 interface Shipping extends Document {
@@ -235,28 +236,27 @@ export const createCart = async (data: CartForServer) => {
 export const findUserCart = async (cartId: string) => {
   try {
     await connectDB();
-    const session: any = await getServerSession(authOptions);
-    if (session) {
-      const userId = session?.user?._id;
-      const user = await UserModel.findOne({ _id: userId });
-      if (!user) {
-        throw new Error("No User found");
-      }
-      const cart = user.carts.find(
-        (cart: any) => cart._id.toString() === cartId
-      );
-      if (!cart) {
-        throw new Error("Cart not found");
-      }
-      if (cart.isPaid) {
-        throw new Error("Cart closed");
-      }
-      return Response("Cart found", 200, true, cart);
-    } else {
-      // Handle the case where there is no active session
-      console.log("No active session found. Please login.");
+
+    const user = await authAction();
+    if (!user) {
       throw new Error("Please login to continue");
     }
+    if (user.role === "admin") {
+      const results = await AdminFindCart(cartId);
+      if (results) {
+        return Response("fetched cart", 200, true, results?.data);
+      } else {
+        throw new Error("failed to fetch cart");
+      }
+    }else{
+    const cart = user.carts.find((cart: any) => cart._id.toString() === cartId);
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+    if (cart.isPaid) {
+      throw new Error("Cart closed");
+    }
+    return Response("Cart found", 200, true, cart);}
   } catch (error) {
     console.log(`Error finding cart: ${error}`);
     throw error;
@@ -377,7 +377,6 @@ export const InitializeOrder = async ({
       !cart.shippingPrice ||
       !cart.receiveBy
     ) {
-
       throw new Error(
         "Failed to place order. Order process is incomplete. Try again"
       );
@@ -518,14 +517,15 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
     await connectDB();
     // console.log(orderNo)
     const user = await authAction();
+
     const order: Order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
       throw new Error("Order not found");
     }
     const customer = await UserModel.findOne({ _id: order?.customer });
-    // if (!user || order.customer !== user?._id && user?.role !== "admin") {
-    //   throw new Error("Unauthorized access");
-    // }
+    if (!user || (order.customer !== user?._id && user?.role !== "admin")) {
+      throw new Error("Unauthorized access");
+    }
     const returnData: OrderReviewData | any = { products: [] };
     await Promise.all(
       order.items.map(async (item: CartItemForServer) => {

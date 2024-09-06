@@ -101,6 +101,9 @@ const router = useRouter()
 
   const form = useForm<z.infer<typeof shippingSchema>>({
     resolver: zodResolver(shippingSchema),
+  defaultValues:{
+    country:"india"
+  }
   });
 
   function onSubmit(values: z.infer<typeof shippingSchema>) {
@@ -277,7 +280,7 @@ const router = useRouter()
                       </h1>
                       <FormMessage />
                       <FormControl>
-                        <Input placeholder="Enter your country" {...field} />
+                        <Input readOnly placeholder="Enter your country" {...field} />
                       </FormControl>
                     </FormItem>
                   )}

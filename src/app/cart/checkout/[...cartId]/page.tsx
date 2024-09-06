@@ -20,7 +20,7 @@ const page = (props: Props) => {
       <div className="w-full container lg:grid lg:grid-cols-9 grid- flex flex-col lg:mb-9 mt-4 gap-9">
         <div className="col-span-3 order-2">
           <div className="sticky top-[34px]">
-            <CheckoutCard cartId={props.params.cartId.toString()} />
+            <CheckoutCard showProducts={true} cartId={props.params.cartId.toString()} />
           </div>
         </div>
         <div className="col-span-6 order-1 flex flex-col h-full">

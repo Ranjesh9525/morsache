@@ -310,6 +310,9 @@ const AccountForm = (props: Props) => {
 
   const form = useForm<z.infer<typeof shippingSchema>>({
     resolver: zodResolver(shippingSchema),
+    defaultValues:{
+      country:"india"
+    }
   });
   // useEffect(() => {
     // if (!userData && !userDataLoading) {
@@ -522,7 +525,7 @@ const AccountForm = (props: Props) => {
                     </h1>
                     <FormMessage />
                     <FormControl>
-                      <Input placeholder="Enter your country" {...field} />
+                    <Input readOnly placeholder="Enter your country" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
