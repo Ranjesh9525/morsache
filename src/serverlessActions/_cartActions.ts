@@ -20,6 +20,7 @@ import { Order, OrderReviewData } from "@/@types/order";
 import { OptimizedProduct } from "@/@types/products";
 import { authAction } from "./middlewares";
 import { AdminFindCart, AdminGetOrderById } from "./_adminActions";
+import AdminModel from "../models/Admin";
 // import UserModel from "../models/User";
 
 interface Shipping extends Document {
@@ -356,6 +357,7 @@ export const InitializeOrder = async ({
   try {
     await connectDB();
     const user = await authAction();
+    const adminData = await AdminModel.find();
     if (!user) {
       throw new Error("No User found");
     }
@@ -410,7 +412,7 @@ export const InitializeOrder = async ({
           totalItems: cart.totalItems,
           totalAmount: responseFromGateway.amount,
           shippingPrice: cart.shippingPrice,
-          orderStatus: "pending",
+          orderStatus: adminData[0]?.defaultConfirmOrders ? "confirmed":"pending",
           collectionMethod: cart.receiveBy,
           shippingAddress: cart.shippingAddress,
           paymentMethod: {
@@ -428,12 +430,23 @@ export const InitializeOrder = async ({
         });
         await user.save();
 
+       if(!adminData[0]?.defaultConfirmOrders){
+
         sendOrderConfirmationEmail(
           order,
           user.email,
           "You placed an order!",
           `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
         );
+      }else{
+        sendOrderConfirmationEmail(
+          order,
+          user.email,
+          "Your order has been confirmed!",
+          `Your order with order no ${order.orderNumber} has been Confirmed. please check the delivery date`
+        );
+
+        }
 
         return Response("Order created", 200, true, order?._id);
       } else {
@@ -449,7 +462,7 @@ export const InitializeOrder = async ({
         totalItems: cart.totalItems,
         totalAmount: cart.totalAmount + (parseInt(cart?.shippingPrice!) || 0),
         shippingPrice: cart.shippingPrice,
-        orderStatus: "pending",
+        orderStatus: adminData[0]?.defaultConfirmOrders ? "confirmed":"pending",
         shippingAddress: cart.shippingAddress,
         paymentMethod: {
           type: paymentMethod,
@@ -466,12 +479,23 @@ export const InitializeOrder = async ({
         status: order?.orderStatus,
       });
       await user.save();
-      sendOrderConfirmationEmail(
-        order,
-        user.email,
-        "You placed an order!",
-        `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
-      );
+      if(!adminData[0]?.defaultConfirmOrders){
+
+        sendOrderConfirmationEmail(
+          order,
+          user.email,
+          "You placed an order!",
+          `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
+        );
+      }else{
+        sendOrderConfirmationEmail(
+          order,
+          user.email,
+          "Your order has been confirmed!",
+          `Your order with order no ${order.orderNumber} has been Confirmed. please check the delivery date`
+        );
+
+        }
       return Response("Order created", 200, true, order?.orderNumber);
     }
   } catch (error) {

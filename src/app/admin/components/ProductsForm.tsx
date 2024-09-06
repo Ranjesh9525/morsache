@@ -83,6 +83,10 @@ const ProductsForm = ({ data }: Props) => {
           description: z.string(),
           description2: z.string().optional(),
           discount: z.string(),
+          code: z.string(),
+          quantityEffect: z.string(),
+          effect: z.union([z.literal("flat"), z.literal("percentage"), z.literal("quantity")]),
+          active: z.boolean(),
         })
       )
       .optional(),

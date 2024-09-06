@@ -46,6 +46,7 @@ import {
   AdminUpdateAdminData,
 } from "@/serverlessActions/_adminActions";
 import { Order } from "@/@types/order";
+import { useSearchParams } from "next/navigation";
 
 type Props = {};
 
@@ -64,6 +65,8 @@ const orderColumns: ColumnDef<Order>[] = [
 const Page = (props: Props) => {
   const [orders, setOrders] = React.useState<Order[] | null>(null);
   const [switchValue, setSwitchValue] = React.useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const status:any = searchParams!.get("status") 
   const {
     isPending:UpdatingAdminData,
     mutate: server_AdminUpdateAdminData,
@@ -79,15 +82,18 @@ const Page = (props: Props) => {
     },
     onError:(err)=>{
       toast({
+        variant:"destructive",
         title:"Failed to update admin data",
         description:<p>{err?.message}</p>
       })
     }
   });
-  const { data, isPending, isSuccess, error, isError } = useQuery({
-    queryKey: ["orders"],
-    queryFn: () => AdminGetAllOrders(),
-  });
+  const { data, isPending, isSuccess, error, isError,mutate:server_AdminGetAllOrders } = useMutation({
+    mutationFn: AdminGetAllOrders
+  })
+  useEffect(()=>{
+    server_AdminGetAllOrders(status)
+  },[status])
   const { data:AdminResponse, isPending:AdminDataIsPending, isSuccess:AdminDataIsSuccess, error:AdminDataError } = useQuery({
     queryKey: ["admin-data"],
     queryFn: () => AdminGetAdminData(),

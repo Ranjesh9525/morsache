@@ -361,12 +361,19 @@ export const AdminGetAllShippingData = async () => {
   }
 };
 
-export const AdminGetAllOrders = async () => {
+export const AdminGetAllOrders = async (status: string) => {
   try {
     await connectDB();
     await adminAction();
-    const orders: Order[] = await OrdersModel.find().sort({ createdAt: -1 });
-    return Response("Orders fetched successfully", 200, true, orders);
+    if (status) {
+      const orders: Order[] = await OrdersModel.find({
+        orderStatus: status,
+      }).sort({ createdAt: -1 });
+      return Response("Orders fetched successfully", 200, true, orders);
+    } else {
+      const orders: Order[] = await OrdersModel.find().sort({ createdAt: -1 });
+      return Response("Orders fetched successfully", 200, true, orders);
+    }
   } catch (error) {
     console.error("Error fetching orders:", error);
     throw error;
@@ -478,8 +485,8 @@ export const AdminGetAdminData = async () => {
     const adminData = await AdminModel.find({});
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
-      // throw new Error("Couldnt retrieve admin data");
-      await AdminModel.create({ defaultConfirmOrders: true });
+      throw new Error("Couldnt retrieve admin data");
+      // await AdminModel.create({ defaultConfirmOrders: true });
     }
 
     return Response("Admin data retrieved successfully", 200, true, adminData);
@@ -493,18 +500,18 @@ export const AdminUpdateAdminData = async (data: any) => {
   try {
     await connectDB();
     await adminAction();
-    const adminData = await AdminModel.find({});
+    const adminData = await AdminModel.find();
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
       throw new Error("Couldnt retrieve admin data");
       // await AdminModel.create({ defaultConfirmOrders: true });
     }
-    const { defaultConfirmOrder } = data;
-    if (defaultConfirmOrder) {
-      adminData[0].defaultConfirmOrder = defaultConfirmOrder;
+    const { defaultConfirmOrders } = data;
+    if (defaultConfirmOrders) {
+      adminData[0].defaultConfirmOrders = defaultConfirmOrders;
       await adminData[0].save();
+      return Response("Store data updated successfully", 200, true, adminData);
     }
-    return Response("Store data updated successfully", 200, true, adminData);
   } catch (Error) {
     console.log("Error updating admin data", Error);
     throw Error;
@@ -646,10 +653,10 @@ export const AdminEditOrder = async ({
   try {
     await connectDB();
     await adminAction();
-    console.log(updatedOrderData);
+    // console.log(updatedOrderData);
     if (updatedOrderData.orderStatus === "confirmed")
       updatedOrderData.confirmedOn = new Date(Date.now());
-
+    const originalOrder = await OrdersModel.findById(orderId);
     const updatedOrder = await OrdersModel.findByIdAndUpdate(
       orderId,
       {
@@ -658,7 +665,7 @@ export const AdminEditOrder = async ({
       { new: true }
     );
     const user = await UserModel.findById(updatedOrder?.customer);
-    if (updatedOrderData.orderStatus === updatedOrder.orderStatus) {
+    if (updatedOrder.orderStatus !== originalOrder.orderStatus) {
       if (updatedOrder.orderStatus === "confirmed")
         sendOrderConfirmationEmail(
           updatedOrder,
@@ -672,6 +679,20 @@ export const AdminEditOrder = async ({
           user.email,
           "Your order has been shipped!",
           `Your order with order no ${updatedOrder.orderNumber} has been Shipped and will be out for delivery soon. please check the delivery date`
+        );
+      if (updatedOrder.orderStatus === "ready")
+        sendOrderConfirmationEmail(
+          updatedOrder,
+          user.email,
+          "Your order is ready for pickup!",
+          `Your order with order no ${updatedOrder.orderNumber} is ready for pickup.`
+        );
+      if (updatedOrder.orderStatus === "collected")
+        sendOrderConfirmationEmail(
+          updatedOrder,
+          user.email,
+          "Thanks for shopping with us",
+          `Your order has been collected at our store. please leave a review on your item`
         );
       if (updatedOrder.orderStatus === "delivered")
         sendOrderConfirmationEmail(
