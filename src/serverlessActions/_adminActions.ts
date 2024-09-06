@@ -471,7 +471,7 @@ export const AdminUpdateStoreData = async (data: any) => {
   }
 };
 
-export const AdminData = async (data: any) => {
+export const AdminGetAdminData = async () => {
   try {
     await connectDB();
     await adminAction();
@@ -481,6 +481,24 @@ export const AdminData = async (data: any) => {
       // throw new Error("Couldnt retrieve admin data");
       await AdminModel.create({ defaultConfirmOrders: true });
     }
+
+    return Response("Admin data retrieved successfully", 200, true, adminData);
+  } catch (Error) {
+    console.log("Error fetching admin data", Error);
+    throw Error;
+  }
+};
+
+export const AdminUpdateAdminData = async (data: any) => {
+  try {
+    await connectDB();
+    await adminAction();
+    const adminData = await AdminModel.find({});
+    // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
+    if (!adminData) {
+      throw new Error("Couldnt retrieve admin data");
+      // await AdminModel.create({ defaultConfirmOrders: true });
+    }
     const { defaultConfirmOrder } = data;
     if (defaultConfirmOrder) {
       adminData[0].defaultConfirmOrder = defaultConfirmOrder;
@@ -488,7 +506,7 @@ export const AdminData = async (data: any) => {
     }
     return Response("Store data updated successfully", 200, true, adminData);
   } catch (Error) {
-    console.log("Error fetching admin data", Error);
+    console.log("Error updating admin data", Error);
     throw Error;
   }
 };

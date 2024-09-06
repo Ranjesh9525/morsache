@@ -10,7 +10,7 @@ import UsersChart from "./components/UsersChart";
 
 type Props = {};
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const { data: Session } = useSession() as any;
   return (
     <div className="h-full min-h-[70vh] p-9 space-y-4">
@@ -47,4 +47,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default Page;

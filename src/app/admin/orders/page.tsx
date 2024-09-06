@@ -41,7 +41,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Offer } from "@/@types/products";
 import {
   AdminCreateOffer,
+  AdminGetAdminData,
   AdminGetAllOrders,
+  AdminUpdateAdminData,
 } from "@/serverlessActions/_adminActions";
 import { Order } from "@/@types/order";
 
@@ -62,26 +64,45 @@ const orderColumns: ColumnDef<Order>[] = [
 const Page = (props: Props) => {
   const [orders, setOrders] = React.useState<Order[] | null>(null);
   const [switchValue, setSwitchValue] = React.useState<boolean>(false);
-  // const {
-  //   isPending,
-  //   isError,
-  //   data: offersData,
-  //   isSuccess,
-  //   error,
-  //   mutate: server_AdminCreateOffer,
-  // } = useMutation({
-  //   mutationFn: AdminCreateOffer,
-  // });
+  const {
+    isPending:UpdatingAdminData,
+    mutate: server_AdminUpdateAdminData,
+  } = useMutation({
+    mutationFn: AdminUpdateAdminData,
+    onSuccess:(res)=>{
+      console.log(res)
+      setSwitchValue(res?.data?.defaultConfirmOrders)
+      toast({
+        variant:"success",
+        title:"Auto confirm orders set"
+      })
+    },
+    onError:(err)=>{
+      toast({
+        title:"Failed to update admin data",
+        description:<p>{err?.message}</p>
+      })
+    }
+  });
   const { data, isPending, isSuccess, error, isError } = useQuery({
     queryKey: ["orders"],
     queryFn: () => AdminGetAllOrders(),
+  });
+  const { data:AdminResponse, isPending:AdminDataIsPending, isSuccess:AdminDataIsSuccess, error:AdminDataError } = useQuery({
+    queryKey: ["admin-data"],
+    queryFn: () => AdminGetAdminData(),
   });
   useEffect(() => {
     if (isSuccess) {
       setOrders(data?.data);
     }
   }, [isSuccess, data]);
+useEffect(()=>{
+if(AdminResponse){
+  setSwitchValue(AdminResponse?.data?.defaultConfirmOrders)
 
+}
+},[AdminResponse,AdminDataIsSuccess])
   useEffect(() => {
     if (error) {
       toast({
@@ -111,7 +132,7 @@ const Page = (props: Props) => {
             </p>
           </div>
 
-          <Switch checked={switchValue} onCheckedChange={setSwitchValue} />
+          <Switch disabled={UpdatingAdminData} checked={switchValue} onCheckedChange={(checked)=> server_AdminUpdateAdminData({ defaultConfirmOrders:checked})} />
         </div>
         {isPending ? (
           <p className="text-center">
