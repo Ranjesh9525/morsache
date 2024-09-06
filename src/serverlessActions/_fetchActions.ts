@@ -115,7 +115,7 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
       SKU: product.SKU,
       salePrice: product.salePrice || null,
     };
-    console.log("fetched optimized products")
+    // console.log("fetched optimized products")
     return Response("product", 200, true, optimizedProduct);
   } catch (error) {
     console.error("Error fetching product:", error);

@@ -73,7 +73,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         </div>
         <Separator className="md:my-6 hidden md:block" />
         <div className="flex flex-col space-y-4  md:space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-          <aside className="max-sm:mx-4 lg:-mx-4 overflow-x-auto hideScroll w-full lg:w-1/5">
+          <aside className="max-sm:mx-2 lg:-mx-4 overflow-x-auto hideScroll w-full lg:w-1/5">
             <SidebarNav items={sidebarNavItems} />
           </aside>
         <Separator className="my-2 md:hidden" />

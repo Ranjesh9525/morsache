@@ -4,11 +4,11 @@ interface Order extends Document {
   orderNumber: string;
   customer: mongoose.Schema.Types.ObjectId | string;
   items: CartItem[];
-  totalItems: number;
-  totalAmount: number;
-  expectedDeliveryOrPickupDate1?:Date;
-  expectedDeliveryOrPickupDate2?:Date;
-  orderStatus: "pending" | "confirmed" | "shipped" | "delivered";
+  totalItems: number | string;
+  totalAmount: number | string;
+  expectedDeliveryOrPickupDate1?:Date | string;
+  expectedDeliveryOrPickupDate2?:Date | string;
+  orderStatus: "pending" | "confirmed" | "shipped" | "delivered" | "ready" |"collected";
   shippingAddress: {
     street: string;
     city: string;
@@ -17,7 +17,7 @@ interface Order extends Document {
     country: string;
   };
   confirmedOn?:Date
-  shippingPrice?: number;
+  shippingPrice?: number | string;
   paymentMethod: {
     type: "creditCard" | "razorPay" | "stripe" | "payOnDelivery";
     cardNumber?: string;
@@ -26,7 +26,7 @@ interface Order extends Document {
   };
   paymentStatus: "pending" | "paid";
   collectionMethod: "delivery" | "pickup";
-  paidOn: Date | null;
+  paidOn: Date | string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -54,7 +54,7 @@ interface OrderReviewData {
     totalAmount: number;
     createdAt?: Date;
     totalItems: number;
-    orderStatus: "pending" | "confirmed" | "shipped" | "delivered";
+    orderStatus: "pending" | "confirmed" | "shipped" | "delivered" | "ready" |"collected";
   collectionMethod: "delivery" | "pickup";
     orderNumber: string;
     expectedDeliveryOrPickupDate1?:Date;

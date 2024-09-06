@@ -76,8 +76,8 @@ const HeaderAds = (props: Props) => {
           </div>
         </section>
       ) : (
-        <div className="overflow-hidden !relative h-[40px]">
-          <div className="embla__container bg-primary-dark"></div>
+        <div className="overflow-hidden !relative h-[40px] w-full bg-primary-dark">
+          <div className="embla__container h-full bg-primary-dark "></div>
         </div>
       )}
     </section>

@@ -26,8 +26,8 @@ const AdsPromotions = (props: Props) => {
       {storeDataIsPending ? (
         <div className="mx-9 w-full h-[70vh]"></div>
       ) : (
-        <div className="px-9">
-          {/* <Carousel slides={images} options={OPTIONS} /> */}
+       
+        
           <section className=" my-12 ">
             {image && (
               <div className="cursor-pointer w-full h-full">
@@ -41,7 +41,7 @@ const AdsPromotions = (props: Props) => {
               </div>
             )}
           </section>
-        </div>
+ 
       )}
     </>
   );

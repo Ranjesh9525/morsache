@@ -81,13 +81,15 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
   const OrderSchema = z.object({
     orderNumber: z.string(),
     customer: z.string(),
-    totalItems: z.number(),
-    totalAmount: z.number(),
+    totalItems:  z.union([z.number(), z.string()]),
+    totalAmount:  z.union([z.number(), z.string()]),
     orderStatus: z.union([
       z.literal("pending"),
       z.literal("confirmed"),
       z.literal("shipped"),
       z.literal("delivered"),
+      z.literal("ready"),
+      z.literal("collected"),
     ]),
     shippingAddress: z.object({
       street: z.string(),
@@ -96,7 +98,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
       postalCode: z.string(),
       country: z.string(),
     }),
-    shippingPrice: z.number().optional(),
+    shippingPrice: z.union([z.number(), z.string()]).optional(),
     paymentMethod: z.object({
       type: z.union([
         z.literal("creditCard"),
@@ -105,11 +107,11 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
         z.literal("payOnDelivery"),
       ]),
     }),
-    expectedDeliveryOrPickupDate1:z.date().optional(),
-    expectedDeliveryOrPickupDate2:z.date().optional(),
+    expectedDeliveryOrPickupDate1:z.union([z.date(), z.string()]).optional(),
+    expectedDeliveryOrPickupDate2:z.union([z.date(), z.string()]).optional(),
     paymentStatus: z.union([z.literal("pending"), z.literal("paid")]),
     collectionMethod: z.union([z.literal("delivery"), z.literal("pickup")]),
-    paidOn: z.date().nullable(),
+    paidOn: z.union([z.date(), z.string()]).nullable().optional(),
   });
 
   const form = useForm<z.infer<typeof OrderSchema>>({
@@ -271,7 +273,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field?.value !== null ? (
+                          {field?.value ? (
                             formatDateFns(field?.value, "PPP")
                           ) : (
                             <span>No date, not yet paid</span>
@@ -514,7 +516,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                         selected={field.value as Date}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
+                          date < new Date() 
                         }
                         initialFocus
                       />
@@ -547,7 +549,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                           {field?.value ? (
                             formatDateFns(field?.value!, "PPP")
                           ) : (
-                            <span>No date, not yet paid</span>
+                            <span>No date selected</span>
                           )}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -559,7 +561,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                         selected={field.value as Date}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
+                          date < new Date() 
                         }
                         initialFocus
                       />
@@ -572,51 +574,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="paidOn"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Paid on</FormLabel>
-
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            " pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field?.value !== null ? (
-                            formatDateFns(field?.value, "PPP")
-                          ) : (
-                            <span>No date, not yet paid</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value as Date}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    This is the date the user paid for this order
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      
           </div>
           <div className="space-y-2 mx-auto my-4 w-fit">
             <Button

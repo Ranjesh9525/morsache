@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema(
     expectedDeliveryOrPickupDate2:Date,
     orderStatus: {
       type: String,
-      enum: ["pending", "confirmed", "shipped", "delivered","cancelled"],
+      enum: ["pending", "confirmed", "shipped", "delivered","cancelled", "ready" ,"collected"],
       default: "pending",
     },
     shippingAddress: {

@@ -174,7 +174,7 @@
 // }
 
 "use client";
-import React from "react";
+import React,{useContext} from "react";
 
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -194,10 +194,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
+import { UserUpdateAccountProfile } from "@/serverlessActions/_userActions";
+import { GlobalContext } from "@/context/globalContext";
+import { toast } from "@/components/ui/use-toast";
 
 type Props = {};
 
 const ProfileForm = (props: Props) => {
+    const {userData} = useContext(GlobalContext)!
+
   const [dragging, setDragging] = React.useState(false);
 
   const profileFormSchema = z.object({
@@ -224,17 +230,35 @@ const ProfileForm = (props: Props) => {
 
   type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-  // // This can come from your database or API.
+ 
   const defaultValues: Partial<ProfileFormValues> = {
-    firstName: "",
-    lastName: "",
+    firstName: userData?.firstName || "",
+    lastName: userData?.lastName || "",
+    image: userData?.image || "",
   };
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
-    mode: "onChange",
   });
+
+  const {isPending,mutate:server_userUpdateAccountProfile}=useMutation({
+    mutationFn: UserUpdateAccountProfile,
+    onSuccess:(res)=>{
+      console.log(res)
+      toast({
+        title:"Profile updated"
+      })
+    },
+    onError:(err)=>{
+      console.log(err)
+      toast({
+        variant:"destructive",
+        title:"Failed to update user profile",
+        description:<p>{err?.message}</p>
+      })
+    }
+  })
 
   function onSubmit(data: ProfileFormValues) {
     // toast({
@@ -245,6 +269,8 @@ const ProfileForm = (props: Props) => {
     //     </pre>
     //   ),
     // })
+    console.log(data)
+    server_userUpdateAccountProfile(data)
   }
   const handleFileChange = (e: any, field: string) => {
     const file = e.target.files?.[0];
@@ -316,7 +342,7 @@ const ProfileForm = (props: Props) => {
                   {!form.getValues("image") ? (
                     <label
                       htmlFor="file"
-                      className={`w-full min-h-[20vh] max-w-[20vw] rounded-lg dark:border-white border-[#00000026] p-3 border flex items-center justify-center ${
+                      className={`lg:w-full lg:min-h-[20vh] lg:max-w-[20vw] w-[180px] h-[180px] rounded-lg dark:border-white border-[#00000026] p-3 border flex items-center justify-center ${
                         dragging ? "bg-blue-500" : "bg-transparent"
                       }`}
                       onDragOver={handleDragOver}

@@ -12,6 +12,7 @@ import { Response } from "./responseClass";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import authAction from "./middlewares";
 import { Order } from "@/@types/order";
+import { cloudinaryUpload } from "@/utilities/config";
 
 export const UserAddToWishList = async ({
   productId,
@@ -156,7 +157,7 @@ export const UserIsNewUser = async () => {
   }
 };
 
-export const UserUpdateProfile = async ({
+export const Account = async ({
   firstName,
   lastName,
   phoneNumber,
@@ -272,3 +273,30 @@ export const UserTrackOrder = async (orderNo: string) => {
     throw error;
   }
 };
+
+export const UserUpdateAccountProfile = async(data:any)=>{
+  try{
+    await connectDB();
+    const user = await authAction();
+    if (data.image) {
+      const cloudPhoto = await cloudinaryUpload(data.image, {
+        folder: `profilePhotos/${user.email}`,
+        public_id: data.name,
+        // width: 150,
+      });
+      data.image = cloudPhoto.secure_url;
+    }
+    const updatedUser = await UsersModel.findByIdAndUpdate(
+      user._id,
+      {
+        $set: data,
+      },
+      { new: true }
+    );
+console.log(updatedUser)
+return Response("updated user", 200, true);
+  }catch(err){
+    console.log("Error Updating user profile", err);
+    throw err;
+  }
+}

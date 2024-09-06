@@ -7,6 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { FetchOrderByOrderNo } from "@/serverlessActions/_cartActions";
 import { formatDate,format } from "@/utilities/global";
+import {format as formatDateFns} from "date-fns"
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -306,7 +307,7 @@ if(!orderNo){
               </span>
               <span className="w-full border-b py-4 px-2">
                   <p className="font-semibold text-black"> {order?.orderDetails?.collectionMethod === "delivery" ? "Expected delivery date" : "Expected pickup date"}</p>
-                  {order?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDate(order?.orderDetails?.expectedDeliveryOrPickupDate1) + " and " + formatDate(order?.orderDetails?.expectedDeliveryOrPickupDate2!)}</p> : "Would be set after order is confirmed"}
+                  {order?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDateFns(order?.orderDetails?.expectedDeliveryOrPickupDate1,"PPP") + " and " + formatDateFns(order?.orderDetails?.expectedDeliveryOrPickupDate2!,"PPP")}</p> : "Would be set after order is confirmed"}
                 </span>
             
                 <span className="w-full border-b py-4 px-2">
