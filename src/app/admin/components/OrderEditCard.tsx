@@ -413,7 +413,7 @@ const OrderEditCard = ({ order }: Props) => {
                     </SelectContent>
                   </Select>
                   <FormDescription className="">
-                    Changing this will alter the order in "to be delivered" page
+                    Changing this will alter the order in &quot;to be delivered&quot; page
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -440,7 +440,7 @@ const OrderEditCard = ({ order }: Props) => {
                     </SelectContent>
                   </Select>
                   <FormDescription className="">
-                    Changing this will alter the order in "to be delivered" page
+                    Changing this will alter the order in &quot;to be delivered&quot; page
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
