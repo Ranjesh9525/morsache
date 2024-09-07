@@ -138,37 +138,72 @@ const AdminNavbar = ({ scrolling }: Props) => {
       setSavedProduct(JSON.parse(localStorage.getItem("product-draft")!));
     }
   }, [isPreview]);
+
   return (
-    <motion.div
-      // variants={scrollingVariants}
-      // animate={scrolling ? "fixed" : "static"}
-      id="nav-wrapper"
-      className="w-full sticky top-0 z-50"
-    >
-      <nav
-        id="nav-body"
-        className="w-full bg-white border-b border-b-gray-100 "
-      >
-        <div className="flex items-center justify-between w-full p-6 py-4">
-          <section className="flex items-center gap-4 ">
-            <Link href="/admin" className="inline-flex items-end uppercase">
+    <motion.div id="nav-wrapper" className="w-full sticky top-0 z-50">
+      <nav id="nav-body" className="w-full bg-white border-b border-b-gray-100">
+        <div className="flex flex-wrap items-center justify-between w-full p-4">
+          <div className="flex items-center justify-between w-full mb-2 sm:mb-0 sm:w-auto">
+            <Link href="/admin" className="inline-flex items-center uppercase">
               <Image
                 src="/morsache-clothing-logo-small.png"
                 alt="logo"
                 width={40}
                 height={40}
               />
-              <h1 className="font-medium text-[#474747] text-2xl">
+              <h1 className="font-medium text-[#474747] text-xl lg:text-2xl ml-2">
                 orsache - Admin
               </h1>
             </Link>
-
-            <NavigationMenu className="z-40">
-              <NavigationMenuList>
+            <div className="flex items-center sm:ml-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <span className="items-center inline-flex hover:bg-accent cursor-pointer p-[0.25rem] px-2 text-[14px] font-medium space-x-1.5 rounded-full">
+                    <Image
+                      src={Session?.user?.image || "https://picsum.photos/200"}
+                      alt="pfp"
+                      width={35}
+                      height={35}
+                      className="rounded-full"
+                    />
+                    <h1 className="hidden sm:block">{Session?.user?.firstName || Session?.user?.email}</h1>
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <Link href="/account/">Edit Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span
+                        onClick={() =>
+                          signOut({ redirect: false, callbackUrl: "/" })
+                        }
+                      >
+                        Log out
+                      </span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <div className="w-full sm:w-auto">
+            <NavigationMenu className="w-full">
+              <NavigationMenuList className="flex flex-wrap">
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Store</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {storeComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -181,11 +216,10 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
-
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Offers</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {offersComponents.map((component) => (
                         <ListItem
                           key={component.title}
@@ -200,197 +234,129 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href="/admin/team" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       Team
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
-          </section>
-          <section>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <span className="items-center inline-flex hover:bg-accent cursor-pointer p-[0.25rem] px-2 text-[14px] font-medium space-x-1.5 rounded-full">
-                  <Image
-                    src={Session?.user?.image || "https://picsum.photos/200"}
-                    alt="pfp"
-                    width={35}
-                    height={35}
-                    className="rounded-full"
-                  />
-                  <h1>{Session?.user?.firstName || Session?.user?.email}</h1>{" "}
-                </span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <Link href="/account/">Edit Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span
-                      onClick={() =>
-                        signOut({ redirect: false, callbackUrl: "/" })
-                      }
-                    >
-                      Log out
-                    </span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </section>
+          </div>
         </div>
         <Separator />
-        <div className="w-full flex justify-between items-center">
-          <div className="p-2">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <Link href="/admin/users" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      {/* <Users size={20} className="mr-2"/>  */}
-                      Users
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="">
-                    {/* <Box size={20} className="mr-2" /> */}
-                    Orders
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                      {ordersComponents.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/admin/shipping" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      {/* <Users size={20} className="mr-2"/>  */}
-                      Shipping
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    {/* <Cloud size={20} className="mr-2"/> */}
-                    Categories
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                      {categoriesComponents.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    {/* <LifeBuoy size={20} className="mr-2" /> */}
-                    Products
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                      {productsComponents.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="space-x-2">
-                    {/* <Mail size={20}/> */}
-                    <h1>Pages</h1>
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                      {pagesComponents.map((component) => (
-                        <ListItem
-                          key={component.title}
-                          title={component.title}
-                          href={component.href}
-                        >
-                          {component.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>{" "}
-          </div>
-          {(pathname === "/admin/products/create" ||
-            `/admin/products/${lastPartPathName}`) &&
-            savedProduct && (
-              <div id="action-btns">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isPending}
-                  onClick={() => discardProduct()}
-                  className="mr-8 gap-4 border border-[#665a47] text-black tracking-wider hover:bg-[#e6e6e6]"
-                >
-                  Discard
-                  <FaTimes color="red" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isPending}
-                  onClick={() => uploadProduct(savedProduct)}
-                  className="mr-8 gap-4 bg-primary-dark text-white tracking-wider hover:bg-primary "
-                >
-                  Upload Product
-                  {!isPending ? (
-                    <FaUpload color="#fff" />
-                  ) : (
-                    <ClipLoader color="#fff" />
-                  )}
-                </Button>
-              </div>
-            )}
+        <div className="w-full p-2 overflow-x-auto">
+          <NavigationMenu>
+            <NavigationMenuList className="flex flex-wrap">
+              <NavigationMenuItem>
+                <Link href="/admin/users" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Users
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Orders</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {ordersComponents.map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/admin/shipping" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Shipping
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {categoriesComponents.map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {productsComponents.map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Pages</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {pagesComponents.map((component) => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        href={component.href}
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
+        {(pathname === "/admin/products/create" || `/admin/products/${lastPartPathName}`) && savedProduct && (
+          <div id="action-btns" className="flex flex-wrap gap-2 p-2">
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isPending}
+              onClick={() => discardProduct()}
+              className="gap-2 border border-[#665a47] text-black tracking-wider hover:bg-[#e6e6e6]"
+            >
+              <span className="hidden sm:inline">Discard</span>
+              <FaTimes color="red" />
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isPending}
+              onClick={() => uploadProduct(savedProduct)}
+              className="gap-2 bg-primary-dark text-white tracking-wider hover:bg-primary"
+            >
+              <span className="hidden sm:inline">Upload Product</span>
+              {!isPending ? <FaUpload color="#fff" /> : <ClipLoader color="#fff" />}
+            </Button>
+          </div>
+        )}
       </nav>
     </motion.div>
-  );
-};
+  )
+}
+  
 
 export default AdminNavbar;
 
@@ -507,25 +473,17 @@ const productsComponents: {
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+>(({ className, title,href, children, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
+         <Link href={href} className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+        <div className="text-sm font-medium leading-none">{title}</div>
+        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
+      </Link>
       </NavigationMenuLink>
     </li>
   );
 });
 ListItem.displayName = "ListItem";
+
