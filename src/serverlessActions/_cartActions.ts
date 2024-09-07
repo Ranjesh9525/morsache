@@ -586,6 +586,7 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       shippingAddress,
       expectedDeliveryOrPickupDate1,
       expectedDeliveryOrPickupDate2,
+collectionMethod
     } = order;
     returnData.paymentDetails = {
       totalAmount,
@@ -601,6 +602,7 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       orderNumber,
       expectedDeliveryOrPickupDate1,
       expectedDeliveryOrPickupDate2,
+collectionMethod
     };
     const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
     returnData.customerDetails = {
