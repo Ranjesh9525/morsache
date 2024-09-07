@@ -27,12 +27,19 @@ const productSchema = new mongoose.Schema(
     stock: { type: Number },
     offers: {
       type: [
-        {
-          title: { type: String },
-          description: { type: String },
-          description2: { type: String },
-          discount: { type: Number },
-        },
+          title: { type: String, required: true },
+  description: { type: String, required: true },
+  description2: String,
+  discount: { type: Number, default: 0 },
+  image: String,
+  code:String,
+  quantityEffect: { type: Number, default: 5 },
+  effect: {
+    type: String,
+    enum: ["flat", "percentage", "quantity"],
+    default: "flat",
+  },
+  active: { type: Boolean, default: true },
       ],
       default: [],
     },
