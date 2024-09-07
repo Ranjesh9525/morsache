@@ -387,6 +387,7 @@ export const InitializeOrder = async ({
       }
     }
     if (!allProductsAcceptPayOnDelivery) {
+console.log(productsNotAcceptingPayOnDelivery)
       throw new Error("Pay on delivery is not avaliable for this order");
     }
     if (paymentMethod === "razorPay") {
