@@ -254,10 +254,10 @@ const AdminNavbar = ({ scrolling }: Props) => {
           </section>
         </div>
         <Separator />
-        <div className="w-full flex justify-between items-center">
+        <div className="w-full flex justify-between items-center max-sm:flex-col">
           <div className="p-2">
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="flex flex-wrap" >
                 <NavigationMenuItem>
                   <Link href="/admin/users" legacyBehavior passHref>
                     <NavigationMenuLink
