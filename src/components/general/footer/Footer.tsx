@@ -112,7 +112,7 @@ const Footer = (props: Props) => {
            target={"_blank"}
             className="font-medium cursor-pointer"
           >
-            Made By a-ww2-er
+            Made By AWE_Roy
           </Link>
         </section>
       </div>
