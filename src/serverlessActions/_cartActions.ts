@@ -465,6 +465,7 @@ console.log(productsNotAcceptingPayOnDelivery)
         shippingPrice: cart.shippingPrice,
         orderStatus: adminData[0]?.defaultConfirmOrders ? "confirmed":"pending",
         shippingAddress: cart.shippingAddress,
+
         paymentMethod: {
           type: paymentMethod,
         },
@@ -480,6 +481,8 @@ console.log(productsNotAcceptingPayOnDelivery)
         status: order?.orderStatus,
       });
       await user.save();
+
+
       if(!adminData[0]?.defaultConfirmOrders){
 
         sendOrderConfirmationEmail(
@@ -489,6 +492,10 @@ console.log(productsNotAcceptingPayOnDelivery)
           `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
         );
       }else{
+order.confirmedOn = new Date(Date.now())
+order.expectedDeliveryOrPickupDate1 =        new Date(order?.confirmedOn.getTime() + 7 * 24 * 60 * 60 * 1000)
+order.expectedDeliveryOrPickupDate2 =        new Date(order?.confirmedOn.getTime() + 12 * 24 * 60 * 60 * 1000)
+await order.save()
         sendOrderConfirmationEmail(
           order,
           user.email,
