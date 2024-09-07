@@ -140,7 +140,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
   }, [isPreview]);
 
   return (
-    <motion.div id="nav-wrapper" className="w-full sticky top-0 z-50">
+   <motion.div id="nav-wrapper" className="w-full sticky top-0 z-40">
       <nav id="nav-body" className="w-full bg-white border-b border-b-gray-100">
         <div className="flex flex-wrap items-center justify-between w-full p-4">
           <div className="flex items-center justify-between w-full mb-2 sm:mb-0 sm:w-auto">
@@ -169,7 +169,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                     <h1 className="hidden sm:block">{Session?.user?.firstName || Session?.user?.email}</h1>
                   </span>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
+                <DropdownMenuContent className="w-56 z-50">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
@@ -202,7 +202,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
               <NavigationMenuList className="flex flex-wrap">
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Store</NavigationMenuTrigger>
-                  <NavigationMenuContent>
+                  <NavigationMenuContent className="z-50">
                     <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {storeComponents.map((component) => (
                         <ListItem
@@ -218,7 +218,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Offers</NavigationMenuTrigger>
-                  <NavigationMenuContent>
+                  <NavigationMenuContent className="z-50">
                     <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {offersComponents.map((component) => (
                         <ListItem
@@ -256,7 +256,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Orders</NavigationMenuTrigger>
-                <NavigationMenuContent>
+                <NavigationMenuContent className="z-50">
                   <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {ordersComponents.map((component) => (
                       <ListItem
@@ -279,7 +279,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
-                <NavigationMenuContent>
+                <NavigationMenuContent className="z-50">
                   <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {categoriesComponents.map((component) => (
                       <ListItem
@@ -295,7 +295,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Products</NavigationMenuTrigger>
-                <NavigationMenuContent>
+                <NavigationMenuContent className="z-50">
                   <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {productsComponents.map((component) => (
                       <ListItem
@@ -311,7 +311,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Pages</NavigationMenuTrigger>
-                <NavigationMenuContent>
+                <NavigationMenuContent className="z-50">
                   <ul className="grid w-fit gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {pagesComponents.map((component) => (
                       <ListItem
