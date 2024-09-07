@@ -238,7 +238,7 @@ const OrderReviewCard = ({ orderId }: Props) => {
                 </span>
                 <span className="w-full border-b py-4 px-2">
                   <p className="font-semibold text-black"> {orderReview?.orderDetails?.collectionMethod === "delivery" ? "Expected delivery date" : "Expected pickup date"}</p>
-                  {orderReview?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDateFns(orderReview?.orderDetails?.expectedDeliveryOrPickupDate1,"PPP") + " and " + formatDateFns(orderReview?.orderDetails?.expectedDeliveryOrPickupDate1,"PPP")}</p> : "Would be set after order is confirmed"}
+                  {orderReview?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDateFns(orderReview?.orderDetails?.expectedDeliveryOrPickupDate1,"PPP") + " and " + formatDateFns(orderReview?.orderDetails?.expectedDeliveryOrPickupDate2,"PPP")}</p> : "Would be set after order is confirmed"}
                 </span>
             
                 <span className="w-full border-b py-4 px-2">
