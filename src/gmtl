@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Order Has Been Placed - Morsache</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <tr>
+            <td style="padding: 20px; background-color: #545454;">
+                <table cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td width="60">
+                            <img src="https://via.placeholder.com/60x60" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">
+                        </td>
+                        <td style="padding-left: 15px;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Morsache</h1>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 40px 20px; text-align: center; background-color: #6a6a6a;">
+                <h2 style="color: #ffffff; margin: 0; font-size: 28px;">Your Order Has Been Placed</h2>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 20px;">
+                <p style="font-size: 16px;">Dear Valued Customer,</p>
+                <p style="font-size: 16px;">Thank you for your order with Morsache. We're excited to confirm that your order has been successfully placed and is being processed.</p>
+                
+                <h2 style="color: #545454; border-bottom: 2px solid #545454; padding-bottom: 10px;">Order Details</h2>
+                <table cellpadding="5" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="font-weight: bold;">Order Number:</td>
+                        <td>{orderNumber}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Total Items:</td>
+                        <td>{totalItems}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Order Status:</td>
+                        <td>{orderStatus}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Expected Delivery/Pickup:</td>
+                        <td>{expectedDeliveryOrPickupDate1} - {expectedDeliveryOrPickupDate2}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Collection Method:</td>
+                        <td>{collectionMethod}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Payment Method:</td>
+                        <td>{paymentMethod.type}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Payment Status:</td>
+                        <td>{paymentStatus}</td>
+                    </tr>
+                </table>
+
+                <h3 style="color: #545454;">Shipping Address</h3>
+                <p>
+                    {shippingAddress.street}<br>
+                    {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}<br>
+                    {shippingAddress.country}
+                </p>
+
+                <h3 style="color: #545454;">Ordered Products</h3>
+                <table cellpadding="10" cellspacing="0" width="100%" style="margin-bottom: 20px; border-collapse: collapse;">
+                    <tr style="background-color: #f0f0f0;">
+                        <th style="text-align: left; border-bottom: 1px solid #ddd;">Product</th>
+                        <th style="text-align: right; border-bottom: 1px solid #ddd;">Quantity</th>
+                        <th style="text-align: right; border-bottom: 1px solid #ddd;">Price</th>
+                    </tr>
+                    {products.map((product, index) => (
+                    <tr key={index} style="border-bottom: 1px solid #ddd;">
+                        <td>
+                            <table cellpadding="5" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <img src={product.images[0]} alt={product.name} style="width: 60px; height: 60px; object-fit: cover;">
+                                    </td>
+                                    <td>
+                                        <strong>{product.name}</strong><br>
+                                        {product.description.substring(0, 50)}...
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style="text-align: right;">{product.purchaseQuantity}</td>
+                        <td style="text-align: right;">${product.price.toFixed(2)}</td>
+                    </tr>
+                    ))}
+                </table>
+
+                <table cellpadding="5" cellspacing="0" width="100%" style="margin-top: 20px; background-color: #f9f9f9; border-radius: 4px;">
+                    <tr>
+                        <td style="font-weight: bold;">Subtotal:</td>
+                        <td style="text-align: right;">${totalAmount}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Shipping:</td>
+                        <td style="text-align: right;">${shippingPrice}</td>
+                    </tr>
+                    <tr style="font-size: 18px; font-weight: bold; color: #545454;">
+                        <td>Total:</td>
+                        <td style="text-align: right;">${(parseFloat(totalAmount) + parseFloat(shippingPrice)).toFixed(2)}</td>
+                    </tr>
+                </table>
+
+                <h3 style="color: #545454; margin-top: 30px;">What's Next?</h3>
+                <ol style="padding-left: 20px;">
+                    <li>We'll send you a shipping confirmation email once your order is on its way.</li>
+                    <li>You can track your order status by logging into your account on our website.</li>
+                    <li>If you have any questions, please don't hesitate to contact our customer service team.</li>
+                </ol>
+
+                <h3 style="color: #545454; margin-top: 30px;">Return Policy</h3>
+                <p>{exchangeAndReturnPolicy}</p>
+
+                <h3 style="color: #545454; margin-top: 30px;">Additional Information</h3>
+                <p>{moreInformation}</p>
+
+                <p style="font-size: 16px; margin-top: 30px;">Thank you for choosing Morsache. We appreciate your business!</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="background-color: #545454; color: #ffffff; padding: 20px; text-align: center;">
+                <p style="margin: 0 0 10px 0; font-size: 14px;">Follow us on social media:</p>
+                <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://via.placeholder.com/30x30" alt="Facebook" style="width: 30px; height: 30px;"></a>
+                <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://via.placeholder.com/30x30" alt="Twitter" style="width: 30px; height: 30px;"></a>
+                <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://via.placeholder.com/30x30" alt="Instagram" style="width: 30px; height: 30px;"></a>
+                <p style="margin: 20px 0 0 0; font-size: 12px;">&copy; 2023 Morsache. All rights reserved.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Order Has Been Placed - Morsache</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+    <table cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <tr>
+            <td style="padding: 40px 20px; text-align: center; background-color: #4a90e2;">
+                <h1 style="color: #ffffff; margin: 0;">Your Order Has Been Placed</h1>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 20px;">
+                <p style="font-size: 16px;">Dear Valued Customer,</p>
+                <p style="font-size: 16px;">Thank you for your order with Morsache. We're excited to confirm that your order has been successfully placed and is being processed.</p>
+                
+                <h2 style="color: #4a90e2; border-bottom: 2px solid #4a90e2; padding-bottom: 10px;">Order Details</h2>
+                <table cellpadding="5" cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                    <tr>
+                        <td style="font-weight: bold;">Order Number:</td>
+                        <td>{orderNumber}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Total Items:</td>
+                        <td>{totalItems}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Total Amount:</td>
+                        <td>${totalAmount}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Order Status:</td>
+                        <td>{orderStatus}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Expected Delivery/Pickup:</td>
+                        <td>{expectedDeliveryOrPickupDate1} - {expectedDeliveryOrPickupDate2}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Collection Method:</td>
+                        <td>{collectionMethod}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Payment Method:</td>
+                        <td>{paymentMethod.type}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Payment Status:</td>
+                        <td>{paymentStatus}</td>
+                    </tr>
+                </table>
+
+                <h3 style="color: #4a90e2;">Shipping Address</h3>
+                <p>
+                    {shippingAddress.street}<br>
+                    {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postalCode}<br>
+                    {shippingAddress.country}
+                </p>
+
+                <p style="font-size: 16px; margin-top: 20px;">If you have any questions about your order, please don't hesitate to contact our customer service team.</p>
+                
+                <p style="font-size: 16px;">Thank you for choosing Morsache!</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="background-color: #4a90e2; color: #ffffff; padding: 20px; text-align: center;">
+                <p style="margin: 0 0 10px 0; font-size: 14px;">Follow us on social media:</p>
+                <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://via.placeholder.com/30x30" alt="Facebook" style="width: 30px; height: 30px;"></a>
+                <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://via.placeholder.com/30x30" alt="Twitter" style="width: 30px; height: 30px;"></a>
+                <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://via.placeholder.com/30x30" alt="Instagram" style="width: 30px; height: 30px;"></a>
+                <p style="margin: 20px 0 0 0; font-size: 12px;">&copy; 2023 Morsache. All rights reserved.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
