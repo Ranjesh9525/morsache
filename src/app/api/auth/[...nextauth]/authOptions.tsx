@@ -1,11 +1,19 @@
-import NextAuth, { AuthOptions, Theme,Account,Profile, User ,Session ,CallbacksOptions } from "next-auth";
+import NextAuth, {
+  AuthOptions,
+  Theme,
+  Account,
+  Profile,
+  User,
+  Session,
+  CallbacksOptions,
+} from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import { Adapter, AdapterUser } from "next-auth/adapters";
 import { MongooseAdapter } from "@choutkamartin/mongoose-adapter";
 import { randomInt } from "crypto";
 import { createTransport } from "nodemailer";
 import { JWT } from "next-auth/jwt";
-import UserModel  from "@/models/User";
+import UserModel from "@/models/User";
 import { connectDB, disconnectDB } from "@/utilities/DB";
 import { UserDocument } from "@/@types/user";
 import { NextApiRequest } from "next";
@@ -18,18 +26,19 @@ interface CustomSignIn {
   profile?: Profile | undefined;
   email?: { verificationRequest?: boolean | undefined } | undefined;
   credentials?: Record<string, any> | undefined;
-  registered?:boolean
-  data?:{
-    password?:string
-    firstName?:string
-    lastName?:string
-    email?:string
-  }
+  registered?: boolean;
+  data?: {
+    password?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+  };
 }
 //   adapter: PrismaAdapter(prisma as PrismaClient) as Adapter,
 const senderName = process.env.SMTP_FROM_NAME;
 const senderEmail = process.env.SMTP_FROM;
 const sender = `"${senderName}" <${senderEmail}>`;
+// const sender = `${senderName}`;
 
 export const authOptions: AuthOptions = {
   adapter: MongooseAdapter(process.env.DBURL || "") as Adapter,
@@ -75,42 +84,40 @@ export const authOptions: AuthOptions = {
   ],
   pages: {
     signIn: "/auth/login",
-    signOut:"/"
+    signOut: "/",
   },
   callbacks: {
-    async signIn({ user,data,registered}: CustomSignIn) {
+    async signIn({ user, data, registered }: CustomSignIn) {
       try {
-        await connectDB()
+        await connectDB();
         // Check if the user already exists in the database
         const existingUser = await UserModel.findOne({ email: user.email });
         if (existingUser) {
           console.log("User already exists in the database");
-                // await disconnectDB()
+          // await disconnectDB()
           return existingUser;
         }
         // if(!registered){
-          
+
         //   return `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`
         // }else{
-      
-            console.log("New user - Redirecting to register page");
-            const newUser = new UserModel({
-              email: user.email,
-            });
-            // const hashedPassword = await bcrypt.hash(data!.password!, 12);
-            //  const newUser = new UserModel({
-            // email: user.email,
-            // firstName: data.firstName,
-            // lastName: data.lastName,
-            // password: hashedPassword,
-            // emailVerified: new Date(),
-            //  });
-          await newUser.save();
-          console.log("New user created and saved ");
-          return newUser;
-        
-          
-      } catch (error:any) {
+
+        console.log("New user - Redirecting to register page");
+        const newUser = new UserModel({
+          email: user.email,
+        });
+        // const hashedPassword = await bcrypt.hash(data!.password!, 12);
+        //  const newUser = new UserModel({
+        // email: user.email,
+        // firstName: data.firstName,
+        // lastName: data.lastName,
+        // password: hashedPassword,
+        // emailVerified: new Date(),
+        //  });
+        await newUser.save();
+        console.log("New user created and saved ");
+        return newUser;
+      } catch (error: any) {
         console.error("Error saving user :", error.message);
         throw new Error("Failed to save user ");
       }
@@ -120,7 +127,15 @@ export const authOptions: AuthOptions = {
 
     // },
 
-   session:async({session,token,user}:{ session: Session; token: JWT; user: AdapterUser; }) =>{
+    session: async ({
+      session,
+      token,
+      user,
+    }: {
+      session: Session;
+      token: JWT;
+      user: AdapterUser;
+    }) => {
       // Fetch user data from the database and set it in the session
       const userData = await UserModel.findOne({ email: user?.email });
       if (userData) {
@@ -128,15 +143,17 @@ export const authOptions: AuthOptions = {
       }
       return session;
     },
-  
-    jwt: async({token, user}: { token: JWT; user: User}) => {
-        const userData: UserDocument = await UserModel.findOne({ email: user.email });
-        user && (token.user = userData);
-        console.log("token - User:", token);
-        return Promise.resolve(token );
-    }
-    }
-}
+
+    jwt: async ({ token, user }: { token: JWT; user: User }) => {
+      const userData: UserDocument = await UserModel.findOne({
+        email: user.email,
+      });
+      user && (token.user = userData);
+      console.log("token - User:", token);
+      return Promise.resolve(token);
+    },
+  },
+};
 
 function gernerateOTP() {
   return randomInt(100000, 999999);
@@ -192,26 +209,26 @@ function text(params: { token: string; host: string }) {
   Keep in mind that this code will expire after 3 minutes. If you did not request this email you can safely ignore it.
   `;
 }
-  // async signIn({ user, account, profile, email, credentials }) {
-    //   const verificationRequest = email.verificationRequest;
-    //   if (verificationRequest) {
-    //     const EMAIL_WHITELIST = ["whitelisted_email.hotmail.com"];
-    //     const { email: emailAddress } = user;
-    //     if (!EMAIL_WHITELIST.includes(emailAddress)) {
-    //       console.log("Invalid email address - not allowed to sign in");
-    //       return false;
-    //     }
-    //   }
+// async signIn({ user, account, profile, email, credentials }) {
+//   const verificationRequest = email.verificationRequest;
+//   if (verificationRequest) {
+//     const EMAIL_WHITELIST = ["whitelisted_email.hotmail.com"];
+//     const { email: emailAddress } = user;
+//     if (!EMAIL_WHITELIST.includes(emailAddress)) {
+//       console.log("Invalid email address - not allowed to sign in");
+//       return false;
+//     }
+//   }
 
-    //   return true;
-    // async signIn(user, account, profile) {
-    //   // Perform actions after user signs in
-    // },
-    // async session(session, user) {
-    //   // Fetch user data from the database and set it in the session
-    //   const userData = await User.findOne({ email: user.email });
-    //   if (userData) {
-    //     session.user = userData;
-    //   }
-    //   return session;
-    // },
+//   return true;
+// async signIn(user, account, profile) {
+//   // Perform actions after user signs in
+// },
+// async session(session, user) {
+//   // Fetch user data from the database and set it in the session
+//   const userData = await User.findOne({ email: user.email });
+//   if (userData) {
+//     session.user = userData;
+//   }
+//   return session;
+// },

@@ -34,6 +34,7 @@ export const cartSchema = new mongoose.Schema(
     items: [cartItemSchema],
     totalItems: Number,
     totalAmount: Number,
+    subtotal: Number,
     shippingAddress: 
       {
         street: String,

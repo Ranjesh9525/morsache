@@ -26,12 +26,14 @@ export const cartReducer = (state: Cart, action: CartAction) => {
     
         const totalItems = updatedItems.reduce((total, item) => total + item.quantity, 0);
         const totalAmount = updatedItems.reduce((total, item) => total + item.quantity * parseFloat(item.product.price), 0);
+        const subtotal = updatedItems.reduce((total, item) => total + item.quantity * parseFloat(item.product.price), 0);
     
         return {
           ...savedCart,
           items: updatedItems,
           totalItems,
-          totalAmount
+          totalAmount,
+          subtotal
         };
       }else {
         // localStorage.setItem(
@@ -55,6 +57,8 @@ export const cartReducer = (state: Cart, action: CartAction) => {
           totalItems: savedCart.totalItems + quantity,
           totalAmount:
             savedCart.totalAmount + parseFloat(product.price) * quantity,
+          subtotal:
+            savedCart.subtotal + parseFloat(product.price) * quantity,
           items: [
             ...savedCart.items,
             {
@@ -74,12 +78,14 @@ export const cartReducer = (state: Cart, action: CartAction) => {
       
         const totalItems = updatedItems.reduce((total, item) => total + item.quantity, 0);
         const totalAmount = updatedItems.reduce((total, item) => total + item.quantity * parseFloat(item.product.price), 0);
+        const subtotal = updatedItems.reduce((total, item) => total + item.quantity * parseFloat(item.product.price), 0);
       
         return {
           ...savedCart,
           items: updatedItems,
           totalItems,
-          totalAmount
+          totalAmount,
+          subtotal
         };
 
     case "INCREASE":
@@ -97,6 +103,11 @@ export const cartReducer = (state: Cart, action: CartAction) => {
           ),
         };
         updatedCart.totalAmount = updatedCart.items.reduce(
+          (total, item) =>
+            total + item.quantity * parseFloat(item.product.price),
+          0
+        );
+        updatedCart.subtotal = updatedCart.items.reduce(
           (total, item) =>
             total + item.quantity * parseFloat(item.product.price),
           0
@@ -132,6 +143,11 @@ export const cartReducer = (state: Cart, action: CartAction) => {
               total + item.quantity * parseFloat(item.product.price),
             0
           );
+          updatedCart.subtotal = updatedCart.items.reduce(
+            (total, item) =>
+              total + item.quantity * parseFloat(item.product.price),
+            0
+          );
           updatedCart.totalItems = updatedCart.items.reduce(
             (total, item) => total + item.quantity,
             0
@@ -148,6 +164,7 @@ export const cartReducer = (state: Cart, action: CartAction) => {
             items: [],
             totalItems: 0,
             totalAmount: 0,
+            subtotal: 0,
             createdAt: new Date(),
             updatedAt: new Date(),
             shippingAddress:[],

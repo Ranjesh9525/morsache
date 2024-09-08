@@ -64,7 +64,7 @@ const orderColumns: ColumnDef<Order>[] = [
 ];
 const Page = (props: Props) => {
   const [orders, setOrders] = React.useState<Order[] | null>(null);
-  const [switchValue, setSwitchValue] = React.useState<boolean>(false);
+  const [switchValue, setSwitchValue] = React.useState<boolean | undefined>(undefined);
   const searchParams = useSearchParams();
   const status:any = searchParams!.get("status") 
   const {
@@ -103,12 +103,11 @@ const Page = (props: Props) => {
       setOrders(data?.data);
     }
   }, [isSuccess, data]);
-useEffect(()=>{
-if(AdminResponse){
-  setSwitchValue(AdminResponse?.data?.defaultConfirmOrders)
-
-}
-},[AdminResponse,AdminDataIsSuccess])
+  useEffect(() => {
+    if (AdminResponse && switchValue === undefined) { 
+      setSwitchValue(AdminResponse?.data?.defaultConfirmOrders);
+    }
+  }, [AdminResponse, switchValue]);
   useEffect(() => {
     if (error) {
       toast({
@@ -138,7 +137,11 @@ if(AdminResponse){
             </p>
           </div>
 
-          <Switch disabled={UpdatingAdminData} checked={switchValue} onCheckedChange={(checked)=> server_AdminUpdateAdminData({ defaultConfirmOrders:checked})} />
+          <Switch
+            disabled={UpdatingAdminData}
+            checked={switchValue || false} // Ensure switchValue is not undefined
+            onCheckedChange={(checked) => server_AdminUpdateAdminData({ defaultConfirmOrders: checked })}
+          />
         </div>
         {isPending ? (
           <p className="text-center">

@@ -164,15 +164,17 @@ const ReviewCard = ({ orderNo }: Props) => {
                 </p>
                 {order?.orderDetails?.expectedDeliveryOrPickupDate1 ? (
                   <p>
-                    {formatDateFns(
-                      order?.orderDetails?.expectedDeliveryOrPickupDate1,
-                      "PPP"
-                    ) +
-                      " and " +
-                      formatDateFns(
-                        order?.orderDetails?.expectedDeliveryOrPickupDate2!,
+                    {"Between" +
+                      " " +
+                      (formatDateFns(
+                        order?.orderDetails?.expectedDeliveryOrPickupDate1,
                         "PPP"
-                      )}
+                      ) +
+                        " and " +
+                        formatDateFns(
+                          order?.orderDetails?.expectedDeliveryOrPickupDate2!,
+                          "PPP"
+                        ))}
                   </p>
                 ) : (
                   "Would be set after order is confirmed"

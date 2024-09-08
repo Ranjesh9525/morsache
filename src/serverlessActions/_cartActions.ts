@@ -201,6 +201,7 @@ export const createCart = async (data: CartForServer) => {
       user.carts = [];
       //   const newArray = [{ _id: cartId ,data}]
       // Generate a random _id for the cart
+      
       const cartId = new ObjectId();
       data._id = cartId;
       // console.log(data);
@@ -330,12 +331,14 @@ export const UpdateCartOrderRecieveBy = async (choice: string) => {
     if (!user) {
       throw new Error("No User found");
     }
-    user.carts[0].receiveBy = choice;
-    if (choice === "pickup") {
-      // user.carts[0].totalAmount =
-      //   parseInt(user.carts[0].totalAmount) -
-      //   parseInt(user.carts[0].shippingPrice || "0");
+    console.log(user.carts[0].subtotal)
+    
+    if (choice === "pickup" && user.carts[0].receiveBy !== choice) {
+      user.carts[0].totalAmount =
+        parseInt(user.carts[0].totalAmount) -
+        parseInt(user.carts[0].shippingPrice || "0");
     }
+      user.carts[0].receiveBy = choice;
     await user.save();
     return Response("shipping data", 200, true);
   } catch (err) {

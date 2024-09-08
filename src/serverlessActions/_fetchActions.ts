@@ -2,6 +2,7 @@
 import { connectDB } from "@/utilities/DB";
 import mongoose from "mongoose";
 import ProductsModel from "../models/Products";
+import OffersModel from "../models/Offers";
 import StoreModel from "../models/Store";
 import CategoryModel from "../models/Category";
 import { Response } from "./responseClass";
@@ -62,6 +63,25 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
     };
     // console.log("fetched optimized products")
     return Response("product", 200, true, optimizedProduct);
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+};
+export const FetchMultipleOffers = async (data: any) => {
+  try {
+    await connectDB();
+    console.log(data);
+    const allOffer = [];
+    for (const offer of data) {
+      const res = await OffersModel.findOne({ code: offer.code });
+      // const res2 = await OffersModel.find();
+      // console.log(res, res2);
+      allOffer.push(res);
+    }
+
+    console.log(allOffer);
+    return Response("offers", 200, true, allOffer);
   } catch (error) {
     console.error("Error fetching product:", error);
     throw error;

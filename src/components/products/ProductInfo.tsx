@@ -12,7 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CartContext } from "@/context/cartContext";
-import { Product } from "@/@types/products.d";
+import { Offer, Product } from "@/@types/products.d";
 import { CartItem } from "@/@types/cart.d";
 import { cn } from "@/lib/utils";
 import { MdOutlineDiscount } from "react-icons/md";
@@ -22,16 +22,18 @@ import { useMutation } from "@tanstack/react-query";
 import { UserAddToWishList } from "@/serverlessActions/_userActions";
 import { toast } from "../ui/use-toast";
 import { ClipLoader } from "react-spinners";
-import { format} from "@/utilities/global";
+import { format } from "@/utilities/global";
+import { FetchMultipleOffers } from "@/serverlessActions/_fetchActions";
+import { Skeleton } from "../ui/skeleton";
 type Props = {
   product: Product;
 };
-
 
 const ProductInfo = ({ product }: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
   const [selectedProduct, setSelectedProduct] = useState<CartItem | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<string>("");
+  const [offers, setOffers] = useState<Offer[] | null>(null);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
   const { data: session }: any = useSession();
@@ -54,6 +56,24 @@ const ProductInfo = ({ product }: Props) => {
       console.log("Error:", error);
     },
   });
+  const { isPending: offersIsFetching, mutate: server_fetchOffers } =
+    useMutation({
+      mutationFn: FetchMultipleOffers,
+      onSuccess: (res) => {
+        // toast({
+        //   title: `${res?.message}`,
+        // });
+        setOffers(res?.data);
+      },
+      onError: (error) => {
+        console.log("Error:", error);
+      },
+    });
+  useEffect(() => {
+    if (!offers && !offersIsFetching) {
+      server_fetchOffers(product?.offers);
+    }
+  }, []);
   // const session = await getSession({ req });
 
   // console.log(session);
@@ -62,7 +82,7 @@ const ProductInfo = ({ product }: Props) => {
     if (!session) {
       router.push("/auth/login");
     } else {
-      const requestData = {  productId: product.id };
+      const requestData = { productId: product.id };
       server_addToWishList(requestData);
       // const res = await UserAddToWishList(session!.user?._id,product.id)
       // console.log(res)
@@ -145,36 +165,45 @@ const ProductInfo = ({ product }: Props) => {
         <p className="w-full text-[15px]">{"(incl. of all taxes)"}</p>
       </div>
       <div id="discounts" className="w-[280px] flex flex-col mt-5 ">
-        {product?.offers!.map((offer, index: number) => (
-          <div
-            key={index}
-            className="flex items-center  justify-center gap-3 mb-3"
-          >
-            <CiDiscount1 color="#fea12f" size={35} />
-
-            <p className="w-full text-[12px]">
-              {offer.title} <br />
-              {offer.effect === "flat" && (
-                <>
-                  {" "}
-                  Get Flat {offer.discount}% Off! <br />
-                </>
-              )}
-              {offer.effect === "percentage" && (
-                <>
-                  {" "}
-                  Get {offer.discount}% Off! <br />
-                </>
-              )}
-              {offer.effect === "quantity" && (
-                <>
-                  Buy {offer.quantityEffect} Get Quantity Discount! <br />
-                </>
-              )}
-              Code: <b>{offer.code}</b>{" "}
-            </p>
+        {offersIsFetching ? (
+          <div>
+            <Skeleton className="w-full h-8 mb-2 rounded-xl" />
+            <Skeleton className="w-full h-4 rounded-xl" />
           </div>
-        ))}
+        ) : offers ? (
+          offers.map((offer, index: number) => (
+            <div
+              key={index}
+              className="flex items-center  justify-center gap-3 mb-3"
+            >
+              <CiDiscount1 color="#fea12f" size={35} />
+
+              <p className="w-full text-[12px]">
+                {offer?.title} <br />
+                {offer?.effect === "flat" && (
+                  <>
+                    {" "}
+                    Get Flat {offer?.discount}% Off! <br />
+                  </>
+                )}
+                {offer?.effect === "percentage" && (
+                  <>
+                    {" "}
+                    Get {offer?.discount}% Off! <br />
+                  </>
+                )}
+                {offer?.effect === "quantity" && (
+                  <>
+                    Buy {offer?.quantityEffect} Get Quantity Discount! <br />
+                  </>
+                )}
+                Code: <b>{offer?.code}</b>{" "}
+              </p>
+            </div>
+          ))
+        ) : (
+          ""
+        )}
         {/* <div className="flex items-center justify-center gap-3 mb-3">
           <CiDiscount1 color="#fea12f" size={35} />
           <p className="w-full text-[12px]">

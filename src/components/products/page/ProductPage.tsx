@@ -526,8 +526,8 @@ const ProductPage = ({ slug }: Props) => {
         </>
       ) : (
         <div className="grid md:grid-cols-2 md:p-9 p-5 min-h-screen gap-x-16 !mt-5 bg-white">
-          <div className="relative flex gap-3">
-            <div className="flex flex-col gap-4 flex-[3]">
+          <div className="relative flex gap-3 max-sm:flex-col">
+            <div className="flex flex-col gap-4 flex-[3] max-sm:flex-row">
               <Skeleton className="h-[160px] w-[100%]  rounded-lg" />
               <Skeleton className="h-[160px] w-[100%] rounded-lg" />{" "}
             </div>

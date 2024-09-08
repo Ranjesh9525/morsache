@@ -7,6 +7,7 @@ import { UserUpdateShippingAddress } from "./_userActions";
 const senderName = process.env.SMTP_FROM_NAME;
 const senderEmail = process.env.SMTP_FROM;
 const sender = `"${senderName}" <${senderEmail}>`;
+
 export const sendOrderConfirmationEmail = (
   order: Order,
   recipient: string,
@@ -68,7 +69,7 @@ export const sendOrderConfirmationEmail = (
          
            <tr>
                <td style="padding: 40px 20px; text-align: center; background-color: #6a6a6a;">
-                   <h2 style="color: #ffffff; margin: 0; font-size: 28px;">                               <img src="https://morsache.vercel.app/morsache-clothing-logo.png" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">
+                   <h2 style="color: #ffffff; margin: 0; font-size: 28px;display:flex;align-items:center;justify-content:center">                               <img src="https://morsache.vercel.app/morsache-clothing-small-logo.png" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">Morsache
                    </h2>
                </td>
            </tr>
@@ -77,7 +78,7 @@ export const sendOrderConfirmationEmail = (
                    <p style="font-size: 16px;">Hello ${user_name || ""}🖐,</p>
                    <p style="font-size: 16px;">${context}</p>
                    
-                   <h2 style="color: #545454; border-bottom: 2px solid #545454; padding-bottom: 10px;">Order Details</h2>
+                   <h2 style="color: #3b3838; border-bottom: 2px solid #3b3838; padding-bottom: 10px;">Order Details</h2>
                    <table cellpadding="5" cellspacing="0" width="100%" style="margin-bottom: 20px;">
                        <tr>
                            <td style="font-weight: bold;">Order Number:</td>
@@ -95,10 +96,10 @@ export const sendOrderConfirmationEmail = (
                            <td style="font-weight: bold;">Expected Delivery/Pickup:</td>
                            <td>Between${formatDate(
                              order.expectedDeliveryOrPickupDate1!,
-                             "ppp"
+                             "PPP"
                            )} - ${formatDate(
     order.expectedDeliveryOrPickupDate2!,
-    "ppp"
+    "PPP"
   )}</td>
                        </tr>
                        <tr>
@@ -107,7 +108,15 @@ export const sendOrderConfirmationEmail = (
                        </tr>
                        <tr>
                            <td style="font-weight: bold;">Payment Method:</td>
-                           <td>${order.paymentMethod.type}</td>
+                           <td>${
+                             order.paymentMethod.type === "payOnDelivery"
+                               ? order.collectionMethod === "pickup"
+                                 ? "Pay on collection"
+                                 : "Pay on delivery"
+                               : order.paymentMethod.type === "stripe"
+                               ? "stripe"
+                               : "Razor pay"
+                           }</td>
                        </tr>
                        <tr>
                            <td style="font-weight: bold;">Payment Status:</td>
@@ -118,14 +127,14 @@ export const sendOrderConfirmationEmail = (
                   ${
                     order.shippingAddress.city ||
                     (order.shippingAddress.state &&
-                      `<h3 style="color: #545454;">Shipping Address</h3>
+                      `<h3 style="color: #3b3838;">Shipping Address</h3>
                    <p>
                        ${order.shippingAddress.street}<br>
                        ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postalCode}<br>
                        ${order.shippingAddress.country}
                    </p>`)
                   }
-                   <h3 style="color: #545454;">Ordered Products</h3>
+                   <h3 style="color: #3b3838;">Ordered Products</h3>
                    <table cellpadding="10" cellspacing="0" width="100%" style="margin-bottom: 20px; border-collapse: collapse;">
                        <tr style="background-color: #f0f0f0;">
                            <th style="text-align: left; border-bottom: 1px solid #ddd;">Product</th>
@@ -148,7 +157,7 @@ export const sendOrderConfirmationEmail = (
                              order.shippingPrice
                            }</td>
                        </tr>
-                       <tr style="font-size: 18px; font-weight: bold; color: #545454;">
+                       <tr style="font-size: 18px; font-weight: bold; color: #3b3838;">
                            <td>Total:</td>
                            <td style="text-align: right;">${
                              (order.totalAmount! as number) +
@@ -159,24 +168,24 @@ export const sendOrderConfirmationEmail = (
                        </tr>
                    </table>
    
-                   <h3 style="color: #545454; margin-top: 30px;">What's Next?</h3>
+                   <h3 style="color: #3b3838; margin-top: 30px;">What's Next?</h3>
                    <ol style="padding-left: 20px;">
                        <li>We'll send you a shipping confirmation email once your order is on its way.</li>
                        <li>You can track your order status by logging into your account on our website.</li>
                        <li>If you have any questions, please don't hesitate to contact our customer service team.</li>
                    </ol>
    
-                   <h3 style="color: #545454; margin-top: 30px;">Return Policy</h3>
+                   <h3 style="color: #3b3838; margin-top: 30px;">Return Policy</h3>
                    <p>{exchangeAndReturnPolicy}</p>
    
-                   <h3 style="color: #545454; margin-top: 30px;">Additional Information</h3>
+                   <h3 style="color: #3b3838; margin-top: 30px;">Additional Information</h3>
                    <p>{moreInformation}</p>
    
                    <p style="font-size: 16px; margin-top: 30px;">Thank you for choosing Morsache. We appreciate your business!</p>
                </td>
            </tr>
            <tr>
-               <td style="background-color: #545454; color: #ffffff; padding: 20px; text-align: center;">
+               <td style="background-color: #3b3838; color: #ffffff; padding: 20px; text-align: center;">
                    <p style="margin: 0 0 10px 0; font-size: 14px;">Follow us on social media:</p>
                    <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://img.icons8.com/?size=100&id=13912&format=png&color=000000" alt="Facebook" style="width: 30px; height: 30px;"></a>
                    <a href="#" style="display: inline-block; margin: 0 10px;"><img src="https://img.icons8.com/?size=100&id=phOKFKYpe00C&format=png&color=000000" alt="Twitter" style="width: 30px; height: 30px;"></a>

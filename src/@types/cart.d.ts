@@ -26,6 +26,7 @@ export interface Cart {
   items: CartItem[];
   totalItems: number;
   totalAmount: number;
+  subtotal: number;
   createdAt: Date;
   updatedAt: Date;
   shippingPrice?: string;
@@ -65,6 +66,7 @@ export interface CartForServer {
   items: CartItemForServer[];
   totalItems: number;
   totalAmount: number;
+  subtotal: number;
   shippingAddress?: ShippingAddress[];
   paymentMethod?: PaymentMethod;
   shippingPrice?: string;
