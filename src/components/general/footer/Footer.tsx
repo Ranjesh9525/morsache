@@ -37,13 +37,13 @@ const Footer = (props: Props) => {
                 <Link href="/contact-us">Contact Us</Link>
               </li>
               <li className="mb-2">
-                <Link href="#">FAQ&#39;s</Link>
+                <Link href="/return-exchange-policy">FAQ&#39;s</Link>
               </li>
               <li className="mb-2">
                 <Link href="#"></Link>
               </li>
               <li className="mb-2">
-                <Link href="/policy">Terms {"&"}Conditions</Link>
+                <Link href="/return-exchange-policy">Terms {"&"}Conditions</Link>
               </li>
             </ul>
           </span>
@@ -53,7 +53,7 @@ const Footer = (props: Props) => {
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
-                <Link href="/account/trackOrder"> TRACK ORDER</Link>
+                <Link href="/account/track"> TRACK ORDER</Link>
               </li>
               <li className="mb-2">
                 <Link href="/return-exchange-policy"> PLACE RETURN/EXCHANGE REQUEST</Link>

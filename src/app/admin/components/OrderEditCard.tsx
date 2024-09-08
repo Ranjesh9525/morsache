@@ -81,8 +81,8 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
   const OrderSchema = z.object({
     orderNumber: z.string(),
     customer: z.string(),
-    totalItems:  z.union([z.number(), z.string()]),
-    totalAmount:  z.union([z.number(), z.string()]),
+    totalItems: z.union([z.number(), z.string()]),
+    totalAmount: z.union([z.number(), z.string()]),
     orderStatus: z.union([
       z.literal("pending"),
       z.literal("confirmed"),
@@ -107,8 +107,8 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
         z.literal("payOnDelivery"),
       ]),
     }),
-    expectedDeliveryOrPickupDate1:z.union([z.date(), z.string()]).optional(),
-    expectedDeliveryOrPickupDate2:z.union([z.date(), z.string()]).optional(),
+    expectedDeliveryOrPickupDate1: z.union([z.date(), z.string()]).optional(),
+    expectedDeliveryOrPickupDate2: z.union([z.date(), z.string()]).optional(),
     paymentStatus: z.union([z.literal("pending"), z.literal("paid")]),
     collectionMethod: z.union([z.literal("delivery"), z.literal("pickup")]),
     paidOn: z.union([z.date(), z.string()]).nullable().optional(),
@@ -133,8 +133,8 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
       paymentMethod: {
         type: order?.paymentMethod.type || "payOnDelivery",
       },
-      expectedDeliveryOrPickupDate1:order?.expectedDeliveryOrPickupDate1,
-      expectedDeliveryOrPickupDate2:order?.expectedDeliveryOrPickupDate2,
+      expectedDeliveryOrPickupDate1: order?.expectedDeliveryOrPickupDate1,
+      expectedDeliveryOrPickupDate2: order?.expectedDeliveryOrPickupDate2,
       collectionMethod: order?.collectionMethod || "delivery",
       paymentStatus: order?.paymentStatus || "pending",
       paidOn: order?.paidOn || null,
@@ -489,7 +489,9 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
               name="expectedDeliveryOrPickupDate1"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Minimum expected delivery or pickup date</FormLabel>
+                  <FormLabel>
+                    Minimum expected delivery or pickup date
+                  </FormLabel>
 
                   <Popover>
                     <PopoverTrigger asChild>
@@ -515,15 +517,14 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                         mode="single"
                         selected={field.value as Date}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date() 
-                        }
+                        disabled={(date) => date < new Date()}
                         initialFocus
                       />
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    if no date manually selected default is 7 days after confirmation
+                    if no date manually selected default is 7 days after
+                    confirmation
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -534,7 +535,9 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
               name="expectedDeliveryOrPickupDate2"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Maximum expected delivery or pickup date</FormLabel>
+                  <FormLabel>
+                    Maximum expected delivery or pickup date
+                  </FormLabel>
 
                   <Popover>
                     <PopoverTrigger asChild>
@@ -560,9 +563,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                         mode="single"
                         selected={field.value as Date}
                         onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date() 
-                        }
+                        disabled={(date) => date < new Date()}
                         initialFocus
                       />
                     </PopoverContent>
@@ -574,13 +575,10 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                 </FormItem>
               )}
             />
-      
           </div>
           <div className="space-y-2 mx-auto my-4 w-fit">
             <Button
-              disabled={
-                isUpdating
-              }
+              disabled={isUpdating}
               type="submit"
               className="w-full max-w-[400px] text-center py-5 h-none"
             >
@@ -591,7 +589,8 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
               )}
             </Button>
             <p className="text-[12.5px] capitalize text-center">
-              Ensure youve selected correct values, this is a permanent change, no backup
+              Ensure youve selected correct values, this is a permanent change,
+              no backup
             </p>
           </div>
         </form>

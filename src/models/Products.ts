@@ -10,7 +10,10 @@ const productSchema = new mongoose.Schema(
     salePrice: { type: Number },
     sizes: { type: [String], default: [] },
     tags: { type: [String], default: [] },
-    reviews: { type: [{rating:Number, userId: String, review: String }], default: [] },
+    reviews: {
+      type: [{ rating: Number, userId: String, review: String }],
+      default: [],
+    },
     variants: {
       type: [
         {
@@ -22,27 +25,26 @@ const productSchema = new mongoose.Schema(
     },
     SKU: { type: String, unique: true },
     images: { type: [String], default: [] },
-    
+
     purchaseQuantity: { type: Number, required: true, default: 0 },
     stock: { type: Number },
-    offers: {
-      type: [
-          title: { type: String, required: true },
-  description: { type: String, required: true },
-  description2: String,
-  discount: { type: Number, default: 0 },
-  image: String,
-  code:String,
-  quantityEffect: { type: Number, default: 5 },
-  effect: {
-    type: String,
-    enum: ["flat", "percentage", "quantity"],
-    default: "flat",
-  },
-  active: { type: Boolean, default: true },
-      ],
-      default: [],
-    },
+    offers: [
+      {
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+        description2: String,
+        discount: { type: Number, default: 0 },
+        image: String,
+        code: String,
+        quantityEffect: { type: Number, default: 5 },
+        effect: {
+          type: String,
+          enum: ["flat", "percentage", "quantity"],
+          default: "flat",
+        },
+        active: { type: Boolean, default: true },
+      },
+    ],
     payOnDelivery: { type: Boolean, default: true },
     exchangeAndReturnPolicy: { type: String },
     moreInformation: { type: String },

@@ -6,12 +6,16 @@ import CheckoutCard from "@/app/cart/components/CheckoutCard";
 import PrevAndNextBtn from "@/app/cart/components/PrevAndNextBtn";
 import Image from "next/image";
 import { IoCardOutline } from "react-icons/io5";
-import { InitializeOrder } from "@/serverlessActions/_cartActions";
+import {
+  FetchUserCartShippingData,
+  InitializeOrder,
+} from "@/serverlessActions/_cartActions";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { CartContext } from "@/context/cartContext";
 import { ClipLoader } from "react-spinners";
 import { GlobalContext } from "@/context/globalContext";
+import { ShippingContext } from "@/context/shippingContext";
 
 type Props = {
   params: {
@@ -21,6 +25,7 @@ type Props = {
 
 const Page = (props: Props) => {
   const { cart, dispatch } = useContext(CartContext)!;
+  const { Shipping, dispatch: shippingDispatch } = useContext(ShippingContext)!;
   const { userData, userDataLoading } = useContext(GlobalContext)!;
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -45,6 +50,7 @@ const Page = (props: Props) => {
   };
 
   const handleRazorPay = async () => {
+    const DefaultShippingData = await FetchUserCartShippingData();
     setIsLoading(true);
     const res = await loadRazorpayScript();
 
@@ -53,6 +59,7 @@ const Page = (props: Props) => {
       setIsLoading(false);
       return;
     }
+    // console.log(cart);
 
     // Call your API to create an order
     const result = await fetch("/api/razorpay", {
@@ -60,7 +67,16 @@ const Page = (props: Props) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount: cart.totalAmount, currency: "INR" }),
+      body: JSON.stringify({
+        amount:
+          cart.totalAmount +
+          (Shipping.choice === "delivery"
+            ? parseInt(
+                cart?.shippingPrice! || DefaultShippingData?.data?.price || "0"
+              )
+            : 0),
+        currency: "INR",
+      }),
     });
 
     const order = await result.json();
@@ -121,8 +137,12 @@ const Page = (props: Props) => {
         title: "order placed",
         description: "Thanks for shopping with us!",
       });
-      dispatch({ type: "CLEAR_CART" });
       router.push(`/review/${data?.data}`);
+      dispatch({ type: "CLEAR_CART" });
+      shippingDispatch({
+        type: "CLEAR_CHOICE",
+        payload: "pickup",
+      });
     }
     if (isError) {
       toast({
@@ -144,7 +164,7 @@ const Page = (props: Props) => {
           ) : (
             <div className="flex-1 flex flex-col items-start gap-4">
               <button
-                className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+                className="md:w-[60%] w-full p-4 py-6 rounded-lg border border-gray-400 flex items-center gap-3 justify-start cursor-pointer"
                 onClick={handlePayOnDelivery}
               >
                 <IoCardOutline size={30} />
@@ -158,7 +178,7 @@ const Page = (props: Props) => {
                 )}
               </button>
               <button
-                className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+                className="md:w-[60%] w-full p-4 py-6 rounded-lg border border-gray-400 flex items-center gap-3 justify-start cursor-pointer"
                 onClick={handleRazorPay}
                 disabled={isLoading}
               >
@@ -173,7 +193,7 @@ const Page = (props: Props) => {
                 </p>
               </button>
               <button
-                className="md:w-[60%] w-full p-4 py-6 rounded-lg border flex items-center gap-3 justify-start cursor-pointer"
+                className="md:w-[60%] w-full p-4 py-6 rounded-lg border border-gray-400 flex items-center gap-3 justify-start cursor-pointer"
                 disabled={true}
               >
                 <Image
@@ -196,7 +216,10 @@ const Page = (props: Props) => {
         </div>
         <div className="col-span-3">
           <div className="sticky top-[34px]">
-            <CheckoutCard showProducts={true} cartId={props.params.cartId.toString()} />
+            <CheckoutCard
+              showProducts={true}
+              cartId={props.params.cartId.toString()}
+            />
           </div>
         </div>
       </div>

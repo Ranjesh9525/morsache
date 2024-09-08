@@ -665,41 +665,58 @@ export const AdminEditOrder = async ({
       { new: true }
     );
     const user = await UserModel.findById(updatedOrder?.customer);
+    const cartItems = originalOrder.items;
+    const allProducts: any = [];
+    for (const item of cartItems) {
+      const product = await ProductsModel.findById(item.productId);
+
+      allProducts.push({ item, product });
+    }
     if (updatedOrder.orderStatus !== originalOrder.orderStatus) {
       if (updatedOrder.orderStatus === "confirmed")
         sendOrderConfirmationEmail(
           updatedOrder,
           user.email,
           "Your order has been confirmed!",
-          `Your order with order no ${updatedOrder.orderNumber} has been Confirmed. please check the delivery date`
+          `Your order with order no ${updatedOrder.orderNumber} has been Confirmed. please check the delivery date`,
+          allProducts,
+          user.firstName
         );
       if (updatedOrder.orderStatus === "shipped")
         sendOrderConfirmationEmail(
           updatedOrder,
           user.email,
           "Your order has been shipped!",
-          `Your order with order no ${updatedOrder.orderNumber} has been Shipped and will be out for delivery soon. please check the delivery date`
+          `Your order with order no ${updatedOrder.orderNumber} has been Shipped and will be out for delivery soon. please check the delivery date`,
+          allProducts,
+          user.firstName
         );
       if (updatedOrder.orderStatus === "ready")
         sendOrderConfirmationEmail(
           updatedOrder,
           user.email,
           "Your order is ready for pickup!",
-          `Your order with order no ${updatedOrder.orderNumber} is ready for pickup.`
+          `Your order with order no ${updatedOrder.orderNumber} is ready for pickup.`,
+          allProducts,
+          user.firstName
         );
       if (updatedOrder.orderStatus === "collected")
         sendOrderConfirmationEmail(
           updatedOrder,
           user.email,
           "Thanks for shopping with us",
-          `Your order has been collected at our store. please leave a review on your item`
+          `Your order has been collected at our store. please leave a review on your item`,
+          allProducts,
+          user.firstName
         );
       if (updatedOrder.orderStatus === "delivered")
         sendOrderConfirmationEmail(
           updatedOrder,
           user.email,
           "Thanks for shopping with us",
-          `Your order has been delivered successfully. please leave a review on your item`
+          `Your order has been delivered successfully. please leave a review on your item`,
+          allProducts,
+          user.firstName
         );
     }
 

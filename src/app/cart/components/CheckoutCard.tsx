@@ -248,8 +248,6 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
   useEffect(() => {
     if (Shipping.choice === "delivery") {
       refetch();
-    } else {
-      shippingRef.current?.innerHTML === 0;
     }
   }, [Shipping]);
   useEffect(() => {
@@ -330,20 +328,29 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
               <h1 className="font-medium text-gray-800 ">Discounts applied</h1>
               <h1 className="text-gray-400 ">{format(totalDiscount)}</h1>
             </span>
-            <span className="inline-flex items-center justify-between text-[15px]">
-              <h1 className="font-medium text-gray-800">Shipping</h1>
-              <span className="text-gray-400 text-[14px]" ref={shippingRef}>
-                {shippingDataIsPending ? (
-                  <p>
-                    Calulating... <ClipLoader size={17} />
-                  </p>
-                ) : Shipping.choice ? (
-                  format(shippingDataResponse?.data?.price)
-                ) : (
-                  "calculated at checkout"
-                )}
+            {Shipping.choice !== "pickup" ? (
+              <span className="inline-flex items-center justify-between text-[15px]">
+                <h1 className="font-medium text-gray-800">Shipping</h1>
+                <span className="text-gray-400 text-[14px]" ref={shippingRef}>
+                  {shippingDataIsPending ? (
+                    <p className="text-center inline-flex items-center">
+                      Calulating... <ClipLoader size={17} />
+                    </p>
+                  ) : Shipping.choice && pathname !== "/cart" ? (
+                    format(shippingDataResponse?.data?.price)
+                  ) : (
+                    "calculated at checkout"
+                  )}
+                </span>
               </span>
-            </span>
+            ) : (
+              <span className="inline-flex items-center justify-between text-[15px]">
+                <h1 className="font-medium text-gray-800">
+                  Collection method:
+                </h1>
+                <span className="text-gray-400 text-[14px]">Pick up</span>
+              </span>
+            )}
             <span className="inline-flex items-center justify-between text-[15px]">
               <h1 className="font-medium text-gray-800">Subtotal</h1>
               <span className="text-gray-400 ">
@@ -363,7 +370,8 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
               <p className="font-semibold text-[1.35rem] ml-1">
                 {format(
                   userCartWithDiscount.totalAmount +
-                    (shippingDataResponse?.data?.price
+                    (shippingDataResponse?.data?.price &&
+                    Shipping.choice !== "pickup"
                       ? shippingDataResponse?.data?.price
                       : 0)
                 )}

@@ -237,10 +237,31 @@ const OrderReviewCard = ({ orderId }: Props) => {
                   {orderReview?.orderDetails?.orderNumber}
                 </span>
                 <span className="w-full border-b py-4 px-2">
-                  <p className="font-semibold text-black"> {orderReview?.orderDetails?.collectionMethod === "delivery" ? "Expected delivery date" : "Expected pickup date"}</p>
-                  {orderReview?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDateFns(orderReview?.orderDetails?.expectedDeliveryOrPickupDate1,"PPP") + " and " + formatDateFns(orderReview?.orderDetails?.expectedDeliveryOrPickupDate2,"PPP")}</p> : "Would be set after order is confirmed"}
+                  <p className="font-semibold text-black">
+                    {" "}
+                    {orderReview?.orderDetails?.collectionMethod === "delivery"
+                      ? "Expected delivery date"
+                      : "Expected pickup date"}
+                  </p>
+                  {orderReview?.orderDetails?.expectedDeliveryOrPickupDate1 ? (
+                    <p>
+                      {formatDateFns(
+                        orderReview?.orderDetails
+                          ?.expectedDeliveryOrPickupDate1,
+                        "PPP"
+                      ) +
+                        " and " +
+                        formatDateFns(
+                          orderReview?.orderDetails
+                            ?.expectedDeliveryOrPickupDate2!,
+                          "PPP"
+                        )}
+                    </p>
+                  ) : (
+                    "Would be set after order is confirmed"
+                  )}
                 </span>
-            
+
                 <span className="w-full border-b py-4 px-2">
                   <p className="font-semibold text-black">Order status:</p>
                   {orderReview?.orderDetails?.orderStatus}
@@ -279,7 +300,9 @@ const OrderReviewCard = ({ orderId }: Props) => {
                   <p className="font-semibold text-black">Payment method:</p>
                   {orderReview?.paymentDetails?.paymentMethod.type ===
                   "payOnDelivery"
-                    ? "Pay on delivery"
+                    ? orderReview?.orderDetails.collectionMethod !== "pickup"
+                      ? "Pay on delivery"
+                      : "Pay on collection"
                     : orderReview?.paymentDetails?.paymentMethod.type ===
                       "stripe"
                     ? "Stripe"
@@ -319,10 +342,12 @@ const OrderReviewCard = ({ orderId }: Props) => {
                   <p className="font-semibold text-black mr-2">Email:</p>
                   {orderReview?.customerDetails?.email}
                 </span>
-                <span className="border-b py-4 px-2 ">
-                  <p className="font-semibold text-black mr-2">Address:</p>
-                  {orderReview?.customerDetails?.shippingAddress}
-                </span>
+                {orderReview?.orderDetails.collectionMethod !== "pickup" && (
+                  <span className="border-b py-4 px-2 ">
+                    <p className="font-semibold text-black mr-2">Address:</p>
+                    {orderReview?.customerDetails?.shippingAddress}
+                  </span>
+                )}
               </section>
             </section>
           </div>

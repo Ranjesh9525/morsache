@@ -331,6 +331,11 @@ export const UpdateCartOrderRecieveBy = async (choice: string) => {
       throw new Error("No User found");
     }
     user.carts[0].receiveBy = choice;
+    if (choice === "pickup") {
+      // user.carts[0].totalAmount =
+      //   parseInt(user.carts[0].totalAmount) -
+      //   parseInt(user.carts[0].shippingPrice || "0");
+    }
     await user.save();
     return Response("shipping data", 200, true);
   } catch (err) {
@@ -358,12 +363,23 @@ export const InitializeOrder = async ({
     await connectDB();
     const user = await authAction();
     const adminData = await AdminModel.find();
+    const DefaultShippingData: any = await ShippingModel.findOne({
+      name: "default",
+    });
     if (!user) {
       throw new Error("No User found");
     }
     const cart: CartForServer = user.carts[0];
     if (!cart) {
       throw new Error("Cart not found");
+    }
+    // console.log(cart);
+    const cartItems = cart.items;
+    const allProducts: any = [];
+    for (const item of cartItems) {
+      const product = await ProductsModel.findById(item.productId);
+
+      allProducts.push({ item, product });
     }
     if (
       !cart.items ||
@@ -372,9 +388,12 @@ export const InitializeOrder = async ({
       !cart.shippingPrice ||
       !cart.receiveBy
     ) {
-      throw new Error(
-        "Failed to place order. Order process is incomplete. Try again"
-      );
+      if (cart.receiveBy === "pickup" && cart.items && cart.totalItems) {
+      } else {
+        throw new Error(
+          "Failed to place order. Order process is incomplete. Try again"
+        );
+      }
     }
     let allProductsAcceptPayOnDelivery = true;
     const productsNotAcceptingPayOnDelivery = [];
@@ -387,9 +406,10 @@ export const InitializeOrder = async ({
       }
     }
     if (!allProductsAcceptPayOnDelivery) {
-console.log(productsNotAcceptingPayOnDelivery)
+      console.log(productsNotAcceptingPayOnDelivery);
       throw new Error("Pay on delivery is not avaliable for this order");
     }
+
     if (paymentMethod === "razorPay") {
       // const razorPayRequest = await fetch("/api/razorpay", {
       //   method: "POST",
@@ -412,10 +432,12 @@ console.log(productsNotAcceptingPayOnDelivery)
           items: cart.items,
           totalItems: cart.totalItems,
           totalAmount: responseFromGateway.amount,
-          shippingPrice: cart.shippingPrice,
-          orderStatus: adminData[0]?.defaultConfirmOrders ? "confirmed":"pending",
+          shippingPrice: cart.shippingPrice || 0,
+          orderStatus: adminData[0]?.defaultConfirmOrders
+            ? "confirmed"
+            : "pending",
           collectionMethod: cart.receiveBy,
-          shippingAddress: cart.shippingAddress,
+          shippingAddress: cart.shippingAddress || "",
           paymentMethod: {
             type: paymentMethod,
           },
@@ -431,25 +453,27 @@ console.log(productsNotAcceptingPayOnDelivery)
         });
         await user.save();
 
-       if(!adminData[0]?.defaultConfirmOrders){
-
-        sendOrderConfirmationEmail(
-          order,
-          user.email,
-          "You placed an order!",
-          `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
-        );
-      }else{
-        sendOrderConfirmationEmail(
-          order,
-          user.email,
-          "Your order has been confirmed!",
-          `Your order with order no ${order.orderNumber} has been Confirmed. please check the delivery date`
-        );
-
+        if (!adminData[0]?.defaultConfirmOrders) {
+          sendOrderConfirmationEmail(
+            order,
+            user.email,
+            "You placed an order!",
+            `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`,
+            allProducts,
+            user.firstName
+          );
+        } else {
+          sendOrderConfirmationEmail(
+            order,
+            user.email,
+            "Your order has been confirmed!",
+            `Your order with order no ${order.orderNumber} has been Confirmed. please check the delivery date`,
+            allProducts,
+            user.firstName
+          );
         }
 
-        return Response("Order created", 200, true, order?._id);
+        return Response("Order created", 200, true, order?.orderNumber);
       } else {
         throw new Error("Payment failed");
       }
@@ -461,10 +485,18 @@ console.log(productsNotAcceptingPayOnDelivery)
         customer: user?._id,
         items: cart.items,
         totalItems: cart.totalItems,
-        totalAmount: cart.totalAmount + (parseInt(cart?.shippingPrice!) || 0),
-        shippingPrice: cart.shippingPrice,
-        orderStatus: adminData[0]?.defaultConfirmOrders ? "confirmed":"pending",
-        shippingAddress: cart.shippingAddress,
+        totalAmount:
+          cart.totalAmount +
+          (cart.receiveBy === "delivery"
+            ? parseInt(
+                cart?.shippingPrice! || DefaultShippingData?.price || "0"
+              )
+            : 0),
+        shippingPrice: cart.shippingPrice || 0,
+        orderStatus: adminData[0]?.defaultConfirmOrders
+          ? "confirmed"
+          : "pending",
+        shippingAddress: cart.shippingAddress || "",
 
         paymentMethod: {
           type: paymentMethod,
@@ -482,29 +514,35 @@ console.log(productsNotAcceptingPayOnDelivery)
       });
       await user.save();
 
-
-      if(!adminData[0]?.defaultConfirmOrders){
-
+      if (!adminData[0]?.defaultConfirmOrders) {
         sendOrderConfirmationEmail(
           order,
           user.email,
           "You placed an order!",
-          `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`
+          `Your order with order Number ${order.orderNumber} has been placed and is awaiting confirmation`,
+          allProducts,
+          user.firstName
         );
-      }else{
-order.confirmedOn = new Date(Date.now())
-order.expectedDeliveryOrPickupDate1 =        new Date(order?.confirmedOn.getTime() + 7 * 24 * 60 * 60 * 1000)
-order.expectedDeliveryOrPickupDate2 =        new Date(order?.confirmedOn.getTime() + 12 * 24 * 60 * 60 * 1000)
-await order.save()
+        return Response("Order created", 200, true, order?.orderNumber);
+      } else {
+        order.confirmedOn = new Date(Date.now());
+        order.expectedDeliveryOrPickupDate1 = new Date(
+          order?.confirmedOn.getTime() + 7 * 24 * 60 * 60 * 1000
+        );
+        order.expectedDeliveryOrPickupDate2 = new Date(
+          order?.confirmedOn.getTime() + 12 * 24 * 60 * 60 * 1000
+        );
+        await order.save();
         sendOrderConfirmationEmail(
           order,
           user.email,
           "Your order has been confirmed!",
-          `Your order with order no ${order.orderNumber} has been Confirmed. please check the delivery date`
+          `Your order with order no ${order.orderNumber} has been Confirmed. please check the delivery date`,
+          allProducts,
+          user.firstName
         );
-
-        }
-      return Response("Order created", 200, true, order?.orderNumber);
+        return Response("Order created", 200, true, order?.orderNumber);
+      }
     }
   } catch (error) {
     console.error("Error creating order", error);
@@ -594,7 +632,7 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       shippingAddress,
       expectedDeliveryOrPickupDate1,
       expectedDeliveryOrPickupDate2,
-collectionMethod
+      collectionMethod,
     } = order;
     returnData.paymentDetails = {
       totalAmount,
@@ -610,7 +648,7 @@ collectionMethod
       orderNumber,
       expectedDeliveryOrPickupDate1,
       expectedDeliveryOrPickupDate2,
-collectionMethod
+      collectionMethod,
     };
     const formattedShippingAddress = `${shippingAddress.street},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country}. ${shippingAddress.postalCode}`;
     returnData.customerDetails = {

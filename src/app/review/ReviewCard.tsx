@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { OrderReviewData } from "@/@types/order";
 import { OptimizedProduct } from "@/@types/products";
 
@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { FetchOrderByOrderNo } from "@/serverlessActions/_cartActions";
-import { formatDate,format } from "@/utilities/global";
-import {format as formatDateFns} from "date-fns"
+import { formatDate, format } from "@/utilities/global";
+import { format as formatDateFns } from "date-fns";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,158 +15,11 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 
-const sample = {
-  _id: "66c6ac500648f244825ea837",
-  orderNumber: "d606cee574b49c26d5934896",
-  customer: "66bcbe6770fcbe0f1e539a36",
-  items: [
-    {
-      productId: "66b8bbde503976c2e7b0c836",
-      offersData: [
-        {
-          code: "",
-          productId: "66b8bbde503976c2e7b0c836",
-          quantity: "1",
-          _id: "66c6a9dc0648f244825ea65a",
-        },
-      ],
-      quantity: "1",
-      size: "sm",
-      variant: "evce cve",
-      totalPrice: "30000",
-      _id: "66c6a9dc0648f244825ea659",
-    },
-  ],
-  totalItems: "1",
-  totalAmount: "30000",
-  orderStatus: "pending",
-  shippingAddress: {
-    street: "mairman stresst",
-    city: "mauripol",
-    state: "bangalore",
-    postalCode: "2389284",
-    country: "india",
-  },
-  paymentMethod: { type: "payOnDelivery" },
-  paymentStatus: "pending",
-  createdAt: "1724296272693",
-  updatedAt: "1724296272693",
-  __v: "0",
-};
-
-// Sample OptimizedProduct objects based on the type definition
-const sampleProduct1: OptimizedProduct = {
-  _id: "66b8bbde503976c2e7b0c836",
-  name: "Sample Product 1",
-  slug: "Sample-Product-1",
-  price: 100,
-  images: [
-    "https://picsum.photos/800/1200?random=8",
-    "https://picsum.photos/800/1200?random=7",
-  ],
-  SKU: "SKU123",
-  salePrice: 80,
-};
-
-const sampleProduct2: OptimizedProduct = {
-  _id: "66c6a9dc0648f244825ea659",
-  name: "Sample Product 2",
-  slug: "Sample-Product-2",
-  price: 50,
-  images: [
-    "https://picsum.photos/800/1200?random=1",
-    "https://picsum.photos/800/1200?random=2",
-  ],
-  SKU: "SKU456",
-  salePrice: null,
-};
-
-const sampleProduct3: OptimizedProduct = {
-  _id: "66c6a9dc0648f244825ea65a",
-  name: "Sample Product 3",
-  slug: "Sample-Product-3",
-  price: 75,
-  images: [
-    "https://picsum.photos/800/1200?random=3",
-    "https://picsum.photos/800/1200?random=4",
-  ],
-  SKU: "SKU789",
-  salePrice: 60,
-};
-
-const sampleProduct4: OptimizedProduct = {
-  _id: "66c6ac500648f244825ea837",
-  name: "Sample Product 4",
-  slug: "Sample-Product-4",
-  price: 120,
-  images: [
-    "https://picsum.photos/800/1200?random=5",
-    "https://picsum.photos/800/1200?random=6",
-  ],
-  SKU: "SKU101",
-  salePrice: 100,
-};
-
-// const returnData: OrderReviewData = {
-//   products: [
-//     {
-//       product: sampleProduct1,
-//       quantity: 1,
-//       size: "sm",
-//       variant: "evce cve",
-//       totalPrice: 30000,
-//     },
-//     {
-//       product: sampleProduct2,
-//       quantity: 1,
-//       size: "md",
-//       variant: "xyz",
-//       totalPrice: 25000,
-//     },
-//     {
-//       product: sampleProduct3,
-//       quantity: 2,
-//       size: "lg",
-//       variant: "abc",
-//       totalPrice: 150000,
-//     },
-//     {
-//       product: sampleProduct4,
-//       quantity: 3,
-//       size: "xl",
-//       variant: "def",
-//       totalPrice: 450000,
-//     },
-//   ],
-//   paymentDetails: {
-//     totalAmount: 100000,
-//     paidOn: new Date(),
-//     paymentMethod: {
-//       type: "payOnDelivery",
-//     },
-//     paymentStatus: "pending",
-//   },
-
-//   orderDetails: {
-//     totalAmount: 100000,
-//     createdAt: new Date(),
-//     totalItems: 7,
-//     orderStatus: "pending",
-//     orderNumber: "786r7ftfuygv68e57",
-//   },
-//   customerDetails: {
-//     shippingAddress: "mairman stresst, mauripol, bangalore, india. 2389284",
-//     firstName: "John",
-//     lastName: "Doe",
-//     email: "john.doe@example.com",
-//     phoneNumber: "1234567890",
-//   },
-// };
 type Props = {
-  orderNo:string
+  orderNo: string;
 };
-const ReviewCard = ({orderNo}: Props) => {
-const router = useRouter()
+const ReviewCard = ({ orderNo }: Props) => {
+  const router = useRouter();
 
   const [order, setOrder] = useState<OrderReviewData | null>(null);
   const {
@@ -177,34 +30,31 @@ const router = useRouter()
   } = useMutation({
     mutationFn: FetchOrderByOrderNo,
     onSuccess(response) {
-    //  console.log(response)
+      //  console.log(response)
       setOrder(response.data);
     },
     onError(error) {
-       console.log(error)
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Error",
-    //     description: <p>{error?.message}</p>,
-    //   });
+      console.log(error);
+      //   toast({
+      //     variant: "destructive",
+      //     title: "Error",
+      //     description: <p>{error?.message}</p>,
+      //   });
     },
   });
   useEffect(() => {
-    server_fetchOrderById(orderNo)
-  },[])
-  //fetch products FetchSingleProductByIdOptimized
-  //fetch customer details from server
-  //payment details comes from server
-  //validate it is the customer viewin this page
-  //fetch random recommendations
-if(!orderNo){
-  router.push('/cart')
-}
+    server_fetchOrderById(orderNo);
+  }, []);
+
+  if (!orderNo) {
+    router.push("/cart");
+  }
   return (
     <div>
       {isPending ? (
         <p className="text-center">
-        <ClipLoader /></p>
+          <ClipLoader />
+        </p>
       ) : order ? (
         <div className="md:max-w-[80vw] w-full">
           <section id="products" className="rounded-t-md">
@@ -306,18 +156,37 @@ if(!orderNo){
                 {order?.orderDetails?.orderNumber}
               </span>
               <span className="w-full border-b py-4 px-2">
-                  <p className="font-semibold text-black"> {order?.orderDetails?.collectionMethod === "delivery" ? "Expected delivery date" : "Expected pickup date"}</p>
-                  {order?.orderDetails?.expectedDeliveryOrPickupDate1 ? <p>{formatDateFns(order?.orderDetails?.expectedDeliveryOrPickupDate1,"PPP") + " and " + formatDateFns(order?.orderDetails?.expectedDeliveryOrPickupDate2!,"PPP")}</p> : "Would be set after order is confirmed"}
-                </span>
-            
-                <span className="w-full border-b py-4 px-2">
-                  <p className="font-semibold text-black">Order status:</p>
-                  {order?.orderDetails?.orderStatus}
-                </span>
-                <span className="w-full border-b py-4 px-2">
-                  <p className="font-semibold text-black">Collection Method</p>
-                  {order?.orderDetails?.collectionMethod}
-                </span>
+                <p className="font-semibold text-black">
+                  {" "}
+                  {order?.orderDetails?.collectionMethod === "delivery"
+                    ? "Expected delivery date"
+                    : "Expected pickup date"}
+                </p>
+                {order?.orderDetails?.expectedDeliveryOrPickupDate1 ? (
+                  <p>
+                    {formatDateFns(
+                      order?.orderDetails?.expectedDeliveryOrPickupDate1,
+                      "PPP"
+                    ) +
+                      " and " +
+                      formatDateFns(
+                        order?.orderDetails?.expectedDeliveryOrPickupDate2!,
+                        "PPP"
+                      )}
+                  </p>
+                ) : (
+                  "Would be set after order is confirmed"
+                )}
+              </span>
+
+              <span className="w-full border-b py-4 px-2">
+                <p className="font-semibold text-black">Order status:</p>
+                {order?.orderDetails?.orderStatus}
+              </span>
+              <span className="w-full border-b py-4 px-2">
+                <p className="font-semibold text-black">Collection Method</p>
+                {order?.orderDetails?.collectionMethod}
+              </span>
               <span className="border-b py-4 px-2">
                 <p className="font-semibold text-black">Order placed on:</p>
                 {formatDate(order?.orderDetails?.createdAt!)}
@@ -346,16 +215,24 @@ if(!orderNo){
               </span>
               <span className="w-full border-b py-4 px-2">
                 <p className="font-semibold text-black">Payment method:</p>
-                {order?.paymentDetails?.paymentMethod.type === "payOnDelivery" ? "Pay on delivery" : order?.paymentDetails?.paymentMethod.type === "stripe" ? "Stripe" : "Razorpay"}
+                {order?.paymentDetails?.paymentMethod.type === "payOnDelivery"
+                  ? order?.orderDetails.collectionMethod === "pickup"
+                    ? "Pay on collection"
+                    : "Pay on delivery"
+                  : order?.paymentDetails?.paymentMethod.type === "stripe"
+                  ? "Stripe"
+                  : "Razorpay"}
               </span>
               <span className="border-b py-4 px-2 ">
-                <p className="font-semibold text-black mr-2">Payment Status: </p>
-                { order?.paymentDetails?.paymentStatus}
+                <p className="font-semibold text-black mr-2">
+                  Payment Status:{" "}
+                </p>
+                {order?.paymentDetails?.paymentStatus}
               </span>
             </section>
           </section>
           <section id="customer_details " className="border-b">
-          <section className="bg-primary-dark p-4">
+            <section className="bg-primary-dark p-4">
               <h1 className="font-medium text-lg text-white">
                 Customer Details
               </h1>
@@ -378,20 +255,37 @@ if(!orderNo){
               </span>
               <span className="border-b py-4 px-2 ">
                 <p className="font-semibold text-black mr-2">Email:</p>
-                { order?.customerDetails?.email}
+                {order?.customerDetails?.email}
               </span>
-              <span className="border-b py-4 px-2 ">
-                <p className="font-semibold text-black mr-2">Address:</p>
-                { order?.customerDetails?.shippingAddress}
-              </span>
+              {order?.orderDetails.collectionMethod !== "pickup" && (
+                <span className="border-b py-4 px-2 ">
+                  <p className="font-semibold text-black mr-2">Address:</p>
+                  {order?.customerDetails?.shippingAddress}
+                </span>
+              )}
             </section>
           </section>
           <section id="recommendations"></section>
         </div>
-      ) : <p className="text-center font-semibold mt-3 text-xl">Nothing to display here<br /> {error? <p className="capitalize font-light text-center text-[14px]"> {error?.message}</p>: <p className="font-light text-center ">This order was not found. Either it has been deleted or removed by admin</p>}</p>}
+      ) : (
+        <p className="text-center font-semibold mt-3 text-xl">
+          Nothing to display here
+          <br />{" "}
+          {error ? (
+            <p className="capitalize font-light text-center text-[14px]">
+              {" "}
+              {error?.message}
+            </p>
+          ) : (
+            <p className="font-light text-center ">
+              This order was not found. Either it has been deleted or removed by
+              admin
+            </p>
+          )}
+        </p>
+      )}
     </div>
   );
 };
 
 export default ReviewCard;
-

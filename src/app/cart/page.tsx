@@ -37,7 +37,7 @@ const Page = (props: Props) => {
             <section className="col-span-7 space-y-2">
               {cart.items.length > 0 &&
                 cart.items.map((item, index) => {
-                  console.log(item)
+                  // console.log(item)
                  return <CartItem key={index} cartItem={item} />
 })}
             </section>

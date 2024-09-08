@@ -38,7 +38,7 @@ const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (storeDataIsSuccess && storeDataResponse.data) {
-      console.log("store res", storeDataResponse);
+      // console.log("store res", storeDataResponse);
 
       setStore(storeDataResponse.data);
     }

@@ -31,7 +31,7 @@ export interface Cart {
   shippingPrice?: string;
   shippingAddress: ShippingAddress[];
   paymentMethod?: PaymentMethod;
-  recieveBy?: "pickup" | "delivery";
+  receiveBy?: "pickup" | "delivery";
   isPaid: boolean;
 }
 export interface CartItemForServer {
