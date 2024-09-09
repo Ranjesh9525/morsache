@@ -33,11 +33,11 @@ const AdminFooter = (props: Props) => {
         <section className=" flex items-center justify-center flex-col text-[12px]">
           <h1>© {new Date().getFullYear()} MORSACHE</h1>
           <Link
-            href="https://www.github.com/a-ww2-er"
+            href=""
             target={"_blank"}
             className="font-medium cursor-pointer"
           >
-            Made By a-ww2-er
+            Made By -------
           </Link>
         </section>
       </section>
