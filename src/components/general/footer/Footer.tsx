@@ -108,11 +108,11 @@ const Footer = (props: Props) => {
         <section className="w-full flex items-center justify-center flex-col my-6 text-[12px]">
           <h1>© {new Date().getFullYear()} MORSACHE</h1>
           <Link
-           href="https://www.github.com/a-ww2-er"
+           href=""
            target={"_blank"}
             className="font-medium cursor-pointer"
           >
-            Made By AWE_Roy
+            Made By ..........
           </Link>
         </section>
       </div>
