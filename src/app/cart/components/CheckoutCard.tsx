@@ -43,7 +43,7 @@ const OfferCard = ({ offer, product, offerDiscountedPrice }: offerProps) => {
   return (
     <div>
       <h1 className="inline-flex justify-between items-center">
-        <p className="font-medium text-lg">{offer.title}</p> <CiDiscount1 />
+        <p className="font-medium text-lg">{offer?.title}</p> <CiDiscount1 />
       </h1>
       <div className="flex flex-col w-full ">
         <h1>Affected Products:</h1>

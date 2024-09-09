@@ -57,90 +57,105 @@ const orderColumns: ColumnDef<Order>[] = [
   { accessorKey: "totalItems", header: "Total Items" },
   { accessorKey: "totalAmount", header: "Total Amount" },
   { accessorKey: "orderStatus", header: "Order Status" },
-  { accessorKey: "shippingAddress", header: "Shipping Address" },
   { accessorKey: "shippingPrice", header: "Shipping Price" },
   { accessorKey: "paymentMethod.type", header: "Payment Method" },
   { accessorKey: "paymentStatus", header: "Payment Status" },
 ];
 const Page = (props: Props) => {
   const [orders, setOrders] = React.useState<Order[] | null>(null);
-  const [switchValue, setSwitchValue] = React.useState<boolean | undefined>(undefined);
+  const [switchValue, setSwitchValue] = React.useState<boolean | undefined>(
+    undefined
+  );
   const searchParams = useSearchParams();
-  const status:any = searchParams!.get("status") 
+  const status: any = searchParams!.get("status");
+  const { isPending: updatingAdminData, mutate: serverAdminUpdateAdminData } =
+    useMutation({
+      mutationFn: AdminUpdateAdminData,
+      onSuccess: (res) => {
+       console.log(res);
+        setSwitchValue(res?.data[0].defaultConfirmOrders);
+        toast({
+          variant: "success",
+          title: "Auto confirm orders set",
+        });
+      },
+      onError: (err) => {
+        toast({
+          variant: "destructive",
+          title: "Failed to update admin data",
+          description: <p>{err?.message}</p>,
+        });
+      },
+    });
+
   const {
-    isPending:UpdatingAdminData,
-    mutate: server_AdminUpdateAdminData,
+    data,
+    isPending,
+    isSuccess,
+    error,
+    isError,
+    mutate: serverAdminGetAllOrders,
   } = useMutation({
-    mutationFn: AdminUpdateAdminData,
-    onSuccess:(res)=>{
-      console.log(res)
-      setSwitchValue(res?.data?.defaultConfirmOrders)
-      toast({
-        variant:"success",
-        title:"Auto confirm orders set"
-      })
-    },
-    onError:(err)=>{
-      toast({
-        variant:"destructive",
-        title:"Failed to update admin data",
-        description:<p>{err?.message}</p>
-      })
-    }
+    mutationFn: AdminGetAllOrders,
   });
-  const { data, isPending, isSuccess, error, isError,mutate:server_AdminGetAllOrders } = useMutation({
-    mutationFn: AdminGetAllOrders
-  })
-  useEffect(()=>{
-    server_AdminGetAllOrders(status)
-  },[status])
-  const { data:AdminResponse, isPending:AdminDataIsPending, isSuccess:AdminDataIsSuccess, error:AdminDataError } = useQuery({
+
+  const { data: adminResponse, isPending: adminDataIsPending } = useQuery({
     queryKey: ["admin-data"],
     queryFn: () => AdminGetAdminData(),
   });
+
+  useEffect(() => {
+    serverAdminGetAllOrders(status);
+  }, [status, serverAdminGetAllOrders]);
+
   useEffect(() => {
     if (isSuccess) {
       setOrders(data?.data);
     }
   }, [isSuccess, data]);
+
   useEffect(() => {
-    if (AdminResponse && switchValue === undefined) { 
-      setSwitchValue(AdminResponse?.data?.defaultConfirmOrders);
+    if (adminResponse?.data[0].defaultConfirmOrders !== undefined) {
+      setSwitchValue(adminResponse?.data[0]?.defaultConfirmOrders);
     }
-  }, [AdminResponse, switchValue]);
+  }, [adminResponse]);
+
   useEffect(() => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Error:offer creation failed",
+        title: "Error: order fetching failed",
         description: <p>{error?.message}</p>,
       });
     }
   }, [isError, error]);
+
+  const handleSwitchChange = (checked: boolean) => {
+    serverAdminUpdateAdminData({ defaultConfirmOrders: checked });
+  };
+
   return (
     <>
       <PageHeadingText
         pageHeading="All Orders"
-        description="Control all the orders and their details here,edit or delete as needed, you can also create new offers here."
+        description="Control all the orders and their details here, edit or delete as needed, you can also create new offers here."
       />
-
-      {/**/}
 
       <div className="container mx-auto min-h-[70vh] py-10">
         <div className="flex flex-row items-center justify-between rounded-lg border mb-10 p-4">
           <div className="space-y-0.5">
             <h1 className="text-xl font-semibold">Auto confirm orders?</h1>
             <p className="text-[14px] text-gray-500">
-              Set all orders to be confirmed after they are placed, NOTE that by
-              default every other would be approved and wouldnt need an admin to
-              review them
+              Set all orders to be confirmed after they are placed. NOTE that by
+              default every other would be approved and wouldn't need an admin
+              to review them
             </p>
           </div>
 
           <Switch
-            disabled={UpdatingAdminData}
-            checked={switchValue || false} // Ensure switchValue is not undefined
-            onCheckedChange={(checked) => server_AdminUpdateAdminData({ defaultConfirmOrders: checked })}
+            disabled={updatingAdminData || adminDataIsPending}
+            checked={switchValue ?? false}
+            onCheckedChange={handleSwitchChange}
           />
         </div>
         {isPending ? (

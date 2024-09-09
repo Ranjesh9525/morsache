@@ -74,10 +74,14 @@ export const FetchMultipleOffers = async (data: any) => {
     console.log(data);
     const allOffer = [];
     for (const offer of data) {
-      const res = await OffersModel.findOne({ title: offer.title });
-      // const res2 = await OffersModel.find();
-      // console.log(res, res2);
-      allOffer.push(res);
+      if (!offer.offerId) {
+        const res = await OffersModel.findOne({ title: offer.title });
+        // console.log(res, res2);
+        allOffer.push(res);
+      } else {
+        const res2 = await OffersModel.findById(offer.offerId);
+        allOffer.push(res2);
+      }
     }
 
     console.log(allOffer);

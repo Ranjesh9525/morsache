@@ -88,6 +88,7 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
       z.literal("confirmed"),
       z.literal("shipped"),
       z.literal("delivered"),
+      z.literal("cancelled"),
       z.literal("ready"),
       z.literal("collected"),
     ]),
@@ -391,6 +392,9 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
                       <SelectItem value="confirmed">Confirmed</SelectItem>
                       <SelectItem value="shipped">Shipped</SelectItem>
                       <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="ready">Ready</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectItem value="collected">Collected</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription className="text-red-500">

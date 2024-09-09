@@ -8,7 +8,7 @@ interface Order extends Document {
   totalAmount: number | string;
   expectedDeliveryOrPickupDate1?:Date | string;
   expectedDeliveryOrPickupDate2?:Date | string;
-  orderStatus: "pending" | "confirmed" | "shipped" | "delivered" | "ready" |"collected";
+  orderStatus: "pending" | "confirmed" | "shipped" | "delivered" | "ready" |"collected"|"cancelled";
   shippingAddress: {
     street: string;
     city: string;
