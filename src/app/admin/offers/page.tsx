@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
-import { format } from "@/components/products/ProductInfo";
 import { cn } from "@/lib/utils";
 import {
   Form,
@@ -38,72 +37,70 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Offer } from "@/@types/products";
-import { AdminCreateOffer } from "@/serverlessActions/_adminActions";
+import {
+  AdminCreateOffer,
+  AdminFetchAllOffers,
+  AdminDeleteOffer,
+} from "@/serverlessActions/_adminActions";
+import { Trash2Icon } from "lucide-react";
 
 type Props = {};
 
+const columns = [
+  {
+    accessorKey: "_id",
+    header: "Id",
+  },
+  {
+    accessorKey: "title",
+    header: "Title",
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+  },
+  {
+    accessorKey: "discount",
+    header: "Discount",
+  },
+  {
+    accessorKey: "code",
+    header: "Code",
+  },
+  {
+    accessorKey: "active",
+    header: "Active",
+  },
+  {
+    id: "actions",
+    cell: ({ row }: any) => {
+      const rowData = row.original;
 
+      return (
+        <Trash2Icon
+          color="red"
+          onClick={async () => {
+            if (confirm("Are you sure you want to delete this offer?")) {
+              const res = await AdminDeleteOffer(rowData.id);
 
-const offersData: Offer[] = [
-  {
-    title: "Special Summer Sale",
-    description: "Get ready for summer with our exclusive discount offers.",
-    description2: "Buy 10 items and get 20% off.",
-    discount: '20',
-    code: "SUMMER20",
-    quantityEffect: '10',
-    effect: "quantity",
-    active: true,
-  },
-  {
-    title: "Back to School Promotion",
-    description:
-      "Start the new school year with great savings on school supplies.",
-    description2:
-      "15% Discounts when you buy over 5 of any backpacks, stationery, and more.",
-    discount: '15',
-    code: "SCHOOL15",
-    quantityEffect: '5',
-    effect: "quantity",
-    active: true,
-  },
-  {
-    title: "30%!! off Winter Clearance Sale",
-    description:
-      "Warm up your winter with hot deals on winter clothing and accessories.",
-    description2: "Huge 30% discounts on jackets, scarves, and gloves.",
-    discount: '30',
-    code: "WINTER30",
-    quantityEffect: '8',
-    effect: "percentage",
-    active: true,
-  },
-  {
-    title: "Fitness Challenge Offer 250INR off",
-    description: "Get fit and save big with our fitness challenge discount.",
-    description2: "Special 250INR discount for any gym wears ",
-    discount: '250',
-    code: "FITNESS25",
-    quantityEffect: '6',
-    effect: "flat",
-    active: true,
-  },
-  {
-    title: "Tech Upgrade Bonanza",
-    description:
-      "Upgrade your tech gadgets with our exclusive tech deals. Get 10% off",
-    description2: "Discounts on smartphones, laptops, and accessories.",
-    discount: '10',
-    code: "TECH10",
-    quantityEffect: '7',
-    effect: "percentage",
-    active: true,
+              if (res) {
+                toast({
+                  variant: "success",
+                  description: "Offer deleted successfully",
+                });
+              }
+            }
+          }}
+        />
+      );
+    },
   },
 ];
 const Page = (props: Props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [allOffers, setAllOffers] = React.useState<Offer[] | null>(null);
   const offerSchema = z.object({
     title: z.string(),
     description: z.string(),
@@ -121,7 +118,7 @@ const Page = (props: Props) => {
   const form = useForm<Offer>({
     resolver: zodResolver(offerSchema),
     defaultValues: {
-quantityEffect: '0',
+      quantityEffect: "0",
       active: true,
     },
   });
@@ -135,27 +132,49 @@ quantityEffect: '0',
   } = useMutation({
     mutationFn: AdminCreateOffer,
   });
+
+  const {
+    isPending: offersIsFetching,
+    data: offers,
+    isSuccess: fetchIssuccess,
+    error: fetchError,
+  } = useQuery({
+    queryKey: ["offers"],
+    queryFn: () => AdminFetchAllOffers(),
+  });
+  useEffect(() => {
+    if (fetchError) {
+      toast({
+        variant: "destructive",
+        title: "Error:offer fetch failed",
+        description: <p>{fetchError?.message}</p>,
+      });
+    }
+    if (fetchIssuccess) {
+      // console.log(offers);
+      setAllOffers(offers?.data);
+    }
+  }, [fetchError, fetchIssuccess]);
   function onSubmit(values: Offer) {
-    server_AdminCreateOffer(values)
-    console.log(values);
+    server_AdminCreateOffer(values);
+    // console.log(values);
   }
-useEffect(()=>{
-  if(isSuccess){
-    toast({
-      variant: "success",
-      title: "Offer created ",
-      description: "Offer has been created successfully",
-    })
-  }
-  if(error){
-    toast({
-      variant: "destructive",
-      title: "Error:offer creation failed",
-      description:<p>{error?.message}</p> ,
-    })
-  }
-  
-},[isSuccess,error])
+  useEffect(() => {
+    if (isSuccess) {
+      toast({
+        variant: "success",
+        title: "Offer created ",
+        description: "Offer has been created successfully",
+      });
+    }
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error:offer creation failed",
+        description: <p>{error?.message}</p>,
+      });
+    }
+  }, [isSuccess, error]);
   return (
     <>
       <PageHeadingText
@@ -166,16 +185,20 @@ useEffect(()=>{
       {/**/}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogTrigger>
-        <section className="w-full px-9 ">
+          <section className="w-full px-9 ">
             {" "}
-           <span className=" rounded-md bg-[#545454] py-3 text-white px-5"> Create New Offer</span>
+            <span className=" rounded-md bg-[#545454] py-3 text-white px-5">
+              {" "}
+              Create New Offer
+            </span>
           </section>
         </DialogTrigger>
         <DialogContent className=" max-w-4xl">
           <DialogHeader>
             <DialogTitle>Create a new offer</DialogTitle>
             <DialogDescription>
-              This action is to create a new offer that will give users discount if they apply the code, beware of the benefits you are setting
+              This action is to create a new offer that will give users discount
+              if they apply the code, beware of the benefits you are setting
             </DialogDescription>
           </DialogHeader>
           <div className="w-full space-y-4">
@@ -400,7 +423,8 @@ useEffect(()=>{
                     )}
                   </Button>
                   <p className="text-[12.5px] capitalize text-center">
-                    You can edit this later but already made orders wont be affected
+                    You can edit this later but already made orders wont be
+                    affected
                   </p>
                 </div>
               </form>
@@ -410,7 +434,15 @@ useEffect(()=>{
       </Dialog>
 
       <div className="container mx-auto min-h-[70vh] py-10">
-        {/* <DataTable columns={columns} data={offersData} /> */}
+        {offersIsFetching ? (
+          <p className="text-center my-6">
+            <ClipLoader size={30} />
+          </p>
+        ) : !allOffers || allOffers?.length == 0 ? (
+          <p className="text-center text-xl">No offers yet</p>
+        ) : (
+          <DataTable rowKey={"_id"} columns={columns} data={allOffers!} />
+        )}
       </div>
     </>
   );

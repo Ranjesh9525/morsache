@@ -20,7 +20,7 @@ import { CartItemForServer } from "@/@types/cart";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import { sendOrderConfirmationEmail } from "./sendMail";
 import { adminAction } from "./middlewares";
-import { startOfWeek, endOfWeek, subWeeks, format } from 'date-fns'
+import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
 
 async function SKUgenerator(amount: number, characters: string) {
   let result = "";
@@ -509,12 +509,11 @@ export const AdminUpdateAdminData = async (data: any) => {
     }
     const { defaultConfirmOrders } = data;
     // console.log(data)
-   
-      adminData[0].defaultConfirmOrders = defaultConfirmOrders;
-      await adminData[0].save();
-      // console.log(adminData)
-      return Response("Store data updated successfully", 200, true, adminData);
-    
+
+    adminData[0].defaultConfirmOrders = defaultConfirmOrders;
+    await adminData[0].save();
+    // console.log(adminData)
+    return Response("Store data updated successfully", 200, true, adminData);
   } catch (Error) {
     console.log("Error updating admin data", Error);
     throw Error;
@@ -741,57 +740,61 @@ export const AdminEditOrder = async ({
   }
 };
 
-
 interface ChartDataPoint {
-  date: string
- users:number
+  date: string;
+  users: number;
 }
 
-export async function AdminGetUserChartData(numberOfWeeks: number = 12): Promise<ChartDataPoint[]> {
-  try{
-  await connectDB();
-  await adminAction();
-
-  const chartData: ChartDataPoint[] = []
-
-  for (let i = 0; i < numberOfWeeks; i++) {
-    const endDate = subWeeks(new Date(), i)
-    const startDate = startOfWeek(endDate)
-    const weekEndDate = endOfWeek(endDate)
-
-    const users = await UserModel.countDocuments({
-      createdAt: { $gte: startDate, $lte: weekEndDate }
-    })
-
-
-    chartData.unshift({
-      date: format(startDate, 'yyyy-MM-dd'),
-    users
-    })
-  }
-
-  return chartData
-} catch (err) {
-  console.log("Error fetching statistics", err);
-  throw err;
-}
-}
-export async function AdminGetTopProducts(): Promise<{
-  label: string
- value:number
-}[]> {
+export async function AdminGetUserChartData(
+  numberOfWeeks: number = 12
+): Promise<ChartDataPoint[]> {
   try {
     await connectDB();
     await adminAction();
 
-    const topProducts = await ProductsModel.find().sort({ purchasedQuantity: -1 }).limit(10);
+    const chartData: ChartDataPoint[] = [];
+
+    for (let i = 0; i < numberOfWeeks; i++) {
+      const endDate = subWeeks(new Date(), i);
+      const startDate = startOfWeek(endDate);
+      const weekEndDate = endOfWeek(endDate);
+
+      const users = await UserModel.countDocuments({
+        createdAt: { $gte: startDate, $lte: weekEndDate },
+      });
+
+      chartData.unshift({
+        date: format(startDate, "yyyy-MM-dd"),
+        users,
+      });
+    }
+
+    return chartData;
+  } catch (err) {
+    console.log("Error fetching statistics", err);
+    throw err;
+  }
+}
+export async function AdminGetTopProducts(): Promise<
+  {
+    label: string;
+    value: number;
+  }[]
+> {
+  try {
+    await connectDB();
+    await adminAction();
+
+    const topProducts = await ProductsModel.find()
+      .sort({ purchasedQuantity: -1 })
+      .limit(10);
 
     const chartData: {
-      label: string
-     value:number
+      label: string;
+      value: number;
     }[] = topProducts.map((product) => ({
       label: product.name, // Assuming product has a name field
-      value: product.purchasedQuantity
+      value: product.purchasedQuantity,
     }));
 
     return chartData;
@@ -801,47 +804,55 @@ export async function AdminGetTopProducts(): Promise<{
   }
 }
 
-type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled" | "ready" | "collected"
+type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "ready"
+  | "collected";
 
 interface OrderChartDataPoint {
-  date: string
-  pending: number
-  confirmed: number
-  shipped: number
-  delivered: number
-  cancelled: number
-  ready: number
-  collected: number
+  date: string;
+  pending: number;
+  confirmed: number;
+  shipped: number;
+  delivered: number;
+  cancelled: number;
+  ready: number;
+  collected: number;
 }
 
-export async function AdminGetOrderChartData(numberOfWeeks: number = 12): Promise<OrderChartDataPoint[]> {
-
+export async function AdminGetOrderChartData(
+  numberOfWeeks: number = 12
+): Promise<OrderChartDataPoint[]> {
   try {
-    await connectDB()
-    await adminAction()
+    await connectDB();
+    await adminAction();
 
-    const chartData: OrderChartDataPoint[] = []
+    const chartData: OrderChartDataPoint[] = [];
 
     for (let i = 0; i < numberOfWeeks; i++) {
-      const endDate = subWeeks(new Date(), i)
-      const startDate = startOfWeek(endDate)
-      const weekEndDate = endOfWeek(endDate)
+      const endDate = subWeeks(new Date(), i);
+      const startDate = startOfWeek(endDate);
+      const weekEndDate = endOfWeek(endDate);
 
       const orderCounts = await OrdersModel.aggregate([
         {
           $match: {
-            createdAt: { $gte: startDate, $lte: weekEndDate }
-          }
+            createdAt: { $gte: startDate, $lte: weekEndDate },
+          },
         },
         {
           $group: {
-            _id: '$orderStatus',
-            count: { $sum: 1 }
-          }
-        }
-      ])
+            _id: "$orderStatus",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
 
-      console.log(orderCounts)
+      console.log(orderCounts);
       const statusCounts: Record<OrderStatus, number> = {
         pending: 0,
         confirmed: 0,
@@ -849,24 +860,49 @@ export async function AdminGetOrderChartData(numberOfWeeks: number = 12): Promis
         delivered: 0,
         ready: 0,
         collected: 0,
-        cancelled:0
-      }
+        cancelled: 0,
+      };
 
-      orderCounts.forEach((item:any) => {
+      orderCounts.forEach((item: any) => {
         if (item._id in statusCounts) {
-          statusCounts[item._id as OrderStatus] = item.count
+          statusCounts[item._id as OrderStatus] = item.count;
         }
-      })
+      });
 
       chartData.unshift({
-        date: format(startDate, 'yyyy-MM-dd'),
-        ...statusCounts
-      })
+        date: format(startDate, "yyyy-MM-dd"),
+        ...statusCounts,
+      });
     }
 
-    return chartData
+    return chartData;
   } catch (err) {
-    console.log("Error fetching order statistics", err)
-    throw err
+    console.log("Error fetching order statistics", err);
+    throw err;
   }
 }
+
+export const AdminFetchAllOffers = async () => {
+  try {
+    await connectDB();
+    await adminAction();
+    const offers = await OffersModel.find();
+    // console.log(offers);
+    return Response("offers", 200, true, offers);
+  } catch (error) {
+    console.log("Error fetching offers", error);
+    throw error;
+  }
+};
+
+export const AdminDeleteOffer = async (id: string) => {
+  try {
+    await connectDB();
+    await adminAction();
+    const offer = await OffersModel.findByIdAndDelete(id);
+    return Response("offer deleted", 200, true, offer);
+  } catch (error) {
+    console.log("Error deleting offer", error);
+    throw error;
+  }
+};

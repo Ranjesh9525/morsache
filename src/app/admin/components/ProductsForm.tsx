@@ -63,7 +63,7 @@ const ProductsForm = ({ data }: Props) => {
   });
 
   const productSchema = z.object({
-    _id:z.string(),
+    _id: z.string(),
     name: z.string(),
     description: z.string(),
     category: z.array(z.string()).nonempty(),
@@ -79,14 +79,7 @@ const ProductsForm = ({ data }: Props) => {
     offers: z
       .array(
         z.object({
-          title: z.string(),
-          description: z.string(),
-          description2: z.string().optional(),
-          discount: z.string(),
-          code: z.string(),
-          quantityEffect: z.string(),
-          effect: z.union([z.literal("flat"), z.literal("percentage"), z.literal("quantity")]),
-          active: z.boolean(),
+          offerId: z.string(),
         })
       )
       .optional(),
@@ -131,15 +124,19 @@ const ProductsForm = ({ data }: Props) => {
     setPreview(true);
     console.log("submitted");
   }
-
+  //this code is beacuse of  old products that pushed whole offer objects..this handles for both old and new products
+  const offersId = data?.offers![0].offerId ? data?.offers : data?.offers?.map((offer:any) => {
+    return { offerId: offer._id };
+  });
+  console.log(offersId)
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      _id:data?._id!?.toString()  || "",
+      _id: data?._id!?.toString() || "",
       category: data?.category || [],
       sizes: data?.sizes || [],
       variants: data?.variants || [],
-      offers: data?.offers || [],
+      offers: offersId || [],
       tags: data?.tags || [],
       images: data?.images || [],
       name: data?.name || "",
@@ -702,16 +699,16 @@ const ProductsForm = ({ data }: Props) => {
                             const updatedValue = () => {
                               if (
                                 field.value.some(
-                                  (offer: { title: string }) =>
-                                    offer.title === item.title
+                                  (offer: { offerId: string }) =>
+                                    offer.offerId === item._id
                                 )
                               ) {
                                 return field.value.filter(
-                                  (offer: { title: string }) =>
-                                    offer.title !== item.title
+                                  (offer: { offerId: string }) =>
+                                    offer.offerId !== item._id
                                 );
                               } else {
-                                return [...field.value, item];
+                                return [...field.value, item._id];
                               }
                             };
                             form.setValue("offers", updatedValue());
@@ -719,8 +716,8 @@ const ProductsForm = ({ data }: Props) => {
                           className={cn(
                             " cursor-pointer inline-block z-20  w-72 p-3 h-full text-[14px] break-words whitespace-normal bg-gray-200 rounded-lg mr-4",
                             field.value.some(
-                              (offer: { title: string }) =>
-                                offer.title === item.title
+                              (offer: { offerId: string }) =>
+                                offer.offerId === item._id
                             ) && "bg-[#4e75b9] text-white"
                           )}
                         >
@@ -740,6 +737,7 @@ const ProductsForm = ({ data }: Props) => {
                               Discount:{item.discount}%
                             </p>
                             <p>Effect: {item.effect}</p>
+                            <p>Code: {item.code}</p>
                           </span>
                         </div>
                       ))

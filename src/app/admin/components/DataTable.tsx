@@ -22,7 +22,7 @@ import { formatDate } from "@/utilities/global";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  route: string;
+  route?: string;
   rowKey?: string;
 }
 //id,firstname,totalorders,datejoined,role,email
@@ -67,16 +67,18 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  onClick={() =>
-                    router.push(
-                      `/admin/${route}/` +
-                        row
-                          .getVisibleCells()
-                          .find((cell) => cell.column.id === (rowKey || "id"))
-                          ?.getContext()
-                          .getValue()
-                    )
-                  }
+                  onClick={() => {
+                    if (route) {
+                      router.push(
+                        `/admin/${route}/` +
+                          row
+                            .getVisibleCells()
+                            .find((cell) => cell.column.id === (rowKey || "id"))
+                            ?.getContext()
+                            .getValue()
+                      );
+                    }
+                  }}
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell: any) => {
