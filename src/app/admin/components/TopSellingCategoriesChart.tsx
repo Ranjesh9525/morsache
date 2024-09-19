@@ -34,7 +34,7 @@ const desktopData = [
   { month: "June", desktop: 0, fill: "var(--color-June)" },
   { month: "July", desktop: 0, fill: "var(--color-july)" },
   { month: "August", desktop: 0, fill: "var(--color-August)" },
-  { month: "September", desktop: 09, fill: "var(--color-September)" },
+  { month: "September", desktop: 9, fill: "var(--color-September)" },
 ]
 
 const chartConfig:ChartConfig = {
