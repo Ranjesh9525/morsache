@@ -67,6 +67,35 @@ const chartConfig:ChartConfig = {
     label: "May",
     color: "hsl(var(--chart-5))",
   },
+   June: {
+    label: "June",
+    color: "hsl(var(--chart-6))",
+  },
+  July: {
+    label: "July",
+    color: "hsl(var(--chart-7))",
+  },
+  August: {
+    label: "August",
+    color: "hsl(var(--chart-8))",
+  },
+  September: {
+    label: "September",
+    color: "hsl(var(--chart-9))",
+  },
+  October: {
+    label: "October",
+    color: "hsl(var(--chart-10))",
+  },
+  November: {
+    label: "November",
+    color: "hsl(var(--chart-11))",
+  },
+  December: {
+    label: "December",
+    color: "hsl(var(--chart-12))",
+  },
+  
 } 
 
 function TopSellingCategoriesChart() {
