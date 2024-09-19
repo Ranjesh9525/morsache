@@ -26,11 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 const desktopData = [
-  { month: "january", desktop: 186, fill: "var(--color-january)" },
-  { month: "february", desktop: 305, fill: "var(--color-february)" },
-  { month: "march", desktop: 237, fill: "var(--color-march)" },
-  { month: "april", desktop: 173, fill: "var(--color-april)" },
-  { month: "may", desktop: 209, fill: "var(--color-may)" },
+  
+  { month: "Sep", desktop: 09, fill: "var(--color-may)" },
 ]
 
 const chartConfig:ChartConfig = {
@@ -63,6 +60,35 @@ const chartConfig:ChartConfig = {
     label: "May",
     color: "hsl(var(--chart-5))",
   },
+  June: {
+    label: "June",
+    color: "hsl(var(--chart-6))",
+  },
+  July: {
+    label: "July",
+    color: "hsl(var(--chart-7))",
+  },
+  August: {
+    label: "August",
+    color: "hsl(var(--chart-8))",
+  },
+  September: {
+    label: "September",
+    color: "hsl(var(--chart-9))",
+  },
+  October: {
+    label: "October",
+    color: "hsl(var(--chart-10))",
+  },
+  November: {
+    label: "November",
+    color: "hsl(var(--chart-11))",
+  },
+  December: {
+    label: "December",
+    color: "hsl(var(--chart-12))",
+  },
+  
 } 
 
  function TopSellingProductsChart() {
