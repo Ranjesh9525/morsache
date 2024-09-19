@@ -26,11 +26,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 const desktopData = [
-  { month: "january", desktop: 186, fill: "var(--color-january)" },
-  { month: "february", desktop: 305, fill: "var(--color-february)" },
-  { month: "march", desktop: 237, fill: "var(--color-march)" },
-  { month: "april", desktop: 173, fill: "var(--color-april)" },
-  { month: "may", desktop: 209, fill: "var(--color-may)" },
+  { month: "january", desktop: 0, fill: "var(--color-january)" },
+  { month: "february", desktop: 0, fill: "var(--color-february)" },
+  { month: "march", desktop: 0, fill: "var(--color-march)" },
+  { month: "april", desktop: 0, fill: "var(--color-april)" },
+  { month: "may", desktop: 0, fill: "var(--color-may)" },
+  { month: "June", desktop: 0, fill: "var(--color-June)" },
+  { month: "July", desktop: 0, fill: "var(--color-july)" },
+  { month: "August", desktop: 0, fill: "var(--color-August)" },
+  { month: "September", desktop: 09, fill: "var(--color-September)" },
 ]
 
 const chartConfig:ChartConfig = {
