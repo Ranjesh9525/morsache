@@ -15,7 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import { VscSettings } from "react-icons/vsc";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -34,7 +34,12 @@ type Props = {
   >;
 };
 //make request to fetch the category
-const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: Props) => {
+const Filter = ({
+  category,
+  currentFilter,
+  setCurrentFilter,
+  amountOfProducts,
+}: Props) => {
   const [currentFilterLocal, setCurrentFilterLocal] = React.useState<
     { tag: string; values: string[] }[] | []
   >([]);
@@ -89,7 +94,11 @@ const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: 
       }
     });
   };
-
+  useEffect(() => {
+    if (setCurrentFilter) {
+      setCurrentFilter(currentFilterGlobal);
+    }
+  }, [currentFilterGlobal]);
   // const handleFilter = (selectedFilter: { tag: string; value: string }) => {
   //   const specificTagExist = currentFilter.findIndex(
   //     (i) => i.tag === selectedFilter.tag
@@ -148,6 +157,7 @@ const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: 
   } = useMutation({
     mutationFn: FetchCategoryData,
   });
+
   useEffect(() => {
     if (category) {
       server_FetchCategoryData(category.toString().replaceAll("-", " "));
@@ -202,11 +212,11 @@ const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: 
   return (
     <div id="filter-container" className="w-full md:sticky  md:top-0">
       <Sheet open={openDialog} onOpenChange={setOpenDialog}>
-      
-      <SheetContent className=" overflow-auto z-[121]">
-        <SheetHeader>
-          <SheetTitle></SheetTitle>
-        </SheetHeader>   <div className=" bg-white h-screen  ">
+        <SheetContent className=" overflow-auto z-[121]">
+          <SheetHeader>
+            <SheetTitle></SheetTitle>
+          </SheetHeader>{" "}
+          <div className=" bg-white h-screen  ">
             {isPending ? (
               <div className="relative flex flex-col  bg-white">
                 <Skeleton className="h-[20px] w-[50%] mb-5 rounded-lg" />
@@ -257,11 +267,11 @@ const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: 
                   )}
                 </section>
                 {categoryData?.name && (
-                  <div id="categories" className="capitalize">
+                  <div id="categories-mobile" className="capitalize">
                     {categoryData?.name}
                   </div>
                 )}
-                <div id="filters">
+                <div id="filters-mobile">
                   <Accordion
                     type="multiple"
                     defaultValue={[...categoryData?.tags.map((i) => i.tag)]}
@@ -311,10 +321,18 @@ const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: 
               //  <span className="mx-auto my-[50%] inline-flex items-center w-full justify-center"><ClipLoader className="" /></span>
             )}
           </div>
-      </SheetContent>
-    </Sheet>
-            <div className="md:hidden flex justify-between w-full items-center p-4 py-2 border-b "> <h1 className="font-normal text-[12.4px]">Showing {amountOfProducts || 0} results</h1><Button className="h-auto p-3 py-2" onClick={()=>setOpenDialog(true)}><VscSettings size={21} color="#ffffff"/></Button></div> 
-        <div className=" bg-white h-screen  overflow-auto p-5 pl-10 md:block hidden">
+        </SheetContent>
+      </Sheet>
+      <div className="md:hidden flex justify-between w-full items-center p-4 py-2 border-b ">
+        {" "}
+        <h1 className="font-normal text-[12.4px]">
+          Showing {amountOfProducts || 0} results
+        </h1>
+        <Button className="h-auto p-3 py-2" onClick={() => setOpenDialog(true)}>
+          <VscSettings size={21} color="#ffffff" />
+        </Button>
+      </div>
+      <div className=" bg-white h-screen  overflow-auto p-5 pl-10 md:block hidden">
         {isPending ? (
           <div className="relative flex flex-col  bg-white">
             <Skeleton className="h-[20px] w-[50%] mb-5 rounded-lg" />
@@ -419,8 +437,6 @@ const Filter = ({ category, currentFilter, setCurrentFilter,amountOfProducts }: 
           //  <span className="mx-auto my-[50%] inline-flex items-center w-full justify-center"><ClipLoader className="" /></span>
         )}
       </div>
-   
-   
     </div>
   );
 };

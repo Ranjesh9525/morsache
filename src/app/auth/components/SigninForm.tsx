@@ -132,11 +132,12 @@ const SigninForm = ({ setEmail }: Props) => {
       <Button
         variant="outline"
         className="lg:w-[20%] cursor-pointer gap-4 inline-flex items-center justify-center"
+        onClick={() => signIn("google")}
+
       >
         <FcGoogle
           title="Google"
           size={25}
-          onClick={() => signIn("google")}
           className={"cursor-pointer  dark:bg-white rounded-full"}
         />
         Google

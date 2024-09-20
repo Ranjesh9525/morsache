@@ -3,6 +3,7 @@ import { Order } from "@/@types/order";
 import { Product } from "@/@types/products";
 import { formatDate } from "date-fns";
 import nodemailer from "nodemailer";
+import { format } from "util";
 import { UserUpdateShippingAddress } from "./_userActions";
 const senderName = process.env.SMTP_FROM_NAME;
 const senderEmail = process.env.SMTP_FROM;
@@ -26,6 +27,7 @@ export const sendOrderConfirmationEmail = (
       pass: process.env.SMTP_PASSWORD,
     },
   };
+  const url = process.env.NEXT_PUBLIC_BASE_URL ?  process.env.NEXT_PUBLIC_BASE_URL :"https://morsache.vercel.app"
   const transporter = nodemailer.createTransport(server);
   const allProducts = items.map(
     (i, index) =>
@@ -69,7 +71,7 @@ export const sendOrderConfirmationEmail = (
          
            <tr>
                <td style="padding: 40px 20px; text-align: center; background-color: #6a6a6a;">
-                   <h2 style="color: #ffffff; margin: 0; font-size: 28px;display:flex;align-items:center;justify-content:center">                               <img src="https://morsache.vercel.app/morsache-clothing-small-logo.png" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">Morsache
+                   <h2 style="color: #ffffff; margin: 0; font-size: 28px;display:flex;align-items:center;justify-content:center">                               <img src="${url}/morsache-clothing-logo-small.png" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">Morsache
                    </h2>
                </td>
            </tr>
@@ -147,30 +149,35 @@ export const sendOrderConfirmationEmail = (
                    <table cellpadding="5" cellspacing="0" width="100%" style="margin-top: 20px; background-color: #f9f9f9; border-radius: 4px;">
                        <tr>
                            <td style="font-weight: bold;">Subtotal:</td>
-                           <td style="text-align: right;">${
+                           <td style="text-align: right;">${format(
                              order.totalAmount
-                           }</td>
+                           )}</td>
                        </tr>
-                       <tr>
+                      ${
+                        order.collectionMethod !== "pickup"
+                          ? `<tr>
                            <td style="font-weight: bold;">Shipping:</td>
-                           <td style="text-align: right;">${
+                           <td style="text-align: right;">${format(
                              order.shippingPrice
-                           }</td>
-                       </tr>
+                           )}</td>
+                       </tr>`
+                          : ""
+                      }
                        <tr style="font-size: 18px; font-weight: bold; color: #3b3838;">
                            <td>Total:</td>
-                           <td style="text-align: right;">${
+                           <td style="text-align: right;">${format(
                              (order.totalAmount! as number) +
-                             (order.shippingPrice
-                               ? (order.shippingPrice as number)
-                               : 0)
-                           }</td>
+                               (order.shippingPrice &&
+                               order.collectionMethod !== "pickup"
+                                 ? (order.shippingPrice as number)
+                                 : 0)
+                           )}</td>
                        </tr>
                    </table>
    
                    <h3 style="color: #3b3838; margin-top: 30px;">What's Next?</h3>
                    <ol style="padding-left: 20px;">
-                       <li>We'll send you a shipping confirmation email once your order is on its way.</li>
+                      <li>We'll send you a shipping confirmation email once your order is on its way.</li>
                        <li>You can track your order status by logging into your account on our website.</li>
                        <li>If you have any questions, please don't hesitate to contact our customer service team.</li>
                    </ol>

@@ -112,7 +112,7 @@ export const FetchProductsFromFilterData = async (
 ) => {
   try {
     await connectDB();
-
+    console.log("here");
     let query: { [key: string]: any } = {};
 
     // Check if data array is empty, return all products
@@ -128,7 +128,7 @@ export const FetchProductsFromFilterData = async (
     }
 
     const products = await ProductsModel.find(query);
-
+    console.log(products);
     return Response("searched products", 200, true, products);
   } catch (error) {
     console.error("Error fetching products based on filter data:", error);

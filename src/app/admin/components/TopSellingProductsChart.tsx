@@ -1,121 +1,172 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Label, Pie, PieChart, Sector } from "recharts"
-import { PieSectorDataItem } from "recharts/types/polar/Pie"
-
+import * as React from "react";
+import { PieSectorDataItem } from "recharts/types/polar/Pie";
+import { Cell, Label, Pie, PieChart, Sector } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartStyle,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-const desktopData = [
-  { month: "january", desktop: 186, fill: "var(--color-january)" },
-  { month: "february", desktop: 305, fill: "var(--color-february)" },
-  { month: "march", desktop: 237, fill: "var(--color-march)" },
-  { month: "april", desktop: 173, fill: "var(--color-april)" },
-  { month: "may", desktop: 209, fill: "var(--color-may)" },
-]
+} from "@/components/ui/select";
+import { AdminGetTopProducts } from "@/serverlessActions/_adminActions";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const chartConfig:ChartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-  },
-  mobile: {
-    label: "Mobile",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-} 
+const chartColors = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--chart-6))",
+  "hsl(var(--chart-7))",
+  "hsl(var(--chart-8))",
+  "hsl(var(--chart-9))",
+  "hsl(var(--chart-10))",
+];
+interface ProductData {
+  label: string;
+  value: number;
+}
+function TopSellingProductsChart() {
+  const id = "pie-interactive";
+  const {
+    data: topProducts,
+    isLoading,
+    error,
+  } = useQuery<ProductData[]>({
+    queryKey: ["topProducts"],
+    queryFn: () => AdminGetTopProducts(),
+  });
 
- function TopSellingProductsChart() {
-  const id = "pie-interactive"
-  const [activeMonth, setActiveMonth] = React.useState(desktopData[0].month)
+  // const [activeProduct, setActiveProduct] = React.useState<string | null>(null);
+  const processedData = React.useMemo(() => {
+    if (!topProducts) return [];
+    return topProducts
+      .map((product, index) => ({
+        ...product,
+        uniqueLabel: `${product.label}_${index}`, // Add a unique identifier
+      }))
+      .sort((a, b) => b.value - a.value); // Sort by value in descending order
+  }, [topProducts]);
+
+  const [activeProduct, setActiveProduct] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (processedData.length > 0) {
+      setActiveProduct(processedData[0].uniqueLabel); // Set the highest selling product as active
+    }
+  }, [processedData]);
 
   const activeIndex = React.useMemo(
-    () => desktopData.findIndex((item) => item.month === activeMonth),
-    [activeMonth]
-  )
-  const months = React.useMemo(() => desktopData.map((item) => item.month), [])
+    () =>
+      processedData.findIndex((item) => item.uniqueLabel === activeProduct) ??
+      0,
+    [processedData, activeProduct]
+  );
 
+  const chartConfig: ChartConfig = React.useMemo(() => {
+    const config: ChartConfig = {};
+    processedData.forEach((product, index) => {
+      config[product.uniqueLabel] = {
+        label: product.label,
+        color: chartColors[index % chartColors.length],
+      };
+    });
+    return config;
+  }, [processedData]);
+
+  const totalValue = React.useMemo(
+    () => processedData.reduce((sum, product) => sum + product.value, 0),
+    [processedData]
+  );
+
+  if (isLoading) {
+    return (
+      <Card data-chart={id} className="flex flex-col">
+        <ChartStyle id={id} config={chartConfig} />
+        <CardHeader className="flex-row items-start space-y-0 pb-0">
+          <div className="grid gap-1">
+            <CardTitle>Top Selling Products</CardTitle>
+            <CardDescription>Top best-selling products</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="text-center p-3">
+          <Skeleton className="h-40 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="h-40 ">
+        <CardContent className="text-center">Error loading data</CardContent>
+      </Card>
+    );
+  }
+
+  if (!processedData || processedData.length === 0) {
+    return (
+      <Card className="h-40 ">
+        <CardContent className="text-center">No data available</CardContent>
+      </Card>
+    );
+  }
   return (
-    <Card data-chart={id} className="flex flex-col">
+    <Card data-chart={id} className="flex flex-col h-full">
       <ChartStyle id={id} config={chartConfig} />
       <CardHeader className="flex-row items-start space-y-0 pb-0">
         <div className="grid gap-1">
-          <CardTitle>Top Selling products</CardTitle>
-          <CardDescription>January - June 2024</CardDescription>
+          <CardTitle>Top Selling Products</CardTitle>
+          <CardDescription>
+            Top {processedData.length} best-selling products
+          </CardDescription>
         </div>
-        <Select value={activeMonth} onValueChange={setActiveMonth}>
+        <Select
+          value={activeProduct || undefined}
+          onValueChange={setActiveProduct}
+        >
           <SelectTrigger
-            className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
-            aria-label="Select a value"
+            className="ml-auto h-7 w-[180px] rounded-lg pl-2.5"
+            aria-label="Select a product"
           >
-            <SelectValue placeholder="Select month" />
+            <SelectValue placeholder="Select product" />
           </SelectTrigger>
           <SelectContent align="end" className="rounded-xl">
-            {months.map((key) => {
-              const config = chartConfig[key as keyof typeof chartConfig]
-
-              if (!config) {
-                return null
-              }
-
-              return (
-                <SelectItem
-                  key={key}
-                  value={key}
-                  className="rounded-lg [&_span]:flex"
-                >
-                  <div className="flex items-center gap-2 text-xs">
-                    <span
-                      className="flex h-3 w-3 shrink-0 rounded-sm"
-                      style={{
-                        backgroundColor: `var(--color-${key})`,
-                      }}
-                    />
-                    {config?.label}
-                  </div>
-                </SelectItem>
-              )
-            })}
+            {processedData.map((product) => (
+              <SelectItem
+                key={product.uniqueLabel}
+                value={product.uniqueLabel}
+                className="rounded-lg [&_span]:flex"
+              >
+                <div className="flex items-center gap-2 text-xs">
+                  <span
+                    className="flex h-3 w-3 shrink-0 rounded-sm"
+                    style={{
+                      backgroundColor: chartConfig[product.uniqueLabel]?.color,
+                    }}
+                  />
+                  {product.label} ({product.value})
+                </div>
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </CardHeader>
@@ -131,29 +182,45 @@ const chartConfig:ChartConfig = {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={desktopData}
-              dataKey="desktop"
-              nameKey="month"
+              data={processedData}
+              dataKey="value"
+              nameKey="uniqueLabel"
               innerRadius={60}
-              strokeWidth={5}
+              outerRadius={80}
+              paddingAngle={2}
               activeIndex={activeIndex}
               activeShape={({
-                outerRadius = 0,
-                ...props
-              }: PieSectorDataItem) => (
+                cx,
+                cy,
+                innerRadius,
+                outerRadius,
+                startAngle,
+                endAngle,
+                fill,
+              }: any) => (
                 <g>
-                  <Sector {...props} outerRadius={outerRadius + 10} />
                   <Sector
-                    {...props}
-                    outerRadius={outerRadius + 25}
-                    innerRadius={outerRadius + 12}
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius + 10}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
                   />
                 </g>
               )}
             >
+              {processedData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={chartColors[index % chartColors.length]}
+                />
+              ))}
               <Label
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    const activeProduct = processedData[activeIndex];
                     return (
                       <text
                         x={viewBox.cx}
@@ -166,17 +233,17 @@ const chartConfig:ChartConfig = {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {desktopData[activeIndex].desktop.toLocaleString()}
+                          {activeProduct.value.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
+                          className="fill-muted-foreground text-sm"
                         >
-                          Visitors
+                          Sold
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -185,7 +252,7 @@ const chartConfig:ChartConfig = {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export default TopSellingProductsChart
+export default TopSellingProductsChart;

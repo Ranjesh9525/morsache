@@ -8,6 +8,7 @@ import NextAuth, {
   CallbacksOptions,
 } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
+import GoogleProvider from "next-auth/providers/google";
 import { Adapter, AdapterUser } from "next-auth/adapters";
 import { MongooseAdapter } from "@choutkamartin/mongoose-adapter";
 import { randomInt } from "crypto";
@@ -48,6 +49,10 @@ export const authOptions: AuthOptions = {
     maxAge: 60 * 60 * 24 * 30,
   },
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     EmailProvider({
       server: {
         host: process.env.SMTP_HOST,
@@ -93,39 +98,20 @@ export const authOptions: AuthOptions = {
         // Check if the user already exists in the database
         const existingUser = await UserModel.findOne({ email: user.email });
         if (existingUser) {
-          console.log("User already exists in the database");
-          // await disconnectDB()
           return existingUser;
         }
-        // if(!registered){
 
-        //   return `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`
-        // }else{
-
-        console.log("New user - Redirecting to register page");
         const newUser = new UserModel({
           email: user.email,
         });
-        // const hashedPassword = await bcrypt.hash(data!.password!, 12);
-        //  const newUser = new UserModel({
-        // email: user.email,
-        // firstName: data.firstName,
-        // lastName: data.lastName,
-        // password: hashedPassword,
-        // emailVerified: new Date(),
-        //  });
+
         await newUser.save();
-        console.log("New user created and saved ");
         return newUser;
       } catch (error: any) {
         console.error("Error saving user :", error.message);
         throw new Error("Failed to save user ");
       }
     },
-    // emailVerification: async({ user, url }) => {
-    //   const { host } = new URL(url);
-
-    // },
 
     session: async ({
       session,
@@ -136,7 +122,6 @@ export const authOptions: AuthOptions = {
       token: JWT;
       user: AdapterUser;
     }) => {
-      // Fetch user data from the database and set it in the session
       const userData = await UserModel.findOne({ email: user?.email });
       if (userData) {
         session.user = userData;
@@ -159,54 +144,138 @@ function gernerateOTP() {
   return randomInt(100000, 999999);
 }
 
-function html(params: { token: string; host: string }) {
+export function html(params: { token: string; host: string }) {
   const { token, host } = params;
-
+  const url = process.env.NEXT_PUBLIC_BASE_URL
   const escapedHost = host.replace(/\./g, "&#8203;.");
-
-  const color = {
-    background: "#f9f9f9",
-    text: "#444",
-    mainBackground: "#fff",
-  };
-
+console.log(host)
   return `
-<body style="background: ${color.background};">
-  <table width="100%" border="0" cellspacing="20" cellpadding="0"
-    style="background: ${color.mainBackground}; max-width: 600px; margin: auto; border-radius: 10px;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in to Morsache</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; }
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    table { border-collapse: collapse !important; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+    div[style*="margin: 16px 0;"] { margin: 0 !important; }
+  </style>
+</head>
+<body style="background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-      <td align="center"
-        style="padding: 10px 0px; font-size: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
-        Sign in to <strong>Morsache</strong>
-      </td>
-    </tr>
-    <tr>
-      <td align="center" style="padding: 20px 0;">
-        <table border="0" cellspacing="0" cellpadding="0">
+      <td bgcolor="#3b3838" align="center">
+        <table border="0" cellpadding="0" cellspacing="0" width="480" >
           <tr>
-            <td align="center"><strong>Sign in code:</strong> ${token}</td>
+            <td align="center" valign="top" style="padding: 40px 10px 40px 10px;">
+              <img alt="Morsache Logo" src="${url}/morsache-clothing-logo-small.png" width="100" height="100" style="display: block; width: 100px; max-width: 100px; min-width: 100px; font-family: 'Poppins', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
+            </td>
           </tr>
         </table>
       </td>
     </tr>
     <tr>
-      <td align="center"
-        style="padding: 0px 0px 10px 0px; font-size: 16px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: ${color.text};">
-        Keep in mind that this code will expire after <strong><em>3 minutes</em></strong>. If you did not request this email you can safely ignore it.
+      <td bgcolor="#3b3838" align="center" style="padding: 0px 10px 0px 10px;">
+        <table border="0" cellpadding="0" cellspacing="0" width="480" >
+          <tr>
+            <td bgcolor="#ffffff" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; text-transform:uppercase; line-height: 48px;">
+              <h1 style="font-size: 28px; font-weight: 600; margin: 0;">Sign in to Morsache</h1>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#f4f4f4" align="center" style="padding: 0px 10px 0px 10px;">
+        <table border="0" cellpadding="0" cellspacing="0" width="480" >
+          <tr>
+            <td bgcolor="#ffffff" align="left" style="padding: 20px 30px 40px 30px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+              <p style="margin: 0;">Your sign-in code is:</p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#ffffff" align="left">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">
+                    <table border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td align="center" style="border-radius: 3px;" bgcolor="#3b3838">
+                          <span style="font-size: 36px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #3b3838; display: inline-block;">${token}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 20px 30px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+              <p style="margin: 0;">This code will expire in <strong>3 minutes</strong>. If you didn't request this email, you can safely ignore it.</p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#ffffff" align="left" style="padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+              <p style="margin: 0;">Cheers,<br>The Morsache Team</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#f4f4f4" align="center" style="padding: 30px 10px 0px 10px;">
+        <table border="0" cellpadding="0" cellspacing="0" width="480" >
+          <tr>
+            <td bgcolor="#FFECD1" align="center" style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+              <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Need more help?</h2>
+              <p style="margin: 0;"><a href="${escapedHost}" target="_blank" style="color: #3b3838;">We&rsquo;re here to help you out</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#f4f4f4" align="center" style="padding: 0px 10px 0px 10px;">
+        <table border="0" cellpadding="0" cellspacing="0" width="480" >
+          <tr>
+            <td bgcolor="#f4f4f4" align="left" style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
+              <p style="margin: 0;">You received this email because we received a request for sign-in for your account. If you didn't request sign-in you can safely delete this email.</p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#f4f4f4" align="left" style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
+              <p style="margin: 0;">Morsache, dwarka sector 7, New Delhi 110077</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 </body>
+</html>
   `;
 }
 
-function text(params: { token: string; host: string }) {
+export function text(params: { token: string; host: string }) {
   return `
-  Sign in to ${params.host}
-  
-  Sign in code: ${params.token}
-  
-  Keep in mind that this code will expire after 3 minutes. If you did not request this email you can safely ignore it.
+Sign in to Morsache
+
+Your sign-in code is: ${params.token}
+
+This code will expire in 3 minutes. If you didn't request this email, you can safely ignore it.
+
+Need more help? Visit ${params.host}
+
+Cheers,
+The Morsache Team
   `;
 }
 // async signIn({ user, account, profile, email, credentials }) {
@@ -219,16 +288,3 @@ function text(params: { token: string; host: string }) {
 //       return false;
 //     }
 //   }
-
-//   return true;
-// async signIn(user, account, profile) {
-//   // Perform actions after user signs in
-// },
-// async session(session, user) {
-//   // Fetch user data from the database and set it in the session
-//   const userData = await User.findOne({ email: user.email });
-//   if (userData) {
-//     session.user = userData;
-//   }
-//   return session;
-// },
