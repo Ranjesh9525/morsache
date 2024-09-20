@@ -24,7 +24,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
-import { format } from "@/components/products/ProductInfo";
 import { cn } from "@/lib/utils";
 import { MdOutlineDiscount } from "react-icons/md";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,17 +58,8 @@ const Page = ({ params }: Props) => {
     tags: z.array(z.string()).nonempty(),
     variants: z
       .array(z.object({ variant: z.string(), image: z.string() }))
-      .nonempty(),
-    offers: z
-      .array(
-        z.object({
-          title: z.string(),
-          description: z.string(),
-          description2: z.string().optional(),
-          discount: z.number(),
-        })
-      )
       .optional(),
+    offers: z.array(z.object({ offerId: z.string() })).optional(),
     images: z.array(z.string()).nonempty(),
     stock: z.string(),
     payOnDelivery: z.boolean(),
@@ -119,13 +109,12 @@ const Page = ({ params }: Props) => {
     mutationFn: AdminGetSingleProduct,
   });
   useEffect(() => {
-
-  server_getSingleProduct(params.id);
-}, [params.id]);
+    server_getSingleProduct(params.id);
+  }, [params.id]);
 
   useEffect(() => {
-    if(response){
-        console.log("response",response)
+    if (response) {
+      console.log("response", response);
     }
     if (isError) {
       console.log("Error while fetching product", error);
@@ -135,7 +124,7 @@ const Page = ({ params }: Props) => {
         variant: "destructive",
       });
     }
-  }, [isError,response]);
+  }, [isError, response]);
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -314,7 +303,7 @@ const Page = ({ params }: Props) => {
             ))}
           </div>
         ) : (
-       <ProductsForm data={response?.data}/>
+          <ProductsForm data={response?.data} />
         )}
       </div>
     </>

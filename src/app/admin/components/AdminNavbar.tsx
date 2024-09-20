@@ -456,6 +456,16 @@ const ordersComponents: { title: string; href: string; description: string }[] =
       description: "View all offers with a status of pending",
     },
     {
+      title: "Cancelled",
+      href: "/admin/orders/?status=cancelled",
+      description: "View all offers with a status of cancelled",
+    },
+    {
+      title: "Ready",
+      href: "/admin/orders/?status=ready",
+      description: "View all offers with a status of ready",
+    },
+    {
       title: "Shipped",
       href: "/admin/orders/?status=shipped",
       description: "View all offers with a status of shipped",
