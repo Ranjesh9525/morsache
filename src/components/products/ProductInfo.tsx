@@ -63,6 +63,7 @@ const ProductInfo = ({ product }: Props) => {
         // toast({
         //   title: `${res?.message}`,
         // });
+        console.log(res)
         setOffers(res?.data);
       },
       onError: (error) => {
@@ -70,10 +71,12 @@ const ProductInfo = ({ product }: Props) => {
       },
     });
   useEffect(() => {
+    console.log(product?.offers)
     if (!offers && !offersIsFetching) {
-      server_fetchOffers(product?.offers);
+      const data = product?.offers
+      server_fetchOffers(data);
     }
-  }, []);
+  }, [product,offers]);
   // const session = await getSession({ req });
 
   // console.log(session);
@@ -321,16 +324,16 @@ const ProductInfo = ({ product }: Props) => {
       </div>
       <div id="accordion">
         <Accordion type="multiple">
-          {product?.offers && product?.offers?.length > 0 && (
+          {offers && offers?.length > 0 && (
             <AccordionItem value="item-1">
               <AccordionTrigger>Offers</AccordionTrigger>
               <AccordionContent>
-                {product?.offers.map((item, index) => {
+                {offers.map((item, index) => {
                   return (
                     <div
                       key={index}
                       className={`flex flex-row items-center gap-2 mb-2 ${
-                        index !== product?.offers?.length! - 1 && "border-b"
+                        index !== offers?.length! - 1 && "border-b"
                       }`}
                     >
                       <MdOutlineDiscount size={20} color="#fea12f" />

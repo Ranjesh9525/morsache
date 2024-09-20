@@ -125,14 +125,16 @@ const ProductsForm = ({ data }: Props) => {
     console.log("submitted");
   }
   //this code is beacuse of  old products that pushed whole offer objects..this handles for both old and new products
-  const offersId = data?.offers![0].offerId ? data?.offers : data?.offers?.map((offer:any) => {
-    return { offerId: offer._id };
-  });
-  console.log(offersId)
+  const offersId = data?.offers![0].offerId
+    ? data?.offers
+    : data?.offers?.map((offer: any) => {
+        return { offerId: offer._id };
+      });
+  console.log(offersId);
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      _id: data?._id!?.toString() || "",
+      _id: data?.id!?.toString() || "",
       category: data?.category || [],
       sizes: data?.sizes || [],
       variants: data?.variants || [],
@@ -697,6 +699,7 @@ const ProductsForm = ({ data }: Props) => {
                           key={index}
                           onClick={() => {
                             const updatedValue = () => {
+                              console.log(field.value, item);
                               if (
                                 field.value.some(
                                   (offer: { offerId: string }) =>
@@ -708,7 +711,7 @@ const ProductsForm = ({ data }: Props) => {
                                     offer.offerId !== item._id
                                 );
                               } else {
-                                return [...field.value, item._id];
+                                return [...field.value, {offerId:item._id}];
                               }
                             };
                             form.setValue("offers", updatedValue());

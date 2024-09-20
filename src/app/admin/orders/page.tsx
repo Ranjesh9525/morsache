@@ -147,7 +147,7 @@ const Page = (props: Props) => {
             <h1 className="text-xl font-semibold">Auto confirm orders?</h1>
             <p className="text-[14px] text-gray-500">
               Set all orders to be confirmed after they are placed. NOTE that by
-              default every other would be approved and wouldn't need an admin
+              default every other would be approved and wouldn&apos;t need an admin
               to review them
             </p>
           </div>

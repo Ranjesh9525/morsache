@@ -63,9 +63,7 @@ export const UserGetWishlists = async () => {
         return product.data;
       })
     );
-    // console.log(products,user?.wishlist)
-    // If there is only one product, convert it to an array
-
+  
     return Response("wishlist fetched", 200, true, products);
   } catch (error) {
     console.error("Error fetching wishlist:", error);

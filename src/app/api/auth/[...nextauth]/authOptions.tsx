@@ -175,7 +175,7 @@ console.log(host)
         <table border="0" cellpadding="0" cellspacing="0" width="480" >
           <tr>
             <td align="center" valign="top" style="padding: 40px 10px 40px 10px;">
-              <img alt="Morsache Logo" src="${url}/morsache-clothing-logo-small.png" width="100" height="100" style="display: block; width: 100px; max-width: 100px; min-width: 100px; font-family: 'Poppins', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
+              <img alt="Morsache Logo" src="https://morsache.vercel.app/morsache-clothing-logo-small.png" width="100" height="100" style="display: block; width: 100px; max-width: 100px; min-width: 100px; font-family: 'Poppins', Helvetica, Arial, sans-serif; color: #ffffff; font-size: 18px;" border="0">
             </td>
           </tr>
         </table>
@@ -251,7 +251,7 @@ console.log(host)
             </td>
           </tr>
           <tr>
-            <td bgcolor="#f4f4f4" align="left" style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
+            <td bgcolor="#f4f4f4" align="center" style="padding: 0px 30px 30px 30px; color: #666666; font-family: 'Poppins', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;">
               <p style="margin: 0;">Morsache, dwarka sector 7, New Delhi 110077</p>
             </td>
           </tr>

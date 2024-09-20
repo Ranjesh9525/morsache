@@ -20,7 +20,7 @@ import HomeLayout from "@/components/layouts/HomeLayout";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/use-toast";
 import { signIn, useSession } from "next-auth/react";
-import { UserUpdateProfile } from "@/serverlessActions/_userActions";
+import { Account } from "@/serverlessActions/_userActions";
 import { useMutation } from "@tanstack/react-query";
 import { ClipLoader } from "react-spinners";
 
@@ -64,7 +64,7 @@ const Page = (props: Props) => {
     },
   });
   const {data,isError,isPending,error,isSuccess,mutate:server_updateUserDetails}=useMutation({
-    mutationFn:UserUpdateProfile,
+    mutationFn:Account,
     onSuccess:(data)=>{
 
       toast({

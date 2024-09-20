@@ -68,7 +68,7 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
     throw error;
   }
 };
-export const FetchMultipleOffers = async (data: any) => {
+export const FetchMultipleOffers = async (data:any) => {
   try {
     await connectDB();
     console.log(data);
