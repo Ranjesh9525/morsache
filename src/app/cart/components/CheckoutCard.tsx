@@ -82,6 +82,9 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
     mutate: validateOffersMutate,
   } = useMutation({
     mutationFn: validateOffers,
+    onError(error, variables, context) {
+        console.log(error)
+    },
   });
   const {
     isPending: uploadCartIsPending,
@@ -128,7 +131,7 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
 
         item.offersData = item!.product!.offers!.map((offer) => {
           return {
-            code: offer.code || "",
+            code: offer.offerId || "",
             productId: item.productId,
             quantity: item.quantity,
           };
