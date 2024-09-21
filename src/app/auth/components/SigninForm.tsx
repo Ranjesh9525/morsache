@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,10 @@ type Props = {
 
 const SigninForm = ({ setEmail }: Props) => {
   const router = useRouter();
-
+  const { data: session } = useSession();
+  useEffect(() => {
+    console.log(session);
+  }, [session]);
   const formSchema = z.object({
     email: z.string().email("Email is invalid"),
   });
@@ -42,16 +45,16 @@ const SigninForm = ({ setEmail }: Props) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     let email = values.email;
     const response = await signIn("email", {
-      email:email.toLowerCase(),
+      email: email.toLowerCase(),
       redirect: false,
       registered: false,
     });
     // console.log(response)
 
     if (response?.url === `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`) {
-      
-    
-      router.push(`/auth/register?callbackUrl=${encodeURIComponent('/auth/login')}`); //  // Redirect to the register page
+      router.push(
+        `/auth/register?callbackUrl=${encodeURIComponent("/auth/login")}`
+      ); //  // Redirect to the register page
     } else {
       if (response?.error) {
         toast({
@@ -121,7 +124,7 @@ const SigninForm = ({ setEmail }: Props) => {
               )}
             </Button>
             <p className="text-[12.5px] capitalize text-center">
-           {"a 6-digit code would be sent to your email"}
+              {"a 6-digit code would be sent to your email"}
             </p>
           </div>
         </form>
@@ -132,8 +135,7 @@ const SigninForm = ({ setEmail }: Props) => {
       <Button
         variant="outline"
         className="lg:w-[20%] cursor-pointer gap-4 inline-flex items-center justify-center"
-        onClick={() => signIn("google")}
-
+        onClick={() => signIn("google", { callbackUrl: "/account" })}
       >
         <FcGoogle
           title="Google"

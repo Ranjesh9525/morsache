@@ -63,7 +63,7 @@ const OTPVerification = ({ email, setEmail }: Props) => {
             description:"Update your account details"
          })}
         if (!isFetching && !isNewUser && !data?.data?.isNewUser) {
-          console.log("triggering",)
+          // console.log("triggering",)
           toast({
             variant: "default",
             title: `You're now authenticated`,

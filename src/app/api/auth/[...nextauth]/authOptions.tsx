@@ -44,14 +44,19 @@ const sender = `"${senderName}" <${senderEmail}>`;
 export const authOptions: AuthOptions = {
   adapter: MongooseAdapter(process.env.DBURL || "") as Adapter,
   jwt: {
-    // The maximum age of the NextAuth.js issued JWT in seconds.
-    // Defaults to `session.maxAge`.
     maxAge: 60 * 60 * 24 * 30,
   },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
     EmailProvider({
       server: {
@@ -92,9 +97,28 @@ export const authOptions: AuthOptions = {
     signOut: "/",
   },
   callbacks: {
-    async signIn({ user, data, registered }: CustomSignIn) {
+    async signIn({ user, data, registered, account, profile }: CustomSignIn) {
       try {
         await connectDB();
+        if (account && account.provider === "google") {
+          if (profile) {
+            const existingUser = await UserModel.findOne({
+              email: profile.email,
+            });
+            if (existingUser) {
+              return existingUser;
+            }
+            const newUser = new UserModel({
+              email: profile.email,
+              image: profile.image,
+              emailVerified: Date.now(),
+              firstName: profile.name,
+            });
+            await newUser.save();
+            return newUser;
+          }
+        }
+        //normal signin
         // Check if the user already exists in the database
         const existingUser = await UserModel.findOne({ email: user.email });
         if (existingUser) {
@@ -113,6 +137,14 @@ export const authOptions: AuthOptions = {
       }
     },
 
+    jwt: async ({ token, user }: { token: JWT; user: User }) => {
+      const userData: UserDocument = await UserModel.findOne({
+        email: user.email,
+      });
+      user && (token.user = userData);
+      // console.log("token - User:", token);
+      return Promise.resolve(token);
+    },
     session: async ({
       session,
       token,
@@ -122,20 +154,12 @@ export const authOptions: AuthOptions = {
       token: JWT;
       user: AdapterUser;
     }) => {
-      const userData = await UserModel.findOne({ email: user?.email });
+      console.log(user);
+      const userData = await UserModel.findOne({ email: token?.email });
       if (userData) {
         session.user = userData;
       }
       return session;
-    },
-
-    jwt: async ({ token, user }: { token: JWT; user: User }) => {
-      const userData: UserDocument = await UserModel.findOne({
-        email: user.email,
-      });
-      user && (token.user = userData);
-      console.log("token - User:", token);
-      return Promise.resolve(token);
     },
   },
 };
@@ -146,9 +170,9 @@ function gernerateOTP() {
 
 export function html(params: { token: string; host: string }) {
   const { token, host } = params;
-  const url = process.env.NEXT_PUBLIC_BASE_URL
+  const url = process.env.NEXT_PUBLIC_BASE_URL;
   const escapedHost = host.replace(/\./g, "&#8203;.");
-console.log(host)
+  // console.log(host)
   return `
 <!DOCTYPE html>
 <html lang="en">

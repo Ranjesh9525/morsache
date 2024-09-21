@@ -420,7 +420,7 @@ const AccountForm = (props: Props) => {
               Saved Shipping Addresses
             </h1>
             <div className="w-full grid md:grid-cols-4 gap-6">
-              {userData!.address!.map((a: ShippingAddress, a_index: number) => {
+              {userData!?.address!?.map((a: ShippingAddress, a_index: number) => {
                 if (!a.city || !a.state || !a.country || !a.street) return null;
                 return (
                   <div
