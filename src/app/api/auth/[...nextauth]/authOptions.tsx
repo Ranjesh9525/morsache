@@ -137,14 +137,7 @@ export const authOptions: AuthOptions = {
       }
     },
 
-    jwt: async ({ token, user }: { token: JWT; user: User }) => {
-      const userData: UserDocument = await UserModel.findOne({
-        email: user.email,
-      });
-      user && (token.user = userData);
-      // console.log("token - User:", token);
-      return Promise.resolve(token);
-    },
+  
     session: async ({
       session,
       token,
@@ -154,12 +147,19 @@ export const authOptions: AuthOptions = {
       token: JWT;
       user: AdapterUser;
     }) => {
-      console.log(user);
-      const userData = await UserModel.findOne({ email: token?.email });
+      // console.log(user);
+      const userData = await UserModel.findOne({ email: user?.email });
       if (userData) {
         session.user = userData;
       }
       return session;
+    },  jwt: async ({ token, user }: { token: JWT; user: User }) => {
+      const userData: UserDocument = await UserModel.findOne({
+        email: user.email,
+      });
+      user && (token.user = userData);
+      // console.log("token - User:", token);
+      return Promise.resolve(token);
     },
   },
 };
