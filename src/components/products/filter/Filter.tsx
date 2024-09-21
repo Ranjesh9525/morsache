@@ -94,11 +94,11 @@ const Filter = ({
       }
     });
   };
-  useEffect(() => {
-    if (setCurrentFilter) {
-      setCurrentFilter(currentFilterGlobal);
-    }
-  }, [currentFilterGlobal]);
+  // useEffect(() => {
+  //   if (setCurrentFilter) {
+  //     setCurrentFilter(currentFilterGlobal);
+  //   }
+  // }, [currentFilterGlobal]);
   // const handleFilter = (selectedFilter: { tag: string; value: string }) => {
   //   const specificTagExist = currentFilter.findIndex(
   //     (i) => i.tag === selectedFilter.tag
