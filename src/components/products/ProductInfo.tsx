@@ -329,6 +329,7 @@ const ProductInfo = ({ product }: Props) => {
               <AccordionTrigger>Offers</AccordionTrigger>
               <AccordionContent>
                 {offers.map((item, index) => {
+                  console.log(offers)
                   return (
                     <div
                       key={index}
@@ -338,8 +339,8 @@ const ProductInfo = ({ product }: Props) => {
                     >
                       <MdOutlineDiscount size={20} color="#fea12f" />
                       <div className="flex items-start flex-col gap-1">
-                        <h1 className="font-medium">{item.title}</h1>
-                        <p>{item.description}</p>
+                        <h1 className="font-medium">{item?.title}</h1>
+                        <p>{item?.description}</p>
                       </div>
                     </div>
                   );

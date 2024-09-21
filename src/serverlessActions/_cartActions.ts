@@ -33,8 +33,8 @@ export async function validateOffers(data: any) {
   try {
     const results = [];
 
-    for (const { code, productId, quantity } of data) {
-      const foundOffer = await Offers.findOne({ code: code });
+    for (const { offerId, productId, quantity } of data) {
+      const foundOffer = await Offers.findById(offerId);
 
       if (!foundOffer) {
         throw new Error(`Invalid discount code `);

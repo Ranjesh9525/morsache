@@ -40,7 +40,7 @@ export interface CartItemForServer {
   product?: Product;
   productId?: any;
   offersData?: {
-    code: string;
+    offerId: string;
     quantity: number;
     productId: string;
   }[];

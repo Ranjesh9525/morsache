@@ -131,7 +131,7 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
 
         item.offersData = item!.product!.offers!.map((offer) => {
           return {
-            code: offer.offerId || "",
+            offerId: offer.offerId || "",
             productId: item.productId,
             quantity: item.quantity,
           };
@@ -211,20 +211,20 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
     if (offersData && userCartWithDiscount) {
       let totalDiscountAmount = 0;
       const updatedCart = { ...userCartWithDiscount };
-
-      offersData.forEach(({ product, offerDiscountedPrice }: any) => {
-        const cartItemIndex = updatedCart!?.items.findIndex(
-          (item) => item.product.id === product.id
-        );
-        if (cartItemIndex !== -1) {
-          const discount = product.salePrice
-            ? product.salePrice - offerDiscountedPrice
-            : product.price - offerDiscountedPrice;
-          totalDiscountAmount += discount;
-          updatedCart.items[cartItemIndex].product.salePrice =
-            offerDiscountedPrice;
-        }
-      });
+console.log(offersData)
+      // offersData.forEach(({ product, offerDiscountedPrice }: any) => {
+      //   const cartItemIndex = updatedCart!?.items.findIndex(
+      //     (item) => item.product.id === product.id
+      //   );
+      //   if (cartItemIndex !== -1) {
+      //     const discount = product.salePrice
+      //       ? product.salePrice - offerDiscountedPrice
+      //       : product.price - offerDiscountedPrice;
+      //     totalDiscountAmount += discount;
+      //     updatedCart.items[cartItemIndex].product.salePrice =
+      //       offerDiscountedPrice;
+      //   }
+      // });
 
       setTotalDiscount(
         (prevTotalDiscount) => prevTotalDiscount + totalDiscountAmount

@@ -8,7 +8,7 @@ export const cartItemSchema = new mongoose.Schema({
   },
   offersData: [
     {
-      code: String,
+      offerId: String,
       productId: String,
       quantity: Number,
     },
