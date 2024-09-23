@@ -71,12 +71,12 @@ const Page = (props: Props) => {
         variant:"default",
         title:"Account updated successfully",
       })
-      router.push("/auth/login")
+      router.push("/account")
     },
     onError:(error)=>{
       toast({
         variant:"destructive",
-        title:"Error",
+        title:"Couldnt update account details",
         description:error.message
       })
       router.push('/serverError')

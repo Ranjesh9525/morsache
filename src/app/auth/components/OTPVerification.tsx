@@ -55,7 +55,7 @@ const OTPVerification = ({ email, setEmail }: Props) => {
           // console.log("check", dat);
           setIsNewUser(dat.data?.data?.isNewUser);
         });
-         console.log("data", data, isNewUser);
+        //  console.log("data", data, isNewUser);
          if(isNewUser){
           toast({
             variant: "default",

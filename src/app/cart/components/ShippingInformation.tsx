@@ -55,7 +55,7 @@ const ShippingInformation = ({cartId}:{cartId:any}) => {
 
         className="flex flex-col space-y-6 mb-12"
       >
-        <div
+        {/* <div
           onClick={() => {
             if(!isPending){
             server_updateCartOrderRecieveBy('pickup')
@@ -83,7 +83,7 @@ const ShippingInformation = ({cartId}:{cartId:any}) => {
             Choose the pickup option for convenient in-store collection of your
             selected items at our store
           </p>
-        </div>
+        </div> */}
         <div
           onClick={() => {
             dispatch({ type: "SET_SHIPPING_CHOICE", payload: "delivery" });

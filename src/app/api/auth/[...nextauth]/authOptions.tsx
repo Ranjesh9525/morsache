@@ -24,7 +24,7 @@ import { signOut } from "next-auth/react";
 interface CustomSignIn {
   user: User | AdapterUser;
   account: Account | null;
-  profile?: Profile | undefined;
+  profile?: any;
   email?: { verificationRequest?: boolean | undefined } | undefined;
   credentials?: Record<string, any> | undefined;
   registered?: boolean;
@@ -50,6 +50,7 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: "consent",
@@ -102,6 +103,7 @@ export const authOptions: AuthOptions = {
         await connectDB();
         if (account && account.provider === "google") {
           if (profile) {
+            // console.log(profile)
             const existingUser = await UserModel.findOne({
               email: profile.email,
             });
@@ -110,7 +112,7 @@ export const authOptions: AuthOptions = {
             }
             const newUser = new UserModel({
               email: profile.email,
-              image: profile.image,
+              image: profile.image || profile.picture,
               emailVerified: Date.now(),
               firstName: profile.name,
             });

@@ -1,30 +1,33 @@
-"use client"
-import { Separator } from "@/components/ui/separator"
+"use client";
+import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
 import { loadComponents } from "next/dist/server/load-components";
 import { useEffect } from "react";
 import AccountForm from "./account-form";
 
-const MAX_RELOAD_COUNT = process.env.MAX_RELOAD_COUNT || 3
+const MAX_RELOAD_COUNT = process.env.MAX_RELOAD_COUNT || 3;
 
 export default function AccountPage() {
   const { data: session, status } = useSession();
   useEffect(() => {
     if (!session && status !== "loading") {
-   
-      const loaded:number = localStorage.getItem('loaded') ? parseInt(localStorage.getItem('loaded')!) : 0;
+      let loaded = localStorage.getItem("loaded")
+        ? parseInt(localStorage.getItem("loaded")!)
+        : 0;
 
       if (loaded < MAX_RELOAD_COUNT) {
-        localStorage.setItem('loaded', loaded + 1 as any) ;
+        // console.log("reloading", loaded);
+        loaded++;
+        localStorage.setItem("loaded", loaded.toString());
         window.location.reload();
       }
-    } else {
-      localStorage.setItem('loaded', '0'); // Reset loaded count to 0 when a session is set
+    } if(session) {
+      // console.log("reloaded");
+      localStorage.setItem("loaded", "0"); 
     }
   }, [status, session]);
   return (
-    <div className="space-y-6"> 
-     
+    <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium">Account</h3>
         <p className="text-sm text-muted-foreground">
@@ -35,5 +38,5 @@ export default function AccountPage() {
       <AccountForm />
       {/* <ProfileForm /> */}
     </div>
-  )
+  );
 }

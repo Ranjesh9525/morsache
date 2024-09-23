@@ -159,7 +159,7 @@ const AdminNavbar = ({ scrolling }: Props) => {
                 width={40}
                 height={40}
               />
-              <h1 className="font-medium text-[#474747] text-2xl">
+              <h1 className="font-medium text-[#474747] text-2xl max-sm:text-lg">
                 orsache - Admin
               </h1>
             </Link>
