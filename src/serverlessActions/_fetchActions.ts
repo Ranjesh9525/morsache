@@ -5,7 +5,7 @@ import ProductsModel from "../models/Products";
 import OffersModel from "../models/Offers";
 import StoreModel from "../models/Store";
 import CategoryModel from "../models/Category";
-import { Response } from "./responseClass";
+import { AppError, ErrorResponse, Response } from "./responseClass";
 import { getSession } from "next-auth/react";
 import { Product } from "@/@types/products";
 
@@ -41,7 +41,15 @@ export const FetchSingleProduct = async (slug: string) => {
     return Response("product", 200, true, product);
   } catch (error) {
     console.error("Error fetching product:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 export const FetchSingleProductByIdOptimized = async (id: string) => {
@@ -65,10 +73,18 @@ export const FetchSingleProductByIdOptimized = async (id: string) => {
     return Response("product", 200, true, optimizedProduct);
   } catch (error) {
     console.error("Error fetching product:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
-export const FetchMultipleOffers = async (data:any) => {
+export const FetchMultipleOffers = async (data: any) => {
   try {
     await connectDB();
     console.log(data);
@@ -84,11 +100,19 @@ export const FetchMultipleOffers = async (data:any) => {
       }
     }
 
-    console.log(allOffer);
+    // console.log(allOffer);
     return Response("offers", 200, true, allOffer);
   } catch (error) {
     console.error("Error fetching product:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -103,7 +127,39 @@ export const FetchCategoryData = async (name: string) => {
     return Response("category", 200, true, category);
   } catch (error) {
     console.error("Error fetching categories:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  }
+};
+
+export const FetchAllCategories = async () => {
+  try {
+    await connectDB();
+    const categories = await CategoryModel.find({});
+
+    if (!categories) {
+      return null;
+    }
+    throw new AppError("failed to fetch categories , test error");
+    // return Response("categories", 200, true, categories);
+    return null;
+  } catch (error) {
+    console.error("Error fetching categories", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -128,11 +184,19 @@ export const FetchProductsFromFilterData = async (
     }
 
     const products = await ProductsModel.find(query);
-    console.log(products);
+    // console.log(products);
     return Response("searched products", 200, true, products);
   } catch (error) {
     console.error("Error fetching products based on filter data:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -169,7 +233,15 @@ export const FetchSimilarProducts = async (tags: string[]) => {
     // return Response("similar products", 200, true, similarProducts );
   } catch (error) {
     console.error("Error fetching similar products:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -182,7 +254,15 @@ export const FetchCategoriesNamesOnly = async () => {
     return Response("categories names", 200, true, categoriesName);
   } catch (error) {
     console.error("Error fetching categories", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -191,12 +271,20 @@ export const FetchStoreData = async () => {
     await connectDB();
     const store = await StoreModel.findOne();
     if (!store) {
-      throw new Error("store not found");
+      throw new AppError("store not found");
     }
     return Response("store", 200, true, store);
   } catch (error) {
     console.error("Error fetching store", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -237,6 +325,14 @@ export const FetchCategoriesById = async ({
     }
   } catch (error) {
     console.error("Error fetching category", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };

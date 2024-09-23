@@ -23,6 +23,7 @@ import CartCard from "./CartCard";
 import { ShippingContext } from "@/context/shippingContext";
 import { useSession } from "next-auth/react";
 import { ObjectId } from "mongoose";
+import { toast } from "@/components/ui/use-toast";
 
 type Props = {
   cart?: Cart;
@@ -83,7 +84,7 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
   } = useMutation({
     mutationFn: validateOffers,
     onError(error, variables, context) {
-        console.log(error)
+      console.log(error);
     },
   });
   const {
@@ -211,7 +212,7 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
     if (offersData && userCartWithDiscount) {
       let totalDiscountAmount = 0;
       const updatedCart = { ...userCartWithDiscount };
-console.log(offersData)
+      console.log(offersData);
       // offersData.forEach(({ product, offerDiscountedPrice }: any) => {
       //   const cartItemIndex = updatedCart!?.items.findIndex(
       //     (item) => item.product.id === product.id
@@ -254,12 +255,16 @@ console.log(offersData)
     }
   }, [Shipping]);
   useEffect(() => {
-    if (shippingDataIsError) {
-      console.log(shippingDataError);
-      router.push("/serverError");
-    }
     if (shippingDataResponse) {
       // console.log(shippingDataResponse, userCartWithDiscount);
+      if (shippingDataResponse?.success == false) {
+        console.log(shippingDataResponse.data);
+        toast({
+          variant: "destructive",
+          title: shippingDataResponse?.data?.error?.message,
+        });
+        // router.push("/serverError");
+      }
     }
   }, [shippingDataIsError, shippingDataResponse]);
   return (
@@ -340,7 +345,11 @@ console.log(offersData)
                       Calulating... <ClipLoader size={17} />
                     </p>
                   ) : Shipping.choice && pathname !== "/cart" ? (
-                    format(shippingDataResponse?.data?.price)
+                    shippingDataResponse?.data?.price === 0 ? (
+                      "FREE"
+                    ) : (
+                      format(shippingDataResponse?.data?.price)
+                    )
                   ) : (
                     "calculated at checkout"
                   )}

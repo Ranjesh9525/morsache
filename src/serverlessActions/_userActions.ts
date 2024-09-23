@@ -8,7 +8,7 @@ import OrdersModel from "../models/Orders";
 import UsersModel from "../models/User";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import bcrypt from "bcryptjs";
-import { Response } from "./responseClass";
+import { AppError, ErrorResponse, Response } from "./responseClass";
 import { FetchSingleProductByIdOptimized } from "./_fetchActions";
 import { authAction } from "./middlewares";
 import { Order } from "@/@types/order";
@@ -23,11 +23,11 @@ export const UserAddToWishList = async ({
     await connectDB();
     const product = await ProductsModel.findOne({ _id: productId });
     if (!product) {
-      throw new Error("Product not found");
+      throw new AppError("Product not found",404);
     }
        const user = await authAction();
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found",404);
     }
     const wishlistIsExist = user?.wishlist.find((item: any) => {
       return item.productId === productId;
@@ -40,13 +40,22 @@ export const UserAddToWishList = async ({
     }
     const prodId = { productId: productId };
     user.wishlist = [prodId, ...user?.wishlist];
-    console.log(user);
+    // console.log(user);
     await user.save();
 
     return { message: "Added to wishlist ❤", success: true };
   } catch (error) {
     console.error("Error adding product to wishlist:", error);
-    throw new Error("Error adding product to wishlist:");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "Error adding product to wishlist",
+      statusCode: 500,
+    });
+  
   }
 };
 
@@ -55,7 +64,7 @@ export const UserGetWishlists = async () => {
     await connectDB();
        const user = await authAction();
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found",404);
     }
     const products = await Promise.all(
       (user?.wishlist || []).map(async (item: any) => {
@@ -67,7 +76,16 @@ export const UserGetWishlists = async () => {
     return Response("wishlist fetched", 200, true, products);
   } catch (error) {
     console.error("Error fetching wishlist:", error);
-    throw new Error("Error fetching wishlist");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  
   }
 };
 
@@ -82,7 +100,7 @@ export const UserUpdateShippingAddress = async ({
     await connectDB();
     const user = await UsersModel.findOne({ _id: userId });
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found",404);
     }
     // console.log(user);
     //this function will destroy this whole action if user address array is empty
@@ -116,7 +134,16 @@ export const UserUpdateShippingAddress = async ({
     }
   } catch (error) {
     console.error("Error updating shipping address:", error);
-    throw new Error("Error updating shipping address");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "Error updating shipping address",
+      statusCode: 500,
+    });
+  
   }
 };
 
@@ -135,7 +162,7 @@ export const UserIsNewUser = async () => {
     await connectDB();
        const user = await authAction();
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found",404);
     }
     if (user.firstName && user.lastName && user.password && user.phoneNumber) {
       return Response("User is not new", 200, true, {
@@ -145,7 +172,16 @@ export const UserIsNewUser = async () => {
     return Response("User is new", 200, true, { isNewUser: true });
   } catch (error) {
     console.error("Error checking if user is new:", error);
-    throw new Error("Error checking if user is new");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  
   }
 };
 
@@ -171,22 +207,22 @@ export const Account = async ({
     // phoneNumber,)
     // if (userId?.toString() !== userIdFromServer?.toString()) {
     //   console.log("unauthorized")
-    //   throw new Error("Unauthorized");
+    //   throw new AppError("Unauthorized");
     // }
     if (!user) {
-      console.log("user not found");
-      throw new Error("User not found");
+      // console.log("user not found",404);
+      throw new AppError("User not found",404);
     }
     user.firstName = firstName;
     user.lastName = lastName;
     user.phoneNumber = phoneNumber;
     user.password = hashedPassword;
     await user.save();
-    console.log("profile updated");
+    // console.log("profile updated");
     return { message: "Profile updated successfully", success: true };
   } catch (error) {
     console.error("Error updating profile:", error);
-    throw new Error("Error updating profile");
+    throw new AppError("Error updating profile");
   }
 };
 
@@ -217,8 +253,17 @@ export const UserGetAllOrders = async () => {
     );
   } catch (error) {
     console.log("Error getting all user orders", error);
-    throw error;
+       if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
+  
 };
 
 export const UserTrackOrder = async (orderNo: string) => {
@@ -227,13 +272,13 @@ export const UserTrackOrder = async (orderNo: string) => {
     const user = await authAction();
     const order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
-      throw new Error("Order not found");
+      throw new AppError("Order not found",404);
     }
     const isUserOrder = user.orders.some(
       (i: { orderId: string; status: string }) => i.orderId === order?._id
     );
     if (!isUserOrder && user.role !== "admin") {
-      throw new Error("Unauthorized access");
+      throw new AppError("Unauthorized access");
     }
     //pickup between 4-7 days , delivery between 7-12 days
     const confirmedDate = order.confirmedOn
@@ -261,12 +306,21 @@ export const UserTrackOrder = async (orderNo: string) => {
         ? new Date(order.expectedDeliveryOrPickupDate2)
         : new Date(confirmedDate.getTime() + 12 * 24 * 60 * 60 * 1000),
     };
-    console.log(ReturnData);
+    // console.log(ReturnData);
     return Response("order tracking results", 200, true, ReturnData);
   } catch (error) {
-    console.log("Error Tracking order", error);
-    throw error;
+    console.error("Error Tracking order", error);
+       if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
+  
 };
 
 export const UserUpdateAccountProfile = async (data: any) => {
@@ -293,8 +347,17 @@ export const UserUpdateAccountProfile = async (data: any) => {
     );
     // console.log(updatedUser)
     return Response("updated user", 200, true);
-  } catch (err) {
-    console.log("Error Updating user profile", err);
-    throw err;
+  } catch (error) {
+    console.log("Error Updating user profile", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  
   }
 };

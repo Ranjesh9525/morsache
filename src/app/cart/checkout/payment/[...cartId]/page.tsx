@@ -192,18 +192,7 @@ const Page = (props: Props) => {
                   {isLoading ? "Processing..." : "Pay With Razor Pay"}
                 </p>
               </button>
-              <button
-                className="md:w-[60%] w-full p-4 py-6 rounded-lg border border-gray-400 flex items-center gap-3 justify-start cursor-pointer"
-                disabled={true}
-              >
-                <Image
-                  src="/stripe.png"
-                  alt="razorPay"
-                  width={80}
-                  height={50}
-                />{" "}
-                <p className="font-medium">Pay with stripe</p>
-              </button>
+          
             </div>
           )}
           <div className="mt-auto">

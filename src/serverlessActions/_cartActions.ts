@@ -10,7 +10,7 @@ import { Cart, CartForServer, CartItemForServer } from "@/@types/cart.d";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // Import the Offers model with the offersSchema
 import Offers from "@/models/Offers";
-import { Response } from "./responseClass";
+import { AppError, ErrorResponse, Response } from "./responseClass";
 import { connectDB } from "@/utilities/DB";
 import { ObjectId } from "mongodb";
 import { Document } from "mongoose";
@@ -37,7 +37,7 @@ export async function validateOffers(data: any) {
       const foundOffer = await Offers.findById(offerId);
 
       if (!foundOffer) {
-        throw new Error(`Invalid discount code `);
+        throw new AppError(`Invalid discount code `, 400);
       }
 
       if (foundOffer.active) {
@@ -45,12 +45,12 @@ export async function validateOffers(data: any) {
           foundOffer.effect === "quantity" &&
           quantity < foundOffer.quantityEffect
         ) {
-          throw new Error("Quantity must be at least 1 for this offer");
+          throw new AppError("Quantity must be at least 1 for this offer", 400);
         }
 
         const product = await ProductsModel.findById(productId);
         if (!product) {
-          throw new Error(`Product with ID ${productId} not found`);
+          throw new AppError(`Product with ID ${productId} not found`, 404);
         }
 
         const productPrice = product.salePrice
@@ -77,119 +77,24 @@ export async function validateOffers(data: any) {
         };
         results.push({ foundOffer, offerDiscountPrice, optimizedProduct });
       } else {
-        throw new Error(`Offer is no longer valid`);
+        throw new AppError(`Offer is no longer valid`, 400);
       }
     }
     //there is a general discounted price , be sure to sum up all dicounted prices and set them to that and use it
     return Response("Offers applied", 200, true, results);
   } catch (error) {
     console.log(`Error in validateOffers:`, error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 }
-// export async function validateOffers(offerId, userId, productId, quantity) {
-//     try {
-
-//         const foundOffer = await Offers.findById(offerId);
-
-//         if (!foundOffer) {
-//             throw new Error('Offer not found');
-//         }
-
-//         if (foundOffer.active) {
-
-//             if (foundOffer.effect === 'quantity' && quantity < foundOffer.quantityEffect) {
-//                 throw new Error('Quantity must be at least 1 for this offer');
-//             }
-
-//             const product = await ProductsModel.findById(productId);
-//             const productPrice = product.salePrice ? product.salePrice : product.price;
-//             let offerDiscountPrice =  productPrice
-//             if (!product) {
-//                 throw new Error('Product not found');
-//             }
-//             if(foundOffer.effect === 'percentage'){
-//                 const discountPercentage = foundOffer.discount / 100;
-//                 offerDiscountPrice =  productPrice - ( productPrice * discountPercentage);
-//             }
-//             if(foundOffer.effect === 'quantity' || foundOffer.effect === 'flat'){
-//                 offerDiscountPrice = productPrice - foundOffer.discount;
-//             }
-
-//             return Response('Offer applied', 200, true, {offerDiscountPrice: offerDiscountPrice});
-//         } else {
-//             throw new Error('Offer is not active');
-//         }
-//     } catch (error) {
-//         console.log(`Error in validateOffers:`,error);
-//         throw error;
-//     }
-// }13:32:25.535 | next.js server
-//   {
-//     items: [
-//       {
-//         product: {
-//           name: 'A star wars Costume',
-//           description: 'idsnhviknhewe',
-//           category: [ 'men', 'unisex', 'women' ],
-//           price: 2339,
-//           slug: 'a-star-wars-costume',
-//           salePrice: 1999,
-//           sizes: [ 'xl', 'xxl', 'm', 'xs' ],
-//           tags: [ 'casual', 'graphic', 'long sleeve', 'collared' ],
-//           variants: [
-//             {
-//               variant: 'blue',
-//               image: ' ... (length: 85359)',
-//               _id: ' ... (length: 24)'
-//             },
-//             {
-//               variant: ' ... (length: 5)',
-//               image: ' ... (length: 97471)',
-//               _id: ' ... (length: 24)'
-//             }
-//           ],
-//           SKU: ' ... (length: 4)',
-//           images: [ ' ... (length: 116)', ' ... (length: 116)' ],
-//           rating: 0,
-//           purchaseQuantity: 0,
-//           stock: 19,
-//           offers: [
-//             {
-//               title: ' ... (length: 7)',
-//               description: ' ... (length: 46)',
-//               description2: ' ... (length: 39)',
-//               discount: 10,
-//               _id: ' ... (length: 24)'
-//             },
-//             {
-//               title: ' ... (length: 10)',
-//               description: ' ... (length: 49)',
-//               description2: ' ... (length: 39)',
-//               discount: 300,
-//               _id: ' ... (length: 24)'
-//             }
-//           ],
-//           payOnDelivery: true,
-//           createdAt: ' ... (length: 24)',
-//           updatedAt: ' ... (length: 24)',
-//           reviews: [],
-//           id: ' ... (length: 24)'
-//         },
-//         quantity: 2,
-//         size: ' ... (length: 3)',
-//         variant: ' ... (length: 4)',
-//         totalPrice: 4678
-//       }
-//     ],
-//     totalItems: 2,
-//     totalAmount: 4678,
-//     createdAt: ' ... (length: 24)',
-//     updatedAt: ' ... (length: 24)',
-//     shippingAddress: '',
-//     paymentMethod: '',
-//     isPaid: false
-//   }
 
 export const createCart = async (data: CartForServer) => {
   try {
@@ -201,7 +106,7 @@ export const createCart = async (data: CartForServer) => {
       user.carts = [];
       //   const newArray = [{ _id: cartId ,data}]
       // Generate a random _id for the cart
-      
+
       const cartId = new ObjectId();
       data._id = cartId;
       // console.log(data);
@@ -212,16 +117,24 @@ export const createCart = async (data: CartForServer) => {
 
       const cartIdFromCart = user.carts[0]._id;
       if (!cartIdFromCart) {
-        throw new Error("no cart id");
+        throw new AppError("no cart id");
       }
       // console.log(user);
       return Response("Cart initialized", 200, true, cartIdFromCart);
     } else {
-      throw new Error("No active session found. Unable to create cart.");
+      throw new AppError("No active session found. Unable to create cart.");
     }
   } catch (error) {
     console.log(`Error creating cart: ${error}`);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -231,30 +144,38 @@ export const findUserCart = async (cartId: string) => {
 
     const user = await authAction();
     if (!user) {
-      throw new Error("Please login to continue");
+      throw new AppError("Please login to continue", 401);
     }
     if (user.role === "admin") {
       const results = await AdminFindCart(cartId);
       if (results) {
         return Response("fetched cart", 200, true, results?.data);
       } else {
-        throw new Error("failed to fetch cart");
+        throw new AppError("failed to fetch cart", 400);
       }
     } else {
       const cart = user.carts.find(
         (cart: any) => cart._id.toString() === cartId
       );
       if (!cart) {
-        throw new Error("Cart not found");
+        throw new AppError("Cart not found", 404);
       }
       if (cart.isPaid) {
-        throw new Error("Cart closed");
+        throw new AppError("Cart closed", 400);
       }
       return Response("Cart found", 200, true, cart);
     }
   } catch (error) {
     console.log(`Error finding cart: ${error}`);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -263,64 +184,86 @@ export const FetchUserCartShippingData = async () => {
     await connectDB();
     const user = await authAction();
     if (!user) {
-      throw new Error("No User found");
+      throw new AppError("No User found", 404);
     }
     const cart = user.carts[0];
     if (!cart) {
-      throw new Error("Cart not found");
+      throw new AppError("Cart not found", 404);
     }
     const userShippingAddress = user
       .toObject()
       .address.find((address: any) => address.defaultAddress === true);
 
-    if (!userShippingAddress) {
-      throw new Error("No shipping address found");
-    }
-    const TotalShippingAddressData: Shipping[] = [];
+    // if (!userShippingAddress) {
+    //   throw new AppError("No shipping address found",404);
+    // }
+    // const TotalShippingAddressData: Shipping[] = [];
 
-    for (const key in userShippingAddress) {
-      const value = userShippingAddress[key];
-      const morsacheShippingData: any = await ShippingModel.findOne({
-        name: value,
-      }).lean();
-      if (morsacheShippingData) {
-        TotalShippingAddressData.push(morsacheShippingData);
-      }
-    }
-    // console.log(TotalShippingAddressData);
-    //shipping logic: send back the ShuppingObject with the highest price
-    const shippingData = TotalShippingAddressData.reduce((acc: any, curr) => {
-      if (!acc || curr.price > acc.price) {
-        return curr;
-      } else {
-        return acc;
-      }
-    }, null);
-    // console.log(shippingData);
-    user.carts[0].shippingAddress = userShippingAddress;
-    user.carts[0].receiveBy = "delivery";
-    if (shippingData) {
-      user.carts[0].shippingPrice = shippingData?.price;
-      await user.save();
-      return Response("shipping data", 200, true, shippingData);
-    }
+    // for (const key in userShippingAddress) {
+    //   const value = userShippingAddress[key];
+    //   const morsacheShippingData: any = await ShippingModel.findOne({
+    //     name: value,
+    //   }).lean();
+    //   if (morsacheShippingData) {
+    //     TotalShippingAddressData.push(morsacheShippingData);
+    //   }
+    // }
+    // // console.log(TotalShippingAddressData);
+    // //shipping logic: send back the ShuppingObject with the highest price
+    // const shippingData = TotalShippingAddressData.reduce((acc: any, curr) => {
+    //   if (!acc || curr.price > acc.price) {
+    //     return curr;
+    //   } else {
+    //     return acc;
+    //   }
+    // }, null);
+    // // console.log(shippingData);
+    // user.carts[0].shippingAddress = userShippingAddress;
+    // user.carts[0].receiveBy = "delivery";
+    // if (shippingData) {
+    //   user.carts[0].shippingPrice = shippingData?.price;
+    //   await user.save();
+    //   return Response("shipping data", 200, true, shippingData);
+    // }
 
-    if (!shippingData || shippingData?.length < 1) {
-      const DefaultShippingData: any = await ShippingModel.findOne({
-        name: "default",
-      });
-      if (!DefaultShippingData) {
-        throw new Error("No default shipping data found");
-      } else {
-        // console.log(DefaultShippingData);
-        user.carts[0].shippingPrice = DefaultShippingData?.price;
-        await user.save();
-        return Response("shipping data", 200, true, DefaultShippingData);
-      }
-    }
+    // if (!shippingData || shippingData?.length < 1) {
+    //   const DefaultShippingData: any = await ShippingModel.findOne({
+    //     name: "default",
+    //   });
+    //   if (!DefaultShippingData) {
+    //     throw new AppError("No default shipping data found",404);
+    //   } else {
+    //     // console.log(DefaultShippingData);
+    //     user.carts[0].shippingPrice = DefaultShippingData?.price;
+    //     await user.save();
+    //     return Response("shipping data", 200, true, DefaultShippingData);
+    //   }
+    // }
+
+    // if (user.carts[0].totalAmount >= 1000) {
+    //   user.carts[0].shippingPrice = 0;
+    //   await user.save();
+    //   const responsePrice={price:0}
+
+    //   return Response("shipping data", 200, true, responsePrice);
+    // } else {
+    //   user.carts[0].shippingPrice = 120;
+    //   await user.save();
+    //   const responsePrice={price:120}
+    //   return Response("shipping data", 200, true, responsePrice);
+    // }
+    throw new AppError("testing error, dont call this function", 404);
   } catch (error) {
     console.error("Error fetching shipping data", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -329,16 +272,16 @@ export const UpdateCartOrderRecieveBy = async (choice: string) => {
     await connectDB();
     const user = await authAction();
     if (!user) {
-      throw new Error("No User found");
+      throw new AppError("No User found", 404);
     }
-    console.log(user.carts[0].subtotal)
-    
+    console.log(user.carts[0].subtotal);
+
     if (choice === "pickup" && user.carts[0].receiveBy !== choice) {
       user.carts[0].totalAmount =
         parseInt(user.carts[0].totalAmount) -
         parseInt(user.carts[0].shippingPrice || "0");
     }
-      user.carts[0].receiveBy = choice;
+    user.carts[0].receiveBy = choice;
     await user.save();
     return Response("shipping data", 200, true);
   } catch (err) {
@@ -370,11 +313,11 @@ export const InitializeOrder = async ({
       name: "default",
     });
     if (!user) {
-      throw new Error("No User found");
+      throw new AppError("No User found", 404);
     }
     const cart: CartForServer = user.carts[0];
     if (!cart) {
-      throw new Error("Cart not found");
+      throw new AppError("Cart not found", 404);
     }
     // console.log(cart);
     const cartItems = cart.items;
@@ -393,7 +336,7 @@ export const InitializeOrder = async ({
     ) {
       if (cart.receiveBy === "pickup" && cart.items && cart.totalItems) {
       } else {
-        throw new Error(
+        throw new AppError(
           "Failed to place order. Order process is incomplete. Try again"
         );
       }
@@ -410,7 +353,7 @@ export const InitializeOrder = async ({
     }
     if (!allProductsAcceptPayOnDelivery) {
       console.log(productsNotAcceptingPayOnDelivery);
-      throw new Error("Pay on delivery is not avaliable for this order");
+      throw new AppError("Pay on delivery is not avaliable for this order");
     }
 
     if (paymentMethod === "razorPay") {
@@ -478,7 +421,7 @@ export const InitializeOrder = async ({
 
         return Response("Order created", 200, true, order?.orderNumber);
       } else {
-        throw new Error("Payment failed");
+        throw new AppError("Payment failed", 400);
       }
     }
 
@@ -549,7 +492,15 @@ export const InitializeOrder = async ({
     }
   } catch (error) {
     console.error("Error creating order", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -558,11 +509,11 @@ export const CartCheckPayOnDelivery = async () => {
     await connectDB();
     const user = await authAction();
     if (!user) {
-      throw new Error("No User found");
+      throw new AppError("No User found", 404);
     }
     const cart: CartForServer = user.carts[0];
     if (!cart) {
-      throw new Error("Cart not found");
+      throw new AppError("Cart not found", 404);
     }
 
     let allProductsAcceptPayOnDelivery = true;
@@ -584,7 +535,15 @@ export const CartCheckPayOnDelivery = async () => {
     return Response("validated products payment method", 200, true, returnData);
   } catch (error) {
     console.error("Error checking payment methods", error);
-    throw new Error("Error checking payment methods");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -596,11 +555,11 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
 
     const order: Order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
-      throw new Error("Order not found");
+      throw new AppError("Order not found", 404);
     }
     const customer = await UserModel.findOne({ _id: order?.customer });
     if (!user || (order.customer !== user?._id && user?.role !== "admin")) {
-      throw new Error("Unauthorized access");
+      throw new AppError("Unauthorized access");
     }
     const returnData: OrderReviewData | any = { products: [] };
     await Promise.all(
@@ -664,6 +623,14 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
     return Response("order information", 200, true, returnData);
   } catch (error) {
     console.error("Error fetching order", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };

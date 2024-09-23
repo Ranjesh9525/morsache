@@ -43,7 +43,15 @@ export const AdminGetAllUsers = async () => {
     return Response("fetched all users", 200, true, users);
   } catch (error) {
     console.error("Error fetching users:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 export const AdminGetSingleUsers = async (id: string) => {
@@ -52,13 +60,21 @@ export const AdminGetSingleUsers = async (id: string) => {
     await adminAction();
     const user = await UserModel.findOne({ _id: id }).select("-password");
     if (!user) {
-      throw new Error("user not found");
+      throw new AppError("user not found", 404);
     }
     // console.log(user);
     return Response("fetched user", 200, true, user);
   } catch (error) {
     console.error("Error fetching users:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 //We delete previous image if user already have image
@@ -168,7 +184,15 @@ export const AdminUploadProduct = async (data: Product) => {
     }
   } catch (error) {
     console.error("Error uploading product:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -182,7 +206,15 @@ export const AdminGetAllProducts = async () => {
     return Response("Products fetched successfully", 200, true, products);
   } catch (error) {
     console.error("Error fetching products:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 export const AdminGetSingleProduct = async (id: string) => {
@@ -191,28 +223,36 @@ export const AdminGetSingleProduct = async (id: string) => {
     await adminAction();
     const product: Product = await ProductsModel.findOne({ _id: id });
     if (!product) {
-      throw new Error("Product not found");
+      throw new AppError("Product not found", 404);
     }
     return Response("Product fetched successfully", 200, true, product);
   } catch (error) {
     console.error("Error fetching product:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 export const AdminCreateOffer = async (data: Offer) => {
   try {
     if (parseInt(data.discount) <= 0) {
-      throw new Error("Invalid discount value");
+      throw new AppError("Invalid discount value");
     }
 
     if (
       data.effect === "percentage" &&
       (parseInt(data.discount) <= 0 || parseInt(data.discount) > 100)
     ) {
-      throw new Error("Invalid percentage discount");
+      throw new AppError("Invalid percentage discount");
     }
     if (parseInt(data.quantityEffect) <= 0 && data.effect === "quantity") {
-      throw new Error(
+      throw new AppError(
         "Invalid quantity discount,quantity effect cannot be 0 or less than 0"
       );
     }
@@ -224,7 +264,15 @@ export const AdminCreateOffer = async (data: Offer) => {
     return Response("Offer created successfully", 200, true, offer);
   } catch (error) {
     console.error("Error creating offer:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -236,7 +284,15 @@ export const AdminGetAllOffers = async () => {
     return Response("Offers fetched successfully", 200, true, offers);
   } catch (error) {
     console.error("Error fetching offers:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -246,7 +302,7 @@ export const AdminCreateCategory = async (data: category) => {
     await adminAction();
     // console.log(data)
     if (!data.tags || data.tags.length < 1) {
-      throw new Error("Tags cannot be empty");
+      throw new AppError("Tags cannot be empty");
     }
     if (data.image) {
       const cloudPhoto = await cloudinaryUpload(data.image, {
@@ -266,7 +322,15 @@ export const AdminCreateCategory = async (data: category) => {
     return Response("Category created successfully", 200, true, category);
   } catch (error) {
     console.error("Error creating category:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -280,7 +344,15 @@ export const AdminGetAllCategories = async () => {
     return Response("Categories fetched successfully", 200, true, categories);
   } catch (error) {
     console.error("Error fetching categories:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -292,7 +364,15 @@ export const AdminDeleteCategory = async (id: string) => {
     return null;
   } catch (error) {
     console.error("Error creating category:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -310,7 +390,15 @@ export const AdminAddShippingData = async (data: {
     await Shipping.save();
   } catch (error) {
     console.error("Error adding shipping data:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -321,7 +409,7 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
     const user = await UserModel.findOne({ email });
 
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
 
     await UserModel.findOneAndUpdate(
@@ -336,7 +424,7 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
     return Response("Teammate added successfully", 200, true);
   } catch (error) {
     console.error("Error adding teammate:", error);
-    throw new Error("Error adding teammate");
+    throw new AppError("Error adding teammate");
   }
 };
 
@@ -377,7 +465,15 @@ export const AdminGetAllOrders = async (status: string) => {
     }
   } catch (error) {
     console.error("Error fetching orders:", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 export const AdminUpdateOrder = async (orderNo: string) => {
@@ -386,14 +482,22 @@ export const AdminUpdateOrder = async (orderNo: string) => {
     await adminAction();
     const order = await OrdersModel.findOne({ orderNumber: orderNo });
     if (!order) {
-      throw new Error("Order not found");
+      throw new AppError("Order not found", 404);
     }
     order.orderStatus = "confirmed";
     await order.save();
     return Response("Order confirmed", 200, true);
   } catch (error) {
     console.error("Error confirming order", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -405,7 +509,7 @@ export const AdminUpdateStoreData = async (data: any) => {
     const storeData = fetchedData[0];
 
     if (!storeData) {
-      throw new Error("Store data not found");
+      throw new AppError("Store data not found", 404);
     }
 
     const {
@@ -475,7 +579,15 @@ export const AdminUpdateStoreData = async (data: any) => {
     return Response("Store data updated successfully", 200, true);
   } catch (error) {
     console.error("Error updating store data", error);
-    throw error;
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -486,14 +598,22 @@ export const AdminGetAdminData = async () => {
     const adminData = await AdminModel.find({});
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
-      throw new Error("Couldnt retrieve admin data");
+      throw new AppError("Couldnt retrieve admin data");
       // await AdminModel.create({ defaultConfirmOrders: true });
     }
 
     return Response("Admin data retrieved successfully", 200, true, adminData);
-  } catch (Error) {
-    console.log("Error fetching admin data", Error);
-    throw Error;
+  } catch (error) {
+    console.log("Error fetching admin data", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -504,7 +624,7 @@ export const AdminUpdateAdminData = async (data: any) => {
     const adminData = await AdminModel.find();
     // const defaultConfirmOrders = adminData[0].defaultConfirmOrder
     if (!adminData) {
-      throw new Error("Couldnt retrieve admin data");
+      throw new AppError("Couldnt retrieve admin data");
       // await AdminModel.create({ defaultConfirmOrders: true });
     }
     const { defaultConfirmOrders } = data;
@@ -516,7 +636,15 @@ export const AdminUpdateAdminData = async (data: any) => {
     return Response("Store data updated successfully", 200, true, adminData);
   } catch (Error) {
     console.log("Error updating admin data", Error);
-    throw Error;
+    if (Error instanceof AppError) {
+      return ErrorResponse(Error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -526,9 +654,17 @@ export const AdminDeleteProduct = async (id: string) => {
     await adminAction();
     await ProductsModel.findByIdAndDelete(id);
     return Response("Product deleted", 200, true);
-  } catch (Error) {
-    console.log("An error occured deleting product", Error);
-    throw Error;
+  } catch (error) {
+    console.log("An error occured deleting product", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -542,7 +678,7 @@ export const AdminFindCart = async (cartId: string) => {
     );
     // console.log(cart);
     if (!cart) {
-      throw new Error("Cart not found");
+      throw new AppError("Cart not found", 404);
     }
     return Response("Cart found", 200, true, cart?.carts[0]);
   } catch (error) {
@@ -567,7 +703,7 @@ export const AdminGetOrderById = async (orderId: string) => {
     // const user = await authAction();
     const order: Order = await OrdersModel.findById(orderId);
     if (!order) {
-      throw new Error("Order not found");
+      throw new AppError("Order not found", 404);
     }
     const customer = await UserModel.findOne({ _id: order?.customer });
 
@@ -635,9 +771,17 @@ export const AdminGetOrderById = async (orderId: string) => {
       orderReview: returnData,
       order,
     });
-  } catch (err) {
-    console.log("error getting order by id", err);
-    throw err;
+  } catch (error) {
+    console.log("error getting order by id", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -647,9 +791,17 @@ export const AdminDeleteOrder = async (orderId: string) => {
     await adminAction();
     await OrdersModel.findByIdAndDelete(orderId);
     return Response("order Deleted successfully", 200, true);
-  } catch (err) {
-    console.log("Error Deleting order", err);
-    throw err;
+  } catch (error) {
+    console.log("Error Deleting order", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -745,12 +897,20 @@ export const AdminEditOrder = async ({
         );
     }
 
-    console.log("Updated Order:", updatedOrder);
+    // console.log("Updated Order:", updatedOrder);
 
     return Response("Order updated successfully", 200, true);
-  } catch (err) {
-    console.log("Error updating order", err);
-    throw err;
+  } catch (error) {
+    console.log("Error updating order", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 };
 
@@ -759,9 +919,7 @@ interface ChartDataPoint {
   users: number;
 }
 
-export async function AdminGetUserChartData(
-  numberOfWeeks: number = 12
-): Promise<ChartDataPoint[]> {
+export async function AdminGetUserChartData(numberOfWeeks: number = 12) {
   try {
     await connectDB();
     await adminAction();
@@ -784,9 +942,17 @@ export async function AdminGetUserChartData(
     }
 
     return chartData;
-  } catch (err) {
-    console.log("Error fetching statistics", err);
-    throw err;
+  } catch (error) {
+    console.log("Error fetching statistics", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 }
 
@@ -806,7 +972,7 @@ export async function AdminGetTopCategories(): Promise<
 
     const categoryCount = topProducts.reduce((acc, product) => {
       if (Array.isArray(product.category)) {
-        product.category.forEach((cat:any) => {
+        product.category.forEach((cat: any) => {
           acc[cat] = (acc[cat] || 0) + 1;
         });
       } else if (typeof product.category === "string") {
@@ -816,31 +982,26 @@ export async function AdminGetTopCategories(): Promise<
     }, {} as Record<string, number>);
 
     const topCategories: any = Object.entries(categoryCount)
-      .sort((a:any, b:any) => b[1] - a[1])
+      .sort((a: any, b: any) => b[1] - a[1])
       .slice(0, 3)
       .map(([label, value]: any) => ({ label, value }));
 
-  //  console.log("Top 3 categories:", topCategories);
+    //  console.log("Top 3 categories:", topCategories);
 
     return topCategories;
-  } catch (err) {
-    console.error("Error fetching top categories statistics", err);
-    throw new Error("Failed to fetch top categories");
+  } catch (error) {
+    console.error("Error fetching top categories statistics", error);
+    throw new AppError("Failed to fetch top categories");
   }
 }
-export async function AdminGetTopProducts(): Promise<
-  {
-    label: string;
-    value: number;
-  }[]
-> {
+export async function AdminGetTopProducts() {
   try {
     await connectDB();
     await adminAction();
     const topProducts = await ProductsModel.find()
       .sort({ purchaseQuantity: -1 })
       .limit(10);
-    console.log(topProducts);
+    // console.log(topProducts);
     const chartData: {
       label: string;
       value: number;
@@ -848,11 +1009,19 @@ export async function AdminGetTopProducts(): Promise<
       label: product.name,
       value: product.purchaseQuantity + index,
     }));
-    console.log(chartData);
+    // console.log(chartData);
     return chartData;
-  } catch (err) {
-    console.log("Error fetching top products statistics", err);
-    throw err;
+  } catch (error) {
+    console.log("Error fetching top products statistics", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 }
 
@@ -876,9 +1045,7 @@ interface OrderChartDataPoint {
   collected: number;
 }
 
-export async function AdminGetOrderChartData(
-  numberOfWeeks: number = 12
-): Promise<OrderChartDataPoint[]> {
+export async function AdminGetOrderChartData(numberOfWeeks: number = 12) {
   try {
     await connectDB();
     await adminAction();
@@ -928,8 +1095,16 @@ export async function AdminGetOrderChartData(
     }
 
     return chartData;
-  } catch (err) {
-    console.log("Error fetching order statistics", err);
-    throw err;
+  } catch (error) {
+    console.log("Error fetching order statistics", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
   }
 }
