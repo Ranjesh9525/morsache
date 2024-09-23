@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 
 type Props = {};
 
-const page = (props: Props) => {
+const GeneralProductsPage = (props: Props) => {
   //fetch all categories
   const [allCategories, setAllCategories] = useState<category[] | null>(null);
 
@@ -57,4 +57,4 @@ const page = (props: Props) => {
   );
 };
 
-export default page;
+export default GeneralProductsPage;
