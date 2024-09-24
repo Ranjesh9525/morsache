@@ -8,26 +8,26 @@ import { redirect,useRouter } from "next/navigation";
 export default function Protected({ children }: any) {
   //   const { data: session } = useSession();
 const router = useRouter()
-  useEffect(() => {
-    const getSerSession = async () => {
+ // useEffect(() => {
+   // const getSerSession = async () => {
       
-      try {
-        const serverSession: any = await getSession();
-        if (!serverSession?.user) {
-          router.push("/auth/login");
-        }
-      } catch (error) {
-        console.error("Error fetching server session:", error);
-        router.push("/?error=500");
-      }
-    };
+   //   try {
+      //  const serverSession: any = //await getSession();
+        //if (!serverSession?.user) {
+         // router.push("/auth/login");
+     //   }
+   //   } catch (error) {
+     //   console.error("Error fetching //server session:", error);
+      //  router.push("/?error=500");
+    //  }
+   // };
 
     // if (!session) {
     //   signIn(); // Redirect to sign-in if no session
     // } else {
-    getSerSession(); // Retrieve server session if user is signed in
+  //  getSerSession(); // Retrieve server session if user is signed in
     // }
-  }, []);
+ // }, []);
 
   return children;
 }
