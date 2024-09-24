@@ -96,7 +96,7 @@ export const sendOrderConfirmationEmail = (
                        </tr>
                        <tr>
                            <td style="font-weight: bold;">Expected Delivery/Pickup:</td>
-                           <td>${order.expectedDeliveryOrPickupDate1 ?"Between " + formatDate(order?.expectedDeliveryOrPickupDate1, "PPP") + " - " + formatDate(order?.expectedDeliveryOrPickupDate2, "PPP") : "Calculated when order is confirmed"}`</td>
+                           <td>${order.expectedDeliveryOrPickupDate1 ?"Between " + formatDate(order?.expectedDeliveryOrPickupDate1, "PPP") + " - " + formatDate(order?.expectedDeliveryOrPickupDate2, "PPP") : "Calculated when order is confirmed"}</td>
                        </tr>
                        <tr>
                            <td style="font-weight: bold;">Collection Method:</td>
