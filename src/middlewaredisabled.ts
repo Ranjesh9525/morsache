@@ -21,7 +21,7 @@ export default async function middleware(request: NextRequest) {
 
   const session: any = await getToken({req:request});
 
-  console.log(session);
+  // console.log(session);
   const isProtectedRoute = protectedRoutes.some((prefix) =>
     request.nextUrl.pathname.startsWith(prefix)
   );
@@ -30,7 +30,7 @@ export default async function middleware(request: NextRequest) {
     refererHeader && refererHeader.includes("/auth/login");
 
   if (!session && isProtectedRoute && !isComingFromAuthLogin) {
-    console.log(request);
+    // console.log(request);
     const absoluteURL = new URL("/auth/login", request.nextUrl.origin);
     return NextResponse.redirect(absoluteURL.toString());
   }

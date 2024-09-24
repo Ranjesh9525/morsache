@@ -9,7 +9,7 @@ export default function Protected({ children }: any) {
   //   const { data: session } = useSession();
 const router = useRouter()
   useEffect(() => {
-    const getSession = async () => {
+    const getSerSession = async () => {
       
       try {
         const serverSession: any = await getSession();
@@ -18,7 +18,6 @@ const router = useRouter()
         }
       } catch (error) {
         console.error("Error fetching server session:", error);
-        // Handle error, router.push, or show a message
         router.push("/?error=500");
       }
     };
@@ -26,7 +25,7 @@ const router = useRouter()
     // if (!session) {
     //   signIn(); // Redirect to sign-in if no session
     // } else {
-    getSession(); // Retrieve server session if user is signed in
+    getSerSession(); // Retrieve server session if user is signed in
     // }
   }, []);
 

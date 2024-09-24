@@ -330,7 +330,7 @@ export const InitializeOrder = async ({
       !cart.items ||
       !cart.totalItems ||
       !cart.shippingAddress ||
-      !cart.shippingPrice ||
+      cart.shippingPrice == null || cart.shippingPrice == undefined ||
       !cart.receiveBy
     ) {
       if (cart.receiveBy === "pickup" && cart.items && cart.totalItems) {
