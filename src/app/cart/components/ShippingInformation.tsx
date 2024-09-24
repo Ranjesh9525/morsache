@@ -86,7 +86,9 @@ const ShippingInformation = ({cartId}:{cartId:any}) => {
         </div> */}
         <div
           onClick={() => {
-            dispatch({ type: "SET_SHIPPING_CHOICE", payload: "delivery" });
+if(!isPending){
+                  server_updateCartOrderRecieveBy('delivery')
+            dispatch({ type: "SET_SHIPPING_CHOICE", payload: "delivery" })} ;
           }}
           className={`flex flex-col gap-2 items-start space-x-3  rounded-xl border cursor-pointer w-full p-4 border-primary`}
         >
@@ -95,7 +97,9 @@ const ShippingInformation = ({cartId}:{cartId:any}) => {
               className="w-4 h-4 checked:!bg-primary"
               type="radio"
               onChange={() => {
-                dispatch({ type: "SET_SHIPPING_CHOICE", payload: "delivery" });
+if(!isPending){
+                  server_updateCartOrderRecieveBy('delivery')
+                dispatch({ type: "SET_SHIPPING_CHOICE", payload: "delivery" })} ;
               }}
               value="delivery"
               checked={Shipping.choice === "delivery"}
