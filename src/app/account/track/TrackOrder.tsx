@@ -283,9 +283,7 @@ const TrackOrder = (props: Props) => {
       console.log(res);
       setOrder(res?.data);
     },
-    onError: (err) => {
-      console.log(err);
-    },
+  
   });
   useEffect(() => {}, []);
 

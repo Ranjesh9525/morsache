@@ -72,20 +72,20 @@ const Page = (props: Props) => {
     useMutation({
       mutationFn: AdminUpdateAdminData,
       onSuccess: (res) => {
+        if(res?.success == false && res?.data?.error){
+          toast({
+            variant: "destructive",
+            title: "Failed to update admin data",
+            description: <p>{res?.data?.error?.message}</p>,
+          });
+        }else{
        console.log(res);
         setSwitchValue(res?.data[0].defaultConfirmOrders);
         toast({
           variant: "success",
           title: "Auto confirm orders set",
         });
-      },
-      onError: (err) => {
-        toast({
-          variant: "destructive",
-          title: "Failed to update admin data",
-          description: <p>{err?.message}</p>,
-        });
-      },
+      }}
     });
 
   const {
@@ -110,7 +110,14 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     if (isSuccess) {
-      setOrders(data?.data);
+      if(data?.success == false && data?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Error: order fetching failed",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
+      }else{
+      setOrders(data?.data);}
     }
   }, [isSuccess, data]);
 
@@ -120,15 +127,15 @@ const Page = (props: Props) => {
     }
   }, [adminResponse]);
 
-  useEffect(() => {
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error: order fetching failed",
-        description: <p>{error?.message}</p>,
-      });
-    }
-  }, [isError, error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Error: order fetching failed",
+  //       description: <p>{error?.message}</p>,
+  //     });
+  //   }
+  // }, [isError, error]);
 
   const handleSwitchChange = (checked: boolean) => {
     serverAdminUpdateAdminData({ defaultConfirmOrders: checked });

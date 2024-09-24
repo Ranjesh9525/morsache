@@ -94,22 +94,21 @@ const Page = (props: Props) => {
   } = useMutation({
     mutationFn: AdminUpdateStoreData,
     onSuccess: (res) => {
-      setOpenDialog(false);
       console.log(res);
+      if(res?.success == false && res?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Couldnt update account detail",
+          description: <p>{res?.data?.error?.message}</p>,
+        }); }else{ 
+      setOpenDialog(false);
       toast({
         variant: "success",
         title: "Store data successfully updated",
         description: "Store data was updated successfully",
-      });
+      });}
     },
-    onError: (error) => {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `${error?.message}`,
-      });
-    },
+   
   });
 
   async function fetchCategories() {

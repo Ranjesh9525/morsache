@@ -131,6 +131,13 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     if (isSuccess) {
+      if (data?.success == false && data?.data?.error) {
+        toast({
+          variant: "destructive",
+          title: "Couldn't place order",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
+      } else {
       setIsLoading(false);
       toast({
         variant: "default",
@@ -143,15 +150,9 @@ const Page = (props: Props) => {
         type: "CLEAR_CHOICE",
         payload: "pickup",
       });
-    }
-    if (isError) {
-      toast({
-        variant: "destructive",
-        title: "Couldn't place order",
-        description: error.message,
-      });
-    }
-  }, [isSuccess, isLoading, isError]);
+    }}
+   
+  }, [isSuccess, isLoading,data]);
 
   return (
     <CheckoutLayout title="Payment - Morsache Clothing">

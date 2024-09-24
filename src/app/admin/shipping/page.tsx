@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
-import { format } from "@/components/products/ProductInfo";
+// import { format } from "@/components/products/ProductInfo";
 import { AdminAddShippingData, AdminGetAllShippingData } from "@/serverlessActions/_adminActions";
 
 
@@ -127,12 +127,19 @@ useEffect(()=>{
 
 useEffect(()=>{
   if(isSuccess){
+    if (shippingsData?.success == false && shippingsData?.data?.error) {
+      toast({
+        variant: "destructive",
+        title: "Error: shipping creation failed",
+        description: <p>{shippingsData?.data?.error?.message}</p>,
+      });
+    } else {
     refetchShippingData()
     toast({
       variant: "success",
       title: "shipping data added ",
       description: "shipping data has been added successfully",
-    })
+    })}
   }
   if(error){
     toast({

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
-import { format } from "@/components/products/ProductInfo";
+// import { format } from "@/components/products/ProductInfo";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
@@ -196,6 +196,13 @@ const Page = (props: Props) => {
  
     useEffect(() => {
       if (isSuccess) {
+        if(categorysData?.success == false && categorysData?.data?.error){
+          toast({
+            variant: "destructive",
+            title: "Category creation failed",
+            description: <p>{categorysData?.data?.error?.message}</p>,
+          });
+        }else{
         form.reset()
         setCategorytags([
           {
@@ -207,15 +214,9 @@ const Page = (props: Props) => {
           variant: "success",
           title: "category created ",
           description: "category has been created successfully",
-        });
+        });}
       }
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error:category creation failed",
-          description: <p>{error?.message}</p>,
-        });
-      }
+  
     }, [isSuccess, error]);
 
   const [dragging, setDragging] = React.useState(false);

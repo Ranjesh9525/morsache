@@ -80,21 +80,23 @@ const router = useRouter()
     fetchUserData();
   }, []);
   useEffect(() => {
-    if (isError) {
-      console.log(error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+
     if (isSuccess) {
+      if (data?.success == false && data?.data?.error) {
+        toast({
+    variant:"destructive",
+    title:"oops",
+    description:`${data?.data?.error?.message}`
+  })  // console.log(findCartData);
+          // redirect("/cart?error=500");
+  
+        } else {
       fetchUserData();
       setaddShippingAddress(false)
       toast({
         title: "Success",
         description: <p>{data?.message}</p>,
-      });
+      })};
     }
   }, [isError, isSuccess]);
 

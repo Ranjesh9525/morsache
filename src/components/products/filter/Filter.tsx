@@ -201,7 +201,11 @@ const Filter = ({
   useEffect(() => {
     if (isSuccess) {
       if (response?.data) {
-        setCategoryData(response?.data);
+        if (response?.success == false && response?.data?.error) {
+          router.push("/serverError");
+        } else {
+          setCategoryData(response?.data);
+        }
       }
     }
     if (error) {

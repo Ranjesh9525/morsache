@@ -130,7 +130,7 @@ const ProductsForm = ({ data }: Props) => {
     : data?.offers?.map((offer: any) => {
         return { offerId: offer._id };
       });
-  console.log(offersId);
+  // console.log(offersId);
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {

@@ -5,7 +5,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import PageHeadingText from "../components/PageHeadingText";
 import { DataTableColumnHeader } from "../components/DataTableColumnHeader";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AdminGetAllUsers,AdminGetAllProducts } from "@/serverlessActions/_adminActions";
+import {
+  AdminGetAllUsers,
+  AdminGetAllProducts,
+} from "@/serverlessActions/_adminActions";
 import { ClipLoader } from "react-spinners";
 import { toast } from "@/components/ui/use-toast";
 import { Product } from "@/@types/products";
@@ -143,18 +146,19 @@ const Page = (props: Props) => {
   // useEffect(() => {
   //   setData(generateRandomUsers(25));
   // }, []);
-     useEffect(() => {
-   if(data){
-          console.log(data)}
-          if(error){
-            toast({
-              title: "Error",
-              description: error.message,
-              variant: "destructive",
-            })
-            console.log(error)
-          }
-   }, [data,isError]);
+  useEffect(() => {
+    if (data) {
+      if (data?.success == false && data?.data?.error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
+      } else {
+        console.log(data);
+      }
+    }
+  }, [data, isError]);
 
   return (
     <>

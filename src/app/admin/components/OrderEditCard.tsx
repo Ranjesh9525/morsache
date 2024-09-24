@@ -62,21 +62,22 @@ const OrderEditCard = ({ order, refetch, setRefetch }: Props) => {
   } = useMutation({
     mutationFn: AdminEditOrder,
     onSuccess: (response) => {
+      if(response?.success == false && response?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "An Error occured",
+          description: <p>{response?.data?.error?.message}</p>,
+        });
+      }else{
+
       setRefetch(!refetch);
       toast({
         variant: "success",
         title: "Order Updated",
       });
       setOpenDialog(false);
-    },
-    onError: (error) => {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: <p>{error?.message}</p>,
-      });
-    },
+    }},
+
   });
   const OrderSchema = z.object({
     orderNumber: z.string(),

@@ -80,18 +80,18 @@ const Page = (props: Props) => {
 
   useEffect(() => {
     if (response?.data) {
-      console.log(response)
-      setCategories(response.data);
+      // console.log(response)
+      if(response?.success == false && response?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "oops",
+          description: <p>{response?.data?.error?.message}</p>,
+        });
+      }else{
+      setCategories(response.data);}
     }
-    if (isError) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `${error}`,
-      });
-    }
-  }, [response, isError]);
+  
+  }, [response]);
 
   //    useEffect(() => {
 
@@ -145,31 +145,31 @@ export const CategoryCardAdmin = ({ cat }: { cat: category }) => {
     isError:deleteIsError,
     isSuccess:deleteIsSuccess,
     error:deleteError,
+    data:deleteResponse,
     mutate: server_deleteCategory,
   } = useMutation({
     mutationFn: AdminDeleteCategory,
   });
 
   useEffect(()=>{
-    if(deleteIsError){
-      console.log(deleteError);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `${deleteError}`,
-      });
-    
-    }
-    if(deleteIsSuccess){
+  
+    if(deleteResponse){
+      if(deleteResponse?.success == false && deleteResponse?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "oops",
+          description: <p>{deleteResponse?.data?.error?.message}</p>,
+        });
+      }else{
       // console.log(deleteError);
       toast({
         variant: "success",
         title: `Category ${cat.name} deleted`,
       })
-    
+      }
     }
 
-  },[deleteIsError,deleteIsSuccess])
+  },[deleteIsSuccess])
   return (
     <div id="category" className="group">
       <section

@@ -240,19 +240,18 @@ export const FetchUserCartShippingData = async () => {
     //   }
     // }
 
-    // if (user.carts[0].totalAmount >= 1000) {
-    //   user.carts[0].shippingPrice = 0;
-    //   await user.save();
-    //   const responsePrice={price:0}
+    if (user.carts[0].totalAmount >= 1000) {
+      user.carts[0].shippingPrice = 0;
+      await user.save();
+      const responsePrice={price:0}
 
-    //   return Response("shipping data", 200, true, responsePrice);
-    // } else {
-    //   user.carts[0].shippingPrice = 120;
-    //   await user.save();
-    //   const responsePrice={price:120}
-    //   return Response("shipping data", 200, true, responsePrice);
-    // }
-    throw new AppError("testing error, dont call this function", 404);
+      return Response("shipping data", 200, true, responsePrice);
+    } else {
+      user.carts[0].shippingPrice = 120;
+      await user.save();
+      const responsePrice={price:120}
+      return Response("shipping data", 200, true, responsePrice);
+    }
   } catch (error) {
     console.error("Error fetching shipping data", error);
     if (error instanceof AppError) {

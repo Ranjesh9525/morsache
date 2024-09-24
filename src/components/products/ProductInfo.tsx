@@ -52,9 +52,7 @@ const ProductInfo = ({ product }: Props) => {
         title: `${response?.message}`,
       });
     },
-    onError: (error) => {
-      console.log("Error:", error);
-    },
+
   });
   const { isPending: offersIsFetching, mutate: server_fetchOffers } =
     useMutation({
@@ -66,9 +64,7 @@ const ProductInfo = ({ product }: Props) => {
         console.log(res)
         setOffers(res?.data);
       },
-      onError: (error) => {
-        console.log("Error:", error);
-      },
+     
     });
   useEffect(() => {
     console.log(product?.offers)

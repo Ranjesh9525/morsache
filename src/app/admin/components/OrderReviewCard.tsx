@@ -67,17 +67,17 @@ const OrderReviewCard = ({ orderId }: Props) => {
     mutationFn: AdminGetOrderById,
     onSuccess: (response) => {
       console.log(response);
-      setOrderReview(response.data.orderReview);
-      setOrder(response.data.order);
+      if(response?.success == false && response?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "An error occured",
+          description: <p>{response?.data?.error?.message}</p>,
+        });
+      }else{
+        setOrderReview(response.data.orderReview);
+      setOrder(response.data.order);}
     },
-    onError: (error) => {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: <p>{error?.message}</p>,
-      });
-    },
+   
   });
   const {
     isSuccess: Deleted,
@@ -87,21 +87,21 @@ const OrderReviewCard = ({ orderId }: Props) => {
     mutationFn: AdminDeleteOrder,
     mutationKey: ["delete"],
     onSuccess: (response) => {
+      if(response?.success == false && response?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "An Error occured",
+          description: <p>{response?.data?.error?.message}</p>,
+        });
+      }else{
       toast({
         variant: "success",
         title: "Order deleted",
       });
       setOpenDialog(false);
-      router.back();
+      router.back();}
     },
-    onError: (error) => {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: <p>{error?.message}</p>,
-      });
-    },
+ 
   });
   useEffect(() => {
     server_fetchOrderById(orderId.toString());

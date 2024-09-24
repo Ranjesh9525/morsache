@@ -92,7 +92,14 @@ const Page = (props: Props) => {
     mutate: server_updateStoreData,
   } = useMutation({
     mutationFn: AdminUpdateStoreData,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if(res?.success == false && res?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: <p>{res?.data?.error?.message}</p>,
+        });
+      }else{
       setOpenDialog(false);
       refetch();
       toast({
@@ -100,17 +107,8 @@ const Page = (props: Props) => {
         title: "Success",
         description: "Data updated successfully",
       });
-    },
-    onError: (error) => {
-      setOpenDialog(false);
+    }}
 
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: <p>{error?.message}</p>,
-      });
-    },
   });
   return (
     <>

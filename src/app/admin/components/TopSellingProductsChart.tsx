@@ -50,20 +50,21 @@ function TopSellingProductsChart() {
     data: topProducts,
     isLoading,
     error,
-  } = useQuery<ProductData[]>({
+  } = useQuery({
     queryKey: ["topProducts"],
     queryFn: () => AdminGetTopProducts(),
   });
 
   // const [activeProduct, setActiveProduct] = React.useState<string | null>(null);
   const processedData = React.useMemo(() => {
-    if (!topProducts) return [];
-    return topProducts
-      .map((product, index) => ({
+    // console.log(topProducts)
+    if (!topProducts?.data || topProducts.success ==false) return [];
+    return topProducts?.data
+      .map((product:any, index:number) => ({
         ...product,
         uniqueLabel: `${product.label}_${index}`, // Add a unique identifier
       }))
-      .sort((a, b) => b.value - a.value); // Sort by value in descending order
+      .sort((a:any, b:any) => b.value - a.value); // Sort by value in descending order
   }, [topProducts]);
 
   const [activeProduct, setActiveProduct] = React.useState<string | null>(null);
@@ -76,14 +77,14 @@ function TopSellingProductsChart() {
 
   const activeIndex = React.useMemo(
     () =>
-      processedData.findIndex((item) => item.uniqueLabel === activeProduct) ??
+      processedData.findIndex((item:any) => item.uniqueLabel === activeProduct) ??
       0,
     [processedData, activeProduct]
   );
 
   const chartConfig: ChartConfig = React.useMemo(() => {
     const config: ChartConfig = {};
-    processedData.forEach((product, index) => {
+    processedData.forEach((product:any, index:number) => {
       config[product.uniqueLabel] = {
         label: product.label,
         color: chartColors[index % chartColors.length],
@@ -93,7 +94,7 @@ function TopSellingProductsChart() {
   }, [processedData]);
 
   const totalValue = React.useMemo(
-    () => processedData.reduce((sum, product) => sum + product.value, 0),
+    () => processedData.reduce((sum:any, product:any) => sum + product.value, 0),
     [processedData]
   );
 
@@ -150,7 +151,7 @@ function TopSellingProductsChart() {
             <SelectValue placeholder="Select product" />
           </SelectTrigger>
           <SelectContent align="end" className="rounded-xl">
-            {processedData.map((product) => (
+            {processedData.map((product:any) => (
               <SelectItem
                 key={product.uniqueLabel}
                 value={product.uniqueLabel}
@@ -211,7 +212,7 @@ function TopSellingProductsChart() {
                 </g>
               )}
             >
-              {processedData.map((entry, index) => (
+              {processedData.map((entry:any, index:number) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={chartColors[index % chartColors.length]}

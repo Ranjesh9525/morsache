@@ -20,6 +20,7 @@ import { UserDocument } from "@/@types/user";
 import { NextApiRequest } from "next";
 import bcrypt from "bcryptjs";
 import { signOut } from "next-auth/react";
+import { ErrorResponse } from "@/serverlessActions/responseClass";
 
 interface CustomSignIn {
   user: User | AdapterUser;
@@ -134,9 +135,13 @@ export const authOptions: AuthOptions = {
         await newUser.save();
         return newUser;
       } catch (error: any) {
-        console.error("Error saving user :", error.message);
-        throw new Error("Failed to save user ");
+        console.error("Error signing in :", error.message);
+        return ErrorResponse({
+          message: "An unexpected error occured",
+          statusCode: 500,
+        });
       }
+      
     },
 
   

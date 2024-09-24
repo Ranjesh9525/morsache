@@ -33,17 +33,18 @@ export const UserAddToWishList = async ({
       return item.productId === productId;
     });
     if (user?.wishlist && wishlistIsExist) {
-      return {
-        message: "You already have this in your wishlist",
-        success: true,
-      };
+      return Response(
+         "You already have this in your wishlist",200,
+       true,null
+      )
     }
     const prodId = { productId: productId };
     user.wishlist = [prodId, ...user?.wishlist];
     // console.log(user);
     await user.save();
 
-    return { message: "Added to wishlist ❤", success: true };
+    return Response( "Added to wishlist ❤",200, true ,null)
+    
   } catch (error) {
     console.error("Error adding product to wishlist:", error);
     if (error instanceof AppError) {
@@ -127,10 +128,9 @@ export const UserUpdateShippingAddress = async ({
       address.defaultAddress = true;
       user.address.unshift(address);
       await user.save();
-      return {
-        message: "Shipping address Added successfully",
-        success: true,
-      };
+ 
+    return Response("Shipping address Added successfully", 200, true, null);
+
     }
   } catch (error) {
     console.error("Error updating shipping address:", error);
@@ -219,7 +219,7 @@ export const Account = async ({
     user.password = hashedPassword;
     await user.save();
     // console.log("profile updated");
-    return { message: "Profile updated successfully", success: true };
+    return Response( "Profile updated successfully",200,true,null);
   } catch (error) {
     console.error("Error updating profile:", error);
     throw new AppError("Error updating profile");

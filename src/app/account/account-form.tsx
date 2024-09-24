@@ -315,21 +315,21 @@ const AccountForm = (props: Props) => {
     useMutation({
       mutationFn: UserUpdateAccountProfile,
       onSuccess: (res) => {
-        // console.log(res);
+        // console.log(res)
+        if(res?.success == false && res?.data?.error){
+          toast({
+            variant: "destructive",
+            title: "Failed to update user profile",
+            description: <p>{res?.data?.error?.message}</p>,
+          });
+        }else{
         fetchUserData();
         toast({
           title: "Profile updated",
         });
         router.refresh();
-      },
-      onError: (err) => {
-        console.log(err);
-        toast({
-          variant: "destructive",
-          title: "Failed to update user profile",
-          description: <p>{err?.message}</p>,
-        });
-      },
+      }},
+
     });
   function onEmailOrPhoneSubmit(data: EmailOrPhoneValues) {
     server_userUpdateAccountProfile(data);
@@ -349,22 +349,29 @@ const AccountForm = (props: Props) => {
     server_userUpdateShippingAddress(body);
   }
   useEffect(() => {
-    if (isError) {
-      console.log(error);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+    // if (isError) {
+    //   console.log(error);
+    //   toast({
+    //     title: "Error",
+    //     description: error.message,
+    //     variant: "destructive",
+    //   });
+    // }
     if (isSuccess) {
+      if(data?.success == false && data?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
+      }else{
       fetchUserData();
       toast({
         title: "Success",
         description: <p>{data?.message}</p>,
       });
-    }
-  }, [isError, isSuccess]);
+    }}
+  }, [ isSuccess]);
   return (
     <div>
       <Form {...emailOrPhoneForm}>

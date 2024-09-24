@@ -25,16 +25,7 @@ const GeneralProductsPage = (props: Props) => {
         // console.log(categoriesResponse);
         setAllCategories(categoriesResponse?.data);
       }
-      if (
-        categoriesResponse?.success == false &&
-        categoriesResponse?.data?.error
-      ) {
-        console.log(categoriesResponse?.data);
-        toast({
-          variant: "destructive",
-          title: categoriesResponse?.data?.error?.message,
-        });
-      }
+     
     }
   }, [categoriesResponse]);
   return (

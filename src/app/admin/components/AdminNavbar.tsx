@@ -112,26 +112,25 @@ const AdminNavbar = ({ scrolling }: Props) => {
   const isPreview = useSearchParams()?.get("preview");
   useEffect(() => {
     if (isSuccess) {
+      console.log(data);
+      if(data?.success == false && data?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Upload failed",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
+      }else{
       toast({
         variant: "success",
         title: `Product uploaded`,
       });
       localStorage.removeItem("product-draft");
       setSavedProduct(null);
-      router.push("/admin/products/create");
+      router.push("/admin/products/create");}
     }
-    if (isError) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "Upload failed",
-        description: <p>{error?.message}</p>,
-      });
-    }
-    if (data) {
-      console.log(data);
-    }
-  }, [data, isError, isSuccess]);
+   
+
+  }, [data, isSuccess]);
 
   useEffect(() => {
     if (localStorage.getItem("product-draft") && isPreview) {

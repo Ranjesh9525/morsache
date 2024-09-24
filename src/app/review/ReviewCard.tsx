@@ -33,14 +33,7 @@ const ReviewCard = ({ orderNo }: Props) => {
       //  console.log(response)
       setOrder(response.data);
     },
-    onError(error) {
-      console.log(error);
-      //   toast({
-      //     variant: "destructive",
-      //     title: "Error",
-      //     description: <p>{error?.message}</p>,
-      //   });
-    },
+   
   });
   useEffect(() => {
     server_fetchOrderById(orderNo);

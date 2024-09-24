@@ -83,9 +83,10 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
     mutate: validateOffersMutate,
   } = useMutation({
     mutationFn: validateOffers,
-    onError(error, variables, context) {
-      console.log(error);
-    },
+onSuccess:(res)=>{
+  if(res?.success == false && res?.data?.error){
+   console.log(res)}
+}
   });
   const {
     isPending: uploadCartIsPending,
@@ -175,28 +176,35 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
 
   useEffect(() => {
     if (findCartIsSuccess) {
+      if (findCartData?.success == false && findCartData?.data?.error) {
+        // console.log(findCartData);
+        redirect("/cart?error=404");
+      } else {
       setUserCartWithDiscount(findCartData?.data);
       if (findCartData?.data?.receiveBy) {
         dispatch({
           type: "SET_SHIPPING_CHOICE",
           payload: findCartData?.data?.receiveBy,
         });
-      }
+      }}
       // console.log(findCartData?.data);
     }
-    if (findCartIsError) {
-      console.log(findCartError);
-      redirect("/cart?error=404");
-    }
-  }, [findCartIsSuccess, findCartData, findCartIsError]);
+ 
+  }, [findCartIsSuccess, findCartData]);
   useEffect(() => {
-    if (uploadCartIsSuccess && uploadCartData?.data) {
-      redirect(`/cart/checkout/${uploadCartData?.data}`);
+    if (uploadCartIsSuccess ) {
+      if (uploadCartData?.success == false && uploadCartData?.data?.error) {
+      toast({
+  variant:"destructive",
+  title:"oops",
+  description:`${uploadCartData?.data?.error?.message}`
+})  // console.log(findCartData);
+        // redirect("/cart?error=500");
+
+      } else {
+      redirect(`/cart/checkout/${uploadCartData?.data}`);}
     }
-    if (uploadCartIsError) {
-      console.log(uploadCartError);
-      redirect("/cart?error=500");
-    }
+  
   }, [uploadCartIsSuccess, uploadCartData, uploadCartIsError]);
 
   useEffect(() => {
@@ -258,7 +266,7 @@ const CheckoutCard = ({ cart, cartId, showProducts }: Props) => {
     if (shippingDataResponse) {
       // console.log(shippingDataResponse, userCartWithDiscount);
       if (shippingDataResponse?.success == false) {
-        console.log(shippingDataResponse.data);
+        // console.log(shippingDataResponse.data);
         toast({
           variant: "destructive",
           title: shippingDataResponse?.data?.error?.message,

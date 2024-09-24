@@ -84,11 +84,11 @@ export default function OrdersChart() {
   }, [fetchChartData])
 
   const filteredData = React.useMemo(() => {
-    if (!chartData) return []
+    if (!chartData || chartData?.success == false) return []
     const now = new Date()
     const monthsToSubtract = timeRange === "1m" ? 1 : timeRange === "3m" ? 3 : timeRange === "6m" ? 6 : 12
     const startDate = subMonths(now, monthsToSubtract)
-    return chartData.filter(item => parseISO(item.date) >= startDate)
+    return chartData?.data.filter((item:any) => parseISO(item.date) >= startDate)
   }, [chartData, timeRange])
 
   const renderChart = () => {

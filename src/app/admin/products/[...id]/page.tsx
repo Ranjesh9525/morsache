@@ -114,17 +114,17 @@ const Page = ({ params }: Props) => {
 
   useEffect(() => {
     if (response) {
-      console.log("response", response);
+      if (response?.success == false && response?.data?.error) {
+        toast({
+          variant: "destructive",
+          title: "Error while fetching products",
+          description: <p>{response?.data?.error?.message}</p>,
+        });
+      } else {
+      console.log("response", response);}
     }
-    if (isError) {
-      console.log("Error while fetching product", error);
-      toast({
-        title: "Error",
-        description: "Error while fetching product see logs",
-        variant: "destructive",
-      });
-    }
-  }, [isError, response]);
+  
+  }, [ response]);
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -265,7 +265,7 @@ const Page = ({ params }: Props) => {
       effect: "flat",
     },
   ];
-  if (isError) {
+  if (isError || response?.success == false) {
     <>
       <PageHeadingText
         pageHeading="Edit product"

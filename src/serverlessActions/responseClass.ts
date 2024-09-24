@@ -24,7 +24,7 @@ export function Response(
   data?: any,){
     return JSON.parse(JSON.stringify(new ResponseClass(message, statusCode, success, data)))
   }
-export function ErrorResponse(error:{message:string,statusCode:number}):{ success: boolean,data:any}{
+export function ErrorResponse(error:{message:string,statusCode:number}):{ success: boolean,data:any,message?:any}{
   return { success:false, data:{error: { message: error.message, statusCode: error.statusCode} } }
 }
   export class AppError extends Error {

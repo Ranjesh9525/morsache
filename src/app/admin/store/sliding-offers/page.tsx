@@ -83,21 +83,22 @@ const Page = (props: Props) => {
     mutate: server_updateStoreData,
   } = useMutation({
     mutationFn: AdminUpdateStoreData,
-    onSuccess: () => {
+    onSuccess: (res) => {
+      if(res?.success == false && res?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "An error occured",
+          description: <p>{res?.data?.error?.message}</p>,
+        });
+      }else{
       refetch();
       toast({
         variant: "success",
         title: "Success",
         description: "Data updated successfully",
-      });
+      });}
     },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: <p>{error?.message}</p>,
-      });
-    },
+  
   });
 
   const slidingOffersFormSchema = z.object({

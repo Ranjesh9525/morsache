@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
-import { format } from "@/components/products/ProductInfo";
 import { AdminAddTeam, AdminGetAllTeam } from "@/serverlessActions/_adminActions";
 
 
@@ -102,20 +101,20 @@ const Page = (props: Props) => {
   } = useMutation({
     mutationFn: AdminAddTeam,
     onSuccess(data, variables, context) {
+      if(data?.success == false && data?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Team addition failed",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
       toast({
         variant:"success",
         title: "Team added ",
         description: "Team added successfully",
       });
-      refetch()
+      refetch()}
     },
-    onError(error){
-      toast({
-        variant: "destructive",
-        title: "Error:Team creation failed",
-        description:<p>{error?.message}</p> ,
-      })
-    }
+   
   });
   function onSubmit(values:z.infer<typeof TeamSchema>) {
    server_AdminAddTeam({email:values.email})
@@ -125,18 +124,25 @@ const Page = (props: Props) => {
  
 useEffect(()=>{
   if(teamIsSuccess){
+    if(teamResponse?.success == false){
+      toast({
+        variant: "destructive",
+        title: "Error:Team fetch failed",
+        description:<p>{teamResponse?.data?.error?.message}</p> ,
+      })
+    }
     setTeamsData(teamResponse?.data)
   }},[teamIsSuccess,teamResponse])
-  useEffect(()=>{
-    if(error){
-    toast({
-      variant: "destructive",
-      title: "Error:Team creation failed",
-      description:<p>{error?.message}</p> ,
-    })
-  }
+//   useEffect(()=>{
+//     if(error){
+//     toast({
+//       variant: "destructive",
+//       title: "Error:Team creation failed",
+//       description:<p>{error?.message}</p> ,
+//     })
+//   }
   
-},[teamError])
+// },[teamError])
 
   return (
     <>

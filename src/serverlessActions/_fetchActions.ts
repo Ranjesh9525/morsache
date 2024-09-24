@@ -147,9 +147,8 @@ export const FetchAllCategories = async () => {
     if (!categories) {
       return null;
     }
-    throw new AppError("failed to fetch categories , test error");
-    // return Response("categories", 200, true, categories);
-    return null;
+    // throw new AppError("failed to fetch categories , test error");
+    return Response("categories", 200, true, categories);
   } catch (error) {
     console.error("Error fetching categories", error);
     if (error instanceof AppError) {

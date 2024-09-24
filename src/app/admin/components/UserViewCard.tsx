@@ -23,16 +23,16 @@ const UserViewCard = ({ id }: Props) => {
     mutationFn: AdminGetSingleUsers,
     onSuccess: (res) => {
       //   console.log(res?.data);
-      setFetchedUser(res?.data);
+      if(res?.success == false && res?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "An Error occured fetching user data",
+          description: <p>{res?.data?.error?.message}</p>,
+        });
+      }else{
+      setFetchedUser(res?.data)}
     },
-    onError(error) {
-      console.log(error);
-      toast({
-        variant: "destructive",
-        title: "An error occured fetching user data",
-        description: <p>{error?.message}</p>,
-      });
-    },
+
   });
 
   useEffect(() => {

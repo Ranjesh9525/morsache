@@ -248,20 +248,20 @@ const ProfileForm = (props: Props) => {
     mutationFn: UserUpdateAccountProfile,
     onSuccess: (res) => {
       // console.log(res);
+      if(res?.success == false && res?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Failed to update user profile",
+          description: <p>{res?.data?.error?.message}</p>,
+        });
+      }else{
       fetchUserData();
       toast({
         title: "Profile updated",
       });
       router.refresh();
-    },
-    onError: (err) => {
-      console.log(err);
-      toast({
-        variant: "destructive",
-        title: "Failed to update user profile",
-        description: <p>{err?.message}</p>,
-      });
-    },
+    }},
+   
   });
 
   function onSubmit(data: ProfileFormValues) {

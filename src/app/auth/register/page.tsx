@@ -66,21 +66,21 @@ const Page = (props: Props) => {
   const {data,isError,isPending,error,isSuccess,mutate:server_updateUserDetails}=useMutation({
     mutationFn:Account,
     onSuccess:(data)=>{
-
+      if(data?.success == false && data?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Couldnt update account detail",
+          description: <p>{data?.data?.error?.message}</p>,
+        });
+      router.push('/serverError')
+      }else{
       toast({
         variant:"default",
         title:"Account updated successfully",
       })
       router.push("/account")
-    },
-    onError:(error)=>{
-      toast({
-        variant:"destructive",
-        title:"Couldnt update account details",
-        description:error.message
-      })
-      router.push('/serverError')
-    }
+    }},
+ 
 
   })
 

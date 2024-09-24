@@ -194,12 +194,10 @@ const DisplayOrders = (props: Props) => {
   } = useMutation({
     mutationFn: UserGetAllOrders,
     onSuccess: (res) => {
-      console.log(res);
+      // console.log(res);
       setOrders(res.data);
     },
-    onError: (err) => {
-      console.log(err);
-    },
+  
   });
   useEffect(() => {
     server_userGetAllOrders();

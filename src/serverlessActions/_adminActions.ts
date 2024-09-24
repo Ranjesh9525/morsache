@@ -256,7 +256,7 @@ export const AdminCreateOffer = async (data: Offer) => {
         "Invalid quantity discount,quantity effect cannot be 0 or less than 0"
       );
     }
-    console.log("creating offer...");
+    // console.log("creating offer...");
     await connectDB();
     await adminAction();
     const offer = new OffersModel(data);
@@ -282,6 +282,25 @@ export const AdminGetAllOffers = async () => {
     await adminAction();
     const offers: Offer[] = await OffersModel.find().sort({ createdAt: -1 });
     return Response("Offers fetched successfully", 200, true, offers);
+  } catch (error) {
+    console.error("Error fetching offers:", error);
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  }
+};
+export const AdminDeleteOffer = async (id:string) => {
+  try {
+    await connectDB();
+    await adminAction();
+     await OffersModel.findByIdAndDelete(id)
+    return Response("Offers deleted successfully", 200, true, null);
   } catch (error) {
     console.error("Error fetching offers:", error);
     if (error instanceof AppError) {
@@ -433,9 +452,21 @@ export const AdminGetAllTeam = async () => {
     await connectDB();
     await adminAction();
     const Team = await UserModel.find({ role: "admin" }).sort({ email: 1 });
-    return Response("Team fetched successfully", 200, true, Team);
+    // return Response("Team fetched successfully", 200, true, Team);
+    throw new AppError("failured")
+    return null
   } catch (error) {
     console.error("Error adding teammate ");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  
   }
 };
 
@@ -447,6 +478,16 @@ export const AdminGetAllShippingData = async () => {
     return Response("Shipping data fetched", 200, true, ShippingData);
   } catch (error) {
     console.error("Error adding teammate ");
+    if (error instanceof AppError) {
+      return ErrorResponse(error);
+    }
+
+    // For unexpected errors, return a generic error message
+    return ErrorResponse({
+      message: "An unexpected error occurred",
+      statusCode: 500,
+    });
+  
   }
 };
 
@@ -1010,7 +1051,7 @@ export async function AdminGetTopProducts() {
       value: product.purchaseQuantity + index,
     }));
     // console.log(chartData);
-    return chartData;
+    return Response("charts data",200,true,chartData)
   } catch (error) {
     console.log("Error fetching top products statistics", error);
     if (error instanceof AppError) {
@@ -1094,7 +1135,7 @@ export async function AdminGetOrderChartData(numberOfWeeks: number = 12) {
       });
     }
 
-    return chartData;
+    return Response("charts data",200,true,chartData)
   } catch (error) {
     console.log("Error fetching order statistics", error);
     if (error instanceof AppError) {

@@ -41,7 +41,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Offer } from "@/@types/products";
 import {
   AdminCreateOffer,
-  AdminFetchAllOffers,
+  AdminGetAllOffers,
   AdminDeleteOffer,
 } from "@/serverlessActions/_adminActions";
 import { Trash2Icon } from "lucide-react";
@@ -140,19 +140,20 @@ const Page = (props: Props) => {
     error: fetchError,
   } = useQuery({
     queryKey: ["offers"],
-    queryFn: () => AdminFetchAllOffers(),
+    queryFn: () => AdminGetAllOffers(),
   });
   useEffect(() => {
-    if (fetchError) {
-      toast({
-        variant: "destructive",
-        title: "Error:offer fetch failed",
-        description: <p>{fetchError?.message}</p>,
-      });
-    }
+
     if (fetchIssuccess) {
       // console.log(offers);
-      setAllOffers(offers?.data);
+      if(offers?.success == false && offers?.data?.error){
+        toast({
+          variant: "destructive",
+          title: "Error:Offer fetch failed",
+          description: <p>{offers?.data?.error?.message}</p>,
+        });
+      }else{
+      setAllOffers(offers?.data);}
     }
   }, [fetchError, fetchIssuccess]);
   function onSubmit(values: Offer) {

@@ -21,7 +21,7 @@ import {
   GetProductsByCategory,
   FetchProductsFromFilterData,
 } from "@/serverlessActions/_fetchActions";
-import { sampleProducts } from "./page/ProductPage";
+// import { sampleProducts } from "./page/ProductPage";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@react-hook/media-query";
 
@@ -77,29 +77,29 @@ const DisplayProducts = ({
   useEffect(() => {
     if (!isError && response?.data) {
       // console.log("data", response);
+      if (response?.success == false && response?.data?.error) {
+        router.push("/serverError");
+
+        } else {
       setProductsAmount(response?.data?.length);
       // console.log(response?.data?.length);
-      setProductsData(response?.data);
+      setProductsData(response?.data);}
     }
-    if (error) {
-      console.log("error", error);
-      router.push("/serverError");
-    }
+
     if (!productsFromFilterIsError && productsFromFilterResponse?.data) {
       // console.log("data", productsFromFilterResponse);/
+      if (productsFromFilterResponse?.success == false && productsFromFilterResponse?.data?.error) {
+        router.push("/serverError");
+
+        } else {
       setProductsAmount(productsFromFilterResponse?.data?.length);
       // console.log(productsFromFilterResponse?.data?.length);
-      setProductsData(productsFromFilterResponse?.data);
+      setProductsData(productsFromFilterResponse?.data);}
     }
-    if (productsFromFilterError) {
-      console.log("error", productsFromFilterError);
-      router.push("/serverError");
-    }
+ 
   }, [
-    isError,
     response,
     error,
-    productsFromFilterIsError,
     productsFromFilterResponse,
     productsFromFilterError,
   ]);
