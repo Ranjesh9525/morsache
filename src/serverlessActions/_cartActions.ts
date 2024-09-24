@@ -335,6 +335,7 @@ export const InitializeOrder = async ({
     ) {
       if (cart.receiveBy === "pickup" && cart.items && cart.totalItems) {
       } else {
+console.log(cart)
         throw new AppError(
           "Failed to place order. Order process is incomplete. Try again"
         );
