@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { getServerSession } from "next-auth";
-import { getSession } from "next-auth/react";
+// import { getSession } from "next-auth/react";
 // import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // import { getSession } from "./_hooks/getSession";
 
@@ -12,14 +12,14 @@ const unprotectedRoutes = ["/auth"];
 // import { auth } from './services/auth';
 
 export default async function middleware(request: NextRequest) {
-  const req = {
-    headers: new Headers(request.headers),
-    method: request.method,
-    url: request.url,
-    cookies: request.cookies,
-  };
+  // const req = {
+  //   headers: new Headers(request.headers),
+  //   method: request.method,
+  //   url: request.url,
+  //   cookies: request.cookies,
+  // };
 
-  const session: any = await getSession();
+  const session: any = await getToken({req:request});
 
   console.log(session);
   const isProtectedRoute = protectedRoutes.some((prefix) =>
