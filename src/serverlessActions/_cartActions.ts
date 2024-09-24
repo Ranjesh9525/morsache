@@ -194,8 +194,8 @@ export const FetchUserCartShippingData = async () => {
       .toObject()
       .address.find((address: any) => address.defaultAddress === true);
 
-    // if (!userShippingAddress) {
-    //   throw new AppError("No shipping address found",404);
+    if (!userShippingAddress) {
+       throw new AppError("No shipping address found",404);
     // }
     // const TotalShippingAddressData: Shipping[] = [];
 
