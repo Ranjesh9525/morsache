@@ -436,7 +436,7 @@ console.log(cart)
           cart.totalAmount +
           (cart.receiveBy === "delivery"
             ? parseInt(
-                cart?.shippingPrice! || DefaultShippingData?.price || "0"
+                cart?.shippingPrice! || "0"
               )
             : 0),
         shippingPrice: cart.shippingPrice || 0,
