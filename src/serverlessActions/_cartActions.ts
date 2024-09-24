@@ -333,10 +333,10 @@ console.log(adminData)
       !cart.shippingAddress ||
       cart.shippingPrice == null || cart.shippingPrice == undefined ||
 !cart.receiveBy
-    ) {
+    ) {console.log(cart)
       if (cart.receiveBy === "pickup" && cart.items && cart.totalItems) {
       } else {
-console.log(cart)
+
         throw new AppError(
           "Failed to place order. Order process is incomplete. Try again"
         );
@@ -451,7 +451,7 @@ console.log(cart)
         collectionMethod: cart.receiveBy,
         paymentStatus: "pending",
       });
-     //  console.log("order", order);
+       console.log("order", order);
       await order.save();
       user.carts[0].paymentMethod = { type: paymentMethod };
       user.carts[0].isPaid = true;
