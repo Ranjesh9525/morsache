@@ -121,14 +121,14 @@ export const sendOrderConfirmationEmail = (
                    </table>
    
                   ${
-                    order.shippingAddress.city ||
-                    (order.shippingAddress.state &&
+                    (order.shippingAddress.city ||
+                    order.shippingAddress.state) &&
                       `<h3 style="color: #3b3838;">Shipping Address</h3>
                    <p>
                        ${order.shippingAddress.street}<br>
                        ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.postalCode}<br>
                        ${order.shippingAddress.country}
-                   </p>`)
+                   </p>`
                   }
                    <h3 style="color: #3b3838;">Ordered Products</h3>
                    <table cellpadding="10" cellspacing="0" width="100%" style="margin-bottom: 20px; border-collapse: collapse;">
