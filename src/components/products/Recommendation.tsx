@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import ProductCard from "../general/ProductCard";
 import DisplayProducts from "./DisplayProducts";
-import { sampleProducts } from "./page/ProductPage";
+// import { sampleProducts } from "./page/ProductPage";
 
 type Props = {
   tags: string[];
@@ -21,7 +21,7 @@ const Recommendation = ({ tags }: Props) => {
   } = useMutation({
     mutationFn: FetchSimilarProducts,
   });
-  console.log(response);
+  // console.log(response);
 
   useEffect(() => {
     if (tags && tags?.length > 0) {
@@ -41,9 +41,9 @@ const Recommendation = ({ tags }: Props) => {
         className="grid md:grid-cols-5 grid-cols-3 gap-4 max-sm:gap-3 gap-y-7"
       >
         {isPending ? (
-          sampleProducts.map((item, index) => (
+          Array.from({length:12}).map((item:any, index:number) => (
             <ProductCard
-              item={item}
+              item={null}
               index={index}
               key={index}
               nameOnly={true}
