@@ -308,6 +308,7 @@ export const InitializeOrder = async ({
     await connectDB();
     const user = await authAction();
     const adminData = await AdminModel.find();
+console.log(adminData)
     const DefaultShippingData: any = await ShippingModel.findOne({
       name: "default",
     });
@@ -330,11 +331,12 @@ export const InitializeOrder = async ({
       !cart.items ||
       !cart.totalItems ||
       !cart.shippingAddress ||
-      cart.shippingPrice == null || cart.shippingPrice == undefined 
+      cart.shippingPrice == null || cart.shippingPrice == undefined ||
+!cart.receiveBy
     ) {
       if (cart.receiveBy === "pickup" && cart.items && cart.totalItems) {
       } else {
-//console.log(cart)
+console.log(cart)
         throw new AppError(
           "Failed to place order. Order process is incomplete. Try again"
         );
@@ -449,7 +451,7 @@ export const InitializeOrder = async ({
         collectionMethod: cart.receiveBy,
         paymentStatus: "pending",
       });
-      // console.log("order", order);
+       console.log("order", order);
       await order.save();
       user.carts[0].paymentMethod = { type: paymentMethod };
       user.carts[0].isPaid = true;
@@ -470,14 +472,7 @@ export const InitializeOrder = async ({
         );
         return Response("Order created", 200, true, order?.orderNumber);
       } else {
-        order.confirmedOn = new Date(Date.now());
-        order.expectedDeliveryOrPickupDate1 = new Date(
-          order?.confirmedOn.getTime() + 7 * 24 * 60 * 60 * 1000
-        );
-        order.expectedDeliveryOrPickupDate2 = new Date(
-          order?.confirmedOn.getTime() + 12 * 24 * 60 * 60 * 1000
-        );
-        await order.save();
+        
         sendOrderConfirmationEmail(
           order,
           user.email,
