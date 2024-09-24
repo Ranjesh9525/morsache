@@ -218,7 +218,7 @@ export const FetchUserCartShippingData = async () => {
     //   }
     // }, null);
     // // console.log(shippingData);
-    // user.carts[0].shippingAddress = userShippingAddress;
+    
     // user.carts[0].receiveBy = "delivery";
     // if (shippingData) {
     //   user.carts[0].shippingPrice = shippingData?.price;
@@ -239,7 +239,7 @@ export const FetchUserCartShippingData = async () => {
     //     return Response("shipping data", 200, true, DefaultShippingData);
     //   }
     // }
-
+user.carts[0].shippingAddress = userShippingAddress;
     if (user.carts[0].totalAmount >= 1000) {
       user.carts[0].shippingPrice = 0;
       await user.save();
