@@ -452,9 +452,9 @@ export const AdminGetAllTeam = async () => {
     await connectDB();
     await adminAction();
     const Team = await UserModel.find({ role: "admin" }).sort({ email: 1 });
-    // return Response("Team fetched successfully", 200, true, Team);
-    throw new AppError("failured")
-    return null
+     return Response("Team fetched successfully", 200, true, Team);
+   //throw new AppError("failured")
+   // return null
   } catch (error) {
     console.error("Error adding teammate ");
     if (error instanceof AppError) {
