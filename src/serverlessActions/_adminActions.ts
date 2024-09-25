@@ -1048,7 +1048,7 @@ export async function AdminGetTopProducts() {
       value: number;
     }[] = topProducts.map((product, index) => ({
       label: product.name,
-      value: product.purchaseQuantity + index,
+      value: product.purchaseQuantity
     }));
     // console.log(chartData);
     return Response("charts data",200,true,chartData)
