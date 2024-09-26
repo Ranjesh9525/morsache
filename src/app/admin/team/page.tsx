@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
-import { AdminAddTeam, AdminGetAllTeam } from "@/serverlessActions/_adminActions";
+import { AdminAddTeam, AdminGetAllTeam,AdminRemoveTeam } from "@/serverlessActions/_adminActions";
 import { Trash2Icon } from "lucide-react";
 
 
@@ -83,14 +83,14 @@ export const columns: ColumnDef<Users>[] = [
           color="red"
           onClick={async () => {
             if (confirm("Are you sure you want to remove this admin?")) {
-              // const res = await AdminDeleteOffer(rowData.id);
+              const res = await AdminRemoveTeam(rowData.id);
 
-              // if (res) {
-              //   toast({
-              //     variant: "success",
-              //     description: "Offer deleted successfully",
-              //   });
-              // }
+              if (res) {
+                toast({
+                  variant: "success",
+                  description: "Admin removed",
+                });
+              }
             }
           }}
         />

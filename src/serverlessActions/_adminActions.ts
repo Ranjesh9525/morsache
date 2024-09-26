@@ -425,11 +425,11 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
   try {
     await connectDB();
     await adminAction();
-    const user = await UserModel.findOne({ email });
+    // const user = await UserModel.findOne({ email });
 
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
+    // if (!user) {
+    //   throw new AppError("User not found", 404);
+    // }
 
     await UserModel.findOneAndUpdate(
       { email: email },
@@ -444,6 +444,31 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
   } catch (error) {
     console.error("Error adding teammate:", error);
     throw new AppError("Error adding teammate");
+  }
+};
+export const AdminRemoveTeam = async (id:any) => {
+  try {
+    await connectDB();
+    await adminAction();
+    // const user = await UserModel.findOne({ email });
+
+    // if (!user) {
+    //   throw new AppError("User not found", 404);
+    // }
+
+    await UserModel.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          role: "customer",
+        },
+      }
+    );
+
+    return Response("Teammate removed successfully", 200, true);
+  } catch (error) {
+    console.error("Error removing teammate:", error);
+    throw new AppError("Error removing teammate");
   }
 };
 

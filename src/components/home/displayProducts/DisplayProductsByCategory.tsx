@@ -19,9 +19,9 @@ const DisplayProductsByCategory = ({ category }: Props) => {
         className="grid lg:grid-cols-4  grid-cols-2 gap-6   "
       >
         {category.items.map((item, index) => (
-          <Link href={`/products/category/${item.name}`}>
+          <Link   key={index} href={`/products/category/${item.name}`}>
             <motion.div
-              key={index}
+            
               whileHover={{ scale: 1.05 }}
               id="product-item"
               className=" relative cursor-pointer"
