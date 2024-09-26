@@ -145,7 +145,7 @@ export const sendOrderConfirmationEmail = (
                        <tr>
                            <td style="font-weight: bold;">Subtotal:</td>
                            <td style="text-align: right;">${format(
-                             parseInt(order.totalAmount as string)
+                             parseInt(order.totalAmount - (order.shippingPrice! || 0) as string)
                            )}</td>
                        </tr>
                       ${
@@ -161,11 +161,7 @@ export const sendOrderConfirmationEmail = (
                        <tr style="font-size: 18px; font-weight: bold; color: #3b3838;">
                            <td>Total:</td>
                            <td style="text-align: right;">${format(
-                             (order.totalAmount! as number) +
-                               (order.shippingPrice &&
-                               order.collectionMethod !== "pickup"
-                                 ? (order.shippingPrice as number)
-                                 : 0)
+                             (order.totalAmount! as number) 
                            )}</td>
                        </tr>
                    </table>
