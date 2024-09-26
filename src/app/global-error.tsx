@@ -27,7 +27,7 @@ export default function GlobalError({
               id="navbar"
               className="lg:p-5 p-3 flex justify-between items-center"
             >
-              {" "}
+              
               <Link
                 scroll={true}
                 href="/"
@@ -51,7 +51,7 @@ export default function GlobalError({
                 {"Oops, something went wrong!"}
               </h1>
               <p className="mt-4 text-muted-foreground">
-                {
+                 {
                   "We're sorry, but an unexpected error has occurred. Please try again later or contact support if the issue persists."
                 }
               </p>

@@ -32,13 +32,7 @@ const AdminFooter = (props: Props) => {
         </section>
         <section className=" flex items-center justify-center flex-col text-[12px]">
           <h1>© {new Date().getFullYear()} MORSACHE</h1>
-          <Link
-            href=""
-            target={"_blank"}
-            className="font-medium cursor-pointer"
-          >
-            Made By -------
-          </Link>
+         
         </section>
       </section>
     </div>

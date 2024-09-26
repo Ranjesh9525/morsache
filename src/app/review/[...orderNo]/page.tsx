@@ -13,6 +13,7 @@ type Props = {
 };
 
 const page = (props: Props) => {
+
   return (
     <HomeLayout title="Review order - Morsache Clothing">
       <div className="w-full md:container p-4 mb-9 mt-4 gap-9">
