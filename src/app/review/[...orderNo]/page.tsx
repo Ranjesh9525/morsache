@@ -13,7 +13,7 @@ type Props = {
 };
 
 const page = (props: Props) => {
-if (!props.params.orderNo) {
+if (props.params.orderNo) {
     throw new Error("Order number is missing!");
   }
   return (
