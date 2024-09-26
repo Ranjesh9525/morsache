@@ -45,7 +45,13 @@ type Props = {};
 const Page = (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any | null>({
+    name: "",
+    section: "",
+    categories: [""],
+    categoriesId: [""],
+    type: "",
+  });
   const [featuredCategories, setFeaturedCategories] =
     useState<FeaturedCategories | null>(null);
   const [featuredCategoriesData, setFeaturedCategoriesData] =
@@ -94,7 +100,7 @@ const Page = (props: Props) => {
   } = useMutation({
     mutationFn: AdminUpdateStoreData,
     onSuccess: (res) => {
-      console.log(res);
+      // console.log(res);
       if (res?.success == false && res?.data?.error) {
         toast({
           variant: "destructive",

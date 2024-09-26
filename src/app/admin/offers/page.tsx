@@ -85,10 +85,16 @@ const columns = [
             if (confirm("Are you sure you want to delete this offer?")) {
               const res = await AdminDeleteOffer(rowData.id);
 
-              if (res) {
+              if (res.success !== false) {
                 toast({
                   variant: "success",
                   description: "Offer deleted successfully",
+                });
+              }else{
+                toast({
+                  variant: "destructive",
+                  title:"Error",
+                  description: `{res?.data?.error?.message}`,
                 });
               }
             }

@@ -85,10 +85,16 @@ export const columns: ColumnDef<Users>[] = [
             if (confirm("Are you sure you want to remove this admin?")) {
               const res = await AdminRemoveTeam(rowData.id);
 
-              if (res) {
+              if (res.success !== false) {
                 toast({
                   variant: "success",
                   description: "Admin removed",
+                });
+              }else{
+                toast({
+                  variant: "destructive",
+                  title:"Error",
+                  description: `${res?.data?.error?.message}`,
                 });
               }
             }
