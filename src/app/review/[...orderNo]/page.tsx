@@ -13,9 +13,7 @@ type Props = {
 };
 
 const page = (props: Props) => {
-if (props.params.orderNo) {
-    throw new Error("Order number is missing!");
-  }
+
   return (
     <HomeLayout title="Review order - Morsache Clothing">
       <div className="w-full md:container p-4 mb-9 mt-4 gap-9">
