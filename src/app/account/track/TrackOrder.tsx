@@ -280,9 +280,12 @@ const TrackOrder = (props: Props) => {
   } = useMutation({
     mutationFn: UserTrackOrder,
     onSuccess: (res) => {
-      console.log(res);
+      // console.log(res);
+      if(res.success==false){
+        setOrder(null)
+      }else{
       setOrder(res?.data);
-    },
+    }},
   
   });
   useEffect(() => {}, []);

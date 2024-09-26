@@ -48,9 +48,14 @@ const ProductInfo = ({ product }: Props) => {
   } = useMutation({
     mutationFn: UserAddToWishList,
     onSuccess: (response) => {
+      if(response.success == false){
+        toast({
+          title: `${response?.data?.error?.message}`,
+        })
+      }else{
       toast({
         title: `${response?.message}`,
-      });
+      });}
     },
 
   });
@@ -61,8 +66,11 @@ const ProductInfo = ({ product }: Props) => {
         // toast({
         //   title: `${res?.message}`,
         // });
-        console.log(res)
-        setOffers(res?.data);
+        if(res.success==false){
+          console.log(res)
+// setOffers(null)
+        }else{
+        setOffers(res?.data);}
       },
      
     });

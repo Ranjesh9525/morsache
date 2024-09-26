@@ -1,9 +1,10 @@
 import { CartItem, CartItemForServer } from "@/@types/cart";
 import { Order } from "@/@types/order";
 import { Product } from "@/@types/products";
+import { format } from "@/utilities/global";
 import { formatDate } from "date-fns";
 import nodemailer from "nodemailer";
-import { format } from "util";
+// import { format } from ".";
 import { UserUpdateShippingAddress } from "./_userActions";
 const senderName = process.env.SMTP_FROM_NAME;
 const senderEmail = process.env.SMTP_FROM;
@@ -51,8 +52,8 @@ export const sendOrderConfirmationEmail = (
          <td style="text-align: right;">${i.item.quantity}</td>
          <td style="text-align: right;">${
            i.item.discountedPrice
-             ? i.item.discountedPrice.toFixed(2)
-             : i.item.totalPrice.toFixed(2)
+             ? format(parseInt(i.item.discountedPrice.toFixed(2)))
+             :format( parseInt(i.item.totalPrice.toFixed(2)))
          }</td>
      </tr>`
   );
@@ -71,7 +72,7 @@ export const sendOrderConfirmationEmail = (
          
            <tr>
                <td style="padding: 40px 20px; text-align: center; background-color: #6a6a6a;">
-                   <h2 style="color: #ffffff; margin: 0; font-size: 28px;display:flex;align-items:center;justify-content:center">                               <img src="${url}/morsache-clothing-logo-small.png" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">Morsache
+                   <h2 style="color: #ffffff; margin: 0; font-size: 28px;display:flex;align-items:center;justify-content:center">                               <img src="https://morsache.vercel.app/morsache-clothing-logo-small.png" alt="Morsache Logo" style="display: block; width: 60px; height: 60px;">Morsache
                    </h2>
                </td>
            </tr>
@@ -96,7 +97,7 @@ export const sendOrderConfirmationEmail = (
                        </tr>
                        <tr>
                            <td style="font-weight: bold;">Expected Delivery/Pickup:</td>
-                           <td>${order.expectedDeliveryOrPickupDate1 ?"Between " + formatDate(order?.expectedDeliveryOrPickupDate1, "PPP") + " - " + formatDate(order?.expectedDeliveryOrPickupDate2, "PPP") : "Calculated when order is confirmed"}</td>
+                           <td>${order.expectedDeliveryOrPickupDate1 ?"Between " + formatDate(order?.expectedDeliveryOrPickupDate1, "PPP") + " - " + formatDate(order?.expectedDeliveryOrPickupDate2!, "PPP") : "Calculated when order is confirmed"}</td>
                        </tr>
                        <tr>
                            <td style="font-weight: bold;">Collection Method:</td>
@@ -144,7 +145,7 @@ export const sendOrderConfirmationEmail = (
                        <tr>
                            <td style="font-weight: bold;">Subtotal:</td>
                            <td style="text-align: right;">${format(
-                             order.totalAmount
+                             parseInt(order.totalAmount as string)
                            )}</td>
                        </tr>
                       ${
@@ -152,7 +153,7 @@ export const sendOrderConfirmationEmail = (
                           ? `<tr>
                            <td style="font-weight: bold;">Shipping:</td>
                            <td style="text-align: right;">${format(
-                             order.shippingPrice
+                            parseInt(order.shippingPrice! as string)
                            )}</td>
                        </tr>`
                           : ""

@@ -194,8 +194,11 @@ const DisplayOrders = (props: Props) => {
   } = useMutation({
     mutationFn: UserGetAllOrders,
     onSuccess: (res) => {
-      // console.log(res);
-      setOrders(res.data);
+      if(res.success == false){
+        // console.log(res);
+        setOrders(null)
+      }else{
+      setOrders(res.data);}
     },
   
   });

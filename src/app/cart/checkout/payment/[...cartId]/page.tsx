@@ -72,7 +72,7 @@ const Page = (props: Props) => {
           cart.totalAmount +
           (Shipping.choice === "delivery"
             ? parseInt(
-                cart?.shippingPrice! || DefaultShippingData?.data?.price || "0"
+                cart?.shippingPrice! || "0"
               )
             : 0),
         currency: "INR",

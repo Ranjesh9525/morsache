@@ -31,7 +31,11 @@ const ReviewCard = ({ orderNo }: Props) => {
     mutationFn: FetchOrderByOrderNo,
     onSuccess(response) {
       //  console.log(response)
-      setOrder(response.data);
+      if(response.success == false ){
+setOrder(null)
+      }else{
+     setOrder(response.data);
+    }
     },
    
   });

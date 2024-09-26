@@ -559,7 +559,8 @@ export const FetchOrderByOrderNo = async (orderNo: string) => {
       throw new AppError("Order not found", 404);
     }
     const customer = await UserModel.findOne({ _id: order?.customer });
-    if (!user || (order.customer !== user?._id && user?.role !== "admin")) {
+    // console.log(order,user)
+    if (!user || (order.customer.toString() !== user?._id.toString() && user?.role !== "admin")) {
       throw new AppError("Unauthorized access");
     }
     const returnData: OrderReviewData | any = { products: [] };
