@@ -36,6 +36,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
 import { AdminAddTeam, AdminGetAllTeam } from "@/serverlessActions/_adminActions";
+import { Trash2Icon } from "lucide-react";
 
 
 type Props = {};
@@ -71,6 +72,30 @@ export const columns: ColumnDef<Users>[] = [
   {
     accessorKey: "role",
     header: "Role",
+  },
+  {
+    id: "actions",
+    cell: ({ row }: any) => {
+      const rowData = row.original;
+
+      return (
+        <Trash2Icon
+          color="red"
+          onClick={async () => {
+            if (confirm("Are you sure you want to remove this admin?")) {
+              // const res = await AdminDeleteOffer(rowData.id);
+
+              // if (res) {
+              //   toast({
+              //     variant: "success",
+              //     description: "Offer deleted successfully",
+              //   });
+              // }
+            }
+          }}
+        />
+      );
+    },
   },
 ];
 const Page = (props: Props) => {
@@ -223,7 +248,7 @@ useEffect(()=>{
         </DialogContent>
       </Dialog>
       <div className="container mx-auto min-h-[70vh] py-10">
-      { teamIsPending ? <p className="text-center"> <ClipLoader size={50}/> </p> : teamsData && teamsData?.length>0 ? <DataTable route={"teams"} columns={columns} data={teamsData} /> : <p className="text-center text-gray-500 mt-16" >No data to show, either fetch error or theres no Team data, check logs for details</p>}
+      { teamIsPending ? <p className="text-center"> <ClipLoader size={50}/> </p> : teamsData && teamsData?.length>0 ? <DataTable  columns={columns} data={teamsData} /> : <p className="text-center text-gray-500 mt-16" >No data to show, either fetch error or theres no Team data, check logs for details</p>}
       </div>
     </>
   );

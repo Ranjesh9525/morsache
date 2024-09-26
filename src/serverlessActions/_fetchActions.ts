@@ -299,7 +299,7 @@ export const FetchCategoriesById = async ({
     if (type === "category") {
       const category = await CategoryModel.findById(id);
       if (!category) {
-        return Response("category not found", 404, false, null);
+        throw new AppError("category not found", 404)
       }
       const products = await ProductsModel.find({
         category: { $elemMatch: { $eq: category.name } },

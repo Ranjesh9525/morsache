@@ -132,6 +132,7 @@ const Page = (props: Props) => {
   useEffect(() => {
     if (isSuccess) {
       if (data?.success == false && data?.data?.error) {
+        console.log(data)
         toast({
           variant: "destructive",
           title: "Couldn't place order",
@@ -141,7 +142,7 @@ const Page = (props: Props) => {
       setIsLoading(false);
       toast({
         variant: "default",
-        title: "order placed",
+        title: "Order placed",
         description: "Thanks for shopping with us!",
       });
       router.push(`/review/${data?.data}`);

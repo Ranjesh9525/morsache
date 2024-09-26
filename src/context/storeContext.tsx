@@ -64,14 +64,16 @@ const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
                 type: "category",
                 id: categoryId,
               });
-              return response?.data;
+              if(response.success != false){
+                return response?.data;}
+           
             })
           );
-
+if(Categories.length > 0){
           allData.push({
             name: item.name,
             categories: Categories,
-          });
+          })}
         }
 
         if ("section" in item && item.categoriesId) {
@@ -81,15 +83,16 @@ const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
                 type: "section",
                 id: categoryId,
               });
-
-              return response?.data;
+              if(response.success != false){
+                return response?.data;}
+           
             })
           );
-
+if(sectionCategories.length > 0){
           allData.push({
             section: item.section,
             items: sectionCategories.filter(Boolean), // Filter out undefined values
-          });
+          })}
         }
       })
     );

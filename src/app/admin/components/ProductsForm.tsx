@@ -44,6 +44,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/@types/products";
 import ConfirmationDialog from "@/components/general/ConfirmationDialog";
 import ProductPreview from "./ProductPreview";
+import { FetchCategoriesNamesOnly } from "@/serverlessActions/_fetchActions";
 type Props = {
   data: Product;
 };
@@ -118,6 +119,15 @@ const ProductsForm = ({ data }: Props) => {
       return [...fieldValue, itemToUpdate];
     }
   };
+  const {
+    data: categoryResponse,
+    isPending: categoryIsPending,
+    error: categoryNameError,
+  } = useQuery({
+    queryKey: ["category"],
+    queryFn: () => FetchCategoriesNamesOnly(),
+  });
+
   function onSubmit(values: z.infer<typeof productSchema>) {
     //save as draft to local storage
     localStorage.setItem("product-draft", JSON.stringify(values));
@@ -362,24 +372,37 @@ const ProductsForm = ({ data }: Props) => {
                     />
                   </FormControl>
                   <div className="flex gap-2">
-                    {categories.map((item, index) => (
-                      <Button
-                        type="button"
-                        variant={
-                          field.value.includes(item) ? "default" : "outline"
-                        }
-                        onClick={() => {
-                          const updatedValue = updateSelectedOptionArray(
-                            field.value,
-                            item
-                          );
-                          field.onChange(updatedValue);
-                        }}
-                        key={index}
-                      >
-                        {item}
-                      </Button>
-                    ))}
+                    {categoryIsPending ? (
+                      <ClipLoader size={20} />
+                    ) : categoryResponse.data ? (
+                      categoryResponse?.data.map(
+                        (
+                          item: { _id: string; name: string },
+                          index: number
+                        ) => (
+                          <Button
+                            type="button"
+                            variant={
+                              field.value.includes(item.name)
+                                ? "default"
+                                : "outline"
+                            }
+                            onClick={() => {
+                              const updatedValue = updateSelectedOptionArray(
+                                field.value,
+                                item.name
+                              );
+                              field.onChange(updatedValue);
+                            }}
+                            key={index}
+                          >
+                            {item.name}
+                          </Button>
+                        )
+                      )
+                    ) : (
+                      <p>Couldnt fetch categories</p>
+                    )}
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -711,7 +734,7 @@ const ProductsForm = ({ data }: Props) => {
                                     offer.offerId !== item._id
                                 );
                               } else {
-                                return [...field.value, {offerId:item._id}];
+                                return [...field.value, { offerId: item._id }];
                               }
                             };
                             form.setValue("offers", updatedValue());

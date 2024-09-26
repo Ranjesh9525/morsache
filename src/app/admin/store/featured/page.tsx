@@ -95,20 +95,21 @@ const Page = (props: Props) => {
     mutationFn: AdminUpdateStoreData,
     onSuccess: (res) => {
       console.log(res);
-      if(res?.success == false && res?.data?.error){
+      if (res?.success == false && res?.data?.error) {
         toast({
           variant: "destructive",
-          title: "Couldnt update account detail",
+          title: "Couldnt update store data",
           description: <p>{res?.data?.error?.message}</p>,
-        }); }else{ 
-      setOpenDialog(false);
-      toast({
-        variant: "success",
-        title: "Store data successfully updated",
-        description: "Store data was updated successfully",
-      });}
+        });
+      } else {
+        setOpenDialog(false);
+        toast({
+          variant: "success",
+          title: "Store data successfully updated",
+          description: "Store data was updated successfully",
+        });
+      }
     },
-   
   });
 
   async function fetchCategories() {
@@ -121,13 +122,15 @@ const Page = (props: Props) => {
         if ("name" in item) {
           const Categories = await Promise.all(
             item.categories!.map(async (categoryId) => {
-              console.log(categoryId);
+              // console.log(categoryId);
               const response = await FetchCategoriesById({
                 type: "category",
                 id: categoryId,
               });
-              console.log(response);
-              return response?.data;
+              // console.log(response);
+              if (response.success != false) {
+                return response?.data;
+              }
             })
           );
 
@@ -137,7 +140,7 @@ const Page = (props: Props) => {
           });
         }
 
-        if ("section" in item ) {
+        if ("section" in item) {
           const sectionCategories = await Promise.all(
             item.categoriesId!.map(async (categoryId) => {
               const response = await FetchCategoriesById({
@@ -145,7 +148,9 @@ const Page = (props: Props) => {
                 id: categoryId,
               });
 
-              return response?.data;
+              if (response.success != false) {
+                return response?.data;
+              }
             })
           );
 
@@ -157,10 +162,10 @@ const Page = (props: Props) => {
       })
     );
     setIsLoading(false);
-    console.log("allData", allData);
+    // console.log("allData", allData);
     setFeaturedCategoriesData(allData);
   }
- 
+
   // useEffect(() => {
   //   // fetchCategories();
   //   const req = { featuredCategories: defaultt };
@@ -414,7 +419,7 @@ const Page = (props: Props) => {
       setFeaturedCategories(newFeaturedCategory);
     }
 
-    console.log("new featured category", newFeaturedCategory);
+    // console.log("new featured category", newFeaturedCategory);
     const req = { featuredCategories: newFeaturedCategory };
     server_updateStoreData(req);
   };
@@ -431,14 +436,22 @@ const Page = (props: Props) => {
     server_updateStoreData(req);
   }
 
-  function handleAddNewCategory() {
+  function handleAddNewCategoriesWithProducts() {
     setOpenDialog(true);
     setSelectedCategory({
       name: "",
+      categories: [""],
+      categoriesId: [""],
+      type: "categoriesWithProducts",
+    });
+  }
+  function handleAddMultipleCategories() {
+    setOpenDialog(true);
+    setSelectedCategory({
       section: "",
       categories: [""],
       categoriesId: [""],
-      type: "",
+      type: "multipleCategories",
     });
   }
   return (
@@ -463,16 +476,16 @@ const Page = (props: Props) => {
                 Category group name
               </h1>
               <h2 className="text-[12px] my-1">
-                {selectedCategory?.name
+                {"name" in selectedCategory
                   ? "This wont be visible to the users"
                   : "This would be boldly visible"}
               </h2>
               <Input
-                value={selectedCategory?.name || selectedCategory?.section}
+                value={"name" in selectedCategory || selectedCategory?.section}
                 onChange={(e) =>
                   setSelectedCategory((prev: any) => ({
                     ...prev,
-                    [selectedCategory?.name ? "name" : "section"]:
+                    ["name" in selectedCategory ? "name" : "section"]:
                       e?.currentTarget?.value,
                   }))
                 }
@@ -486,7 +499,7 @@ const Page = (props: Props) => {
                 Copy the category Id from Categories tab and paste it here
               </h2>
               {selectedCategory?.[
-                selectedCategory?.name ? "categories" : "categoriesId"
+                "name" in selectedCategory ? "categories" : "categoriesId"
               ]?.map((item: any, index: number) => {
                 return (
                   <div className="w-full flex flex-col" key={index}>
@@ -499,17 +512,17 @@ const Page = (props: Props) => {
                         onChange={(e) => {
                           setSelectedCategory((prev: any) => ({
                             ...prev,
-                            [selectedCategory?.name
+                            ["name" in selectedCategory
                               ? "categories"
                               : "categoriesId"]: [
                               ...prev?.[
-                                selectedCategory?.name
+                                "name" in selectedCategory
                                   ? "categories"
                                   : "categoriesId"
                               ].slice(0, index),
                               e?.currentTarget?.value,
                               ...prev?.[
-                                selectedCategory?.name
+                                "name" in selectedCategory
                                   ? "categories"
                                   : "categoriesId"
                               ].slice(index + 1),
@@ -528,9 +541,13 @@ const Page = (props: Props) => {
                   setSelectedCategory((prev: any) => ({
                     ...prev,
 
-                    [selectedCategory?.name ? "categories" : "categoriesId"]: [
+                    ["name" in selectedCategory
+                      ? "categories"
+                      : "categoriesId"]: [
                       ...prev?.[
-                        selectedCategory?.name ? "categories" : "categoriesId"
+                        "name" in selectedCategory
+                          ? "categories"
+                          : "categoriesId"
                       ],
                       "",
                     ],
@@ -544,17 +561,17 @@ const Page = (props: Props) => {
               className="w-full"
               disabled={
                 selectedCategory?.[
-                  selectedCategory?.name ? "categories" : "categoriesId"
+                  "name" in selectedCategory ? "categories" : "categoriesId"
                 ]?.includes("") ||
                 updateIsPending ||
                 isPending ||
                 isLoading ||
                 selectedCategory?.[
-                  selectedCategory?.name ? "name" : "section"
+                  "name" in selectedCategory ? "name" : "section"
                 ] === "" ||
                 selectedCategory?.type === "" ||
                 selectedCategory?.[
-                  selectedCategory?.name ? "categories" : "categoriesId"
+                  "name" in selectedCategory ? "categories" : "categoriesId"
                 ]?.length === 0
               }
               onClick={() => onSubmit(selectedCategory)}
@@ -602,10 +619,9 @@ const Page = (props: Props) => {
                       <Trash className="" color="#fff" size={18} />
                       Delete
                     </section>
-                    <DisplayBySections
-                     
-                      defaultTabs={item.categories!}
-                    />
+                    {item.categories.length > 0 && (
+                      <DisplayBySections defaultTabs={item.categories!} />
+                    )}
                   </section>
                 );
               }
@@ -613,8 +629,9 @@ const Page = (props: Props) => {
                 const EditableData = featuredCategories!.find(
                   (i) => "section" in i && i.section === item.section
                 );
+                //  console.log(item);
                 return (
-                  <section  key={index} className="relative">
+                  <section key={index} className="relative">
                     <section
                       className="absolute top-10 hover:scale-[105%] transition-all text-white p-2 px-4 gap-1 rounded-md bg-red-500 left-10 items-center cursor-pointer inline-flex tracking-tight "
                       onClick={() => {
@@ -634,11 +651,13 @@ const Page = (props: Props) => {
                       <PencilIcon className="" size={18} />
                       Edit
                     </section>
-                    <DisplayProductsByCategory  category={item} />
+                    {item.items.length > 0 && (
+                      <DisplayProductsByCategory category={item} />
+                    )}
                   </section>
                 );
               }
-              return <div  key={index}></div>;
+              return <div key={index}></div>;
             })
           ) : (
             <p className="text-center w-full">
@@ -646,11 +665,16 @@ const Page = (props: Props) => {
               something quickly
             </p>
           )}
-          <section className="w-full inline-flex items-center">
-
-          <Button className=" w-[50%] " onClick={handleAddNewCategory}>
-            <Plus className="mr-2" size={24} /> Add New Category{" "}
-          </Button>
+          <section className="w-full inline-flex items-center gap-2 justify-center max-sm:flex-col p-9 max-sm:p-5">
+            <Button
+              className=" w-[50%] "
+              onClick={handleAddNewCategoriesWithProducts}
+            >
+              <Plus className="mr-2" size={24} /> Add New Category with products{" "}
+            </Button>
+            <Button className=" w-[50%] " onClick={handleAddMultipleCategories}>
+              <Plus className="mr-2" size={24} /> Add New Multiple Categories{" "}
+            </Button>
           </section>
         </div>
       )}
