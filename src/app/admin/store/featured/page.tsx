@@ -487,7 +487,7 @@ const Page = (props: Props) => {
                   : "This would be boldly visible"}
               </h2>
               <Input
-                value={"name" in selectedCategory || selectedCategory?.section}
+                value={selectedCategory?.name || selectedCategory?.section}
                 onChange={(e) =>
                   setSelectedCategory((prev: any) => ({
                     ...prev,
