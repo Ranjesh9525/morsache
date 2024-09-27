@@ -432,7 +432,7 @@ export const AdminAddTeam = async ({ email }: { email: string }) => {
     // }
 
     await UserModel.findOneAndUpdate(
-      { email: email },
+      { email: email.toLowerCase()},
       {
         $set: {
           role: "admin",
@@ -455,9 +455,9 @@ export const AdminRemoveTeam = async (id:any) => {
     // if (!user) {
     //   throw new AppError("User not found", 404);
     // }
-
-    await UserModel.findOneAndUpdate(
-      { _id: id },
+console.log(id)
+    await UserModel.findByIdAndUpdate(
+    id,
       {
         $set: {
           role: "customer",
