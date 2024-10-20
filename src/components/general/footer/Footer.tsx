@@ -20,7 +20,7 @@ const Footer = (props: Props) => {
         <section className="grid lg:grid-cols-4 md:grid-cols-2 gap-6 py-4">
           <span>
             <h1 className="text-[14px] uppercase  tracking-wider mb-4">
-              Offline Store
+            
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
