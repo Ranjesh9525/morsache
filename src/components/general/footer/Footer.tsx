@@ -24,7 +24,7 @@ const Footer = (props: Props) => {
             </h1>
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">
-                <Link href="#">Visit Our Store</Link>
+                <Link href="#">Your Feedback</Link>
               </li>
             </ul>
           </span>
@@ -70,9 +70,9 @@ const Footer = (props: Props) => {
             <ul className="text-[12px] tracking-wide">
               <li className="mb-2">Timings: 10 AM - 7 PM (Mon - Sat)</li>
               <li className="mb-2">
-                Whatsapp :<Link href="#"> +91 7491922495</Link>
+                Whatsapp :<Link href="#"> </Link>
               </li>
-              <li className="mb-2">Instagram: @morsache</li>
+              <li className="mb-2">Instagram</li>
             </ul>
           </span>
         </section>
@@ -106,7 +106,7 @@ const Footer = (props: Props) => {
           </div>
         </section>
         <section className="w-full flex items-center justify-center flex-col my-6 text-[12px]">
-          <Link href={`https://github.com/a-ww2-er`} target={"_blank"} >© {new Date().getFullYear()} MORSACHE</Link>
+          <Link href={``} target={"_blank"} >© {new Date().getFullYear()} MORSACHE</Link>
          
         </section>
       </div>
